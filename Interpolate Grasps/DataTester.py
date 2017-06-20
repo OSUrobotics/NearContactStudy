@@ -7,29 +7,13 @@ import sys, os
 from openravepy import *
 import pdb
 from ParseGraspData import ParseGraspData
-from Colors import ColorsDict, bcolors
 from Visualizers import Vis, GenVis, ObjectVis, HandVis
 import numpy as np
-import platform
 import copy
 import time
 import matplotlib.pyplot as plt
 import subprocess
 import time
-
-if platform.node() == 'Sonny': #lab computer
-	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
-	import retract_finger
-elif platform.node() == 'Desktop': #personal desktop Linux
-	base_path = '/home/ammar/Documents/Grasping Lab/Interpolate Grasps/'
-	# import transforms3d #get all the geometric transforms
-	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
-	sys.path.append(retract_fingers_path)
-	import retract_finger
-
-else: # personal desktop Windows
-	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
-
 
 
 

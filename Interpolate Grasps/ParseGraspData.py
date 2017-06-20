@@ -15,7 +15,7 @@ class ParseGraspData(object):
 		if platform.node() == 'Sonny':
 			self.fn_root = '/home/sonny/Desktop/'
 		if platform.node() == 'Desktop':
-			self.fn_root = '/home/ammar/Documents/Grasping Lab/Interpolate Grasps/'
+			self.fn_root = os.path.dirname(os.path.realpath(__file__)) + '/'
 		else:
 			self.fn_root = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
 		self.fn_grasp_file = self.fn_root + 'all_grasp_file.csv'

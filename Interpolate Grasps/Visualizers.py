@@ -1,3 +1,23 @@
+from openravepy import *
+from Colors import ColorsDict, bcolors
+import numpy as np
+import sys, os, pdb, copy, subprocess
+
+
+import platform
+if platform.node() == 'Sonny': #lab computer
+	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
+	import retract_finger
+elif platform.node() == 'Desktop': #personal desktop Linux
+	base_path = os.path.dirname(os.path.realpath(__file__))
+	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
+	sys.path.append(retract_fingers_path)
+	import retract_finger
+
+else: # personal desktop Windows
+	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
+
+
 class Vis(object): #General Class for visualization
 	def __init__(self):
 		self.env = Environment()
@@ -153,7 +173,7 @@ class ObjectVis(GenVis):
 	def __init__(self, V):
 		super(ObjectVis, self).__init__(V)
 		self.loadObjectList()
-		self.stl_path = base_path + "models/stl_files/"
+		self.stl_path = base_path + "/models/stl_files/"
 		
 	def loadObjectList(self):
 		import obj_dict
