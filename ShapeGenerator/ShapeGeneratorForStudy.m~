@@ -1,0 +1,19 @@
+% % % Generate Shapes for Study
+
+base_dir = 'Shapes';
+shapes = {'cube', 'ellipse'};
+resolution = [10, 100]; %certain resolutions do not produce an image
+% dimensions in cm
+width = [
+height = 1:5:10;
+extent = 1:5:10;
+for is = 1:size(shapes,2)
+    for ih = 1:size(height,2)
+        for iw = 1:size(width,2)
+            for ie = 1:size(extent,2)
+                filename = sprintf('%s/%s_h%d_w%d_e%d', base_dir, shapes{is}, height(ih), width(iw), extent(ie));
+                ShapeSTLGenerator(shapes(is), resolution(is), filename, height(ih)/100, width(iw)/100, extent(ie)/100)
+            end
+        end
+    end
+end

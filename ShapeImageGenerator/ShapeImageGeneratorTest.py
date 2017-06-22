@@ -38,14 +38,20 @@ class ShapeImageGenerator(object):
 		h = int(fn_parts[1].strip('h'))
 		w = int(fn_parts[2].strip('w'))
 		e = int(fn_parts[3].strip('e'))
-		return shape, h, w, e
+		a = None
+		if len(fn_parts) == 5: # extra feature when there is alpha
+			a = int(fn_parts[4].strip('a'))
+		return shape, h, w, e, a
+		
 
-	def loadObject(self, objtype, h, w, e):
+	def loadObject(self, objtype, h, w, e, a):
 		self.Obj.features['type'] = objtype
 		self.Obj.features['h'] = h
 		self.Obj.features['w'] = w
 		self.Obj.features['e'] = e
-		result = self.Obj.loadObject(objtype, h, w, e)
+		self.Obj.features['a'] = a
+
+		result = self.Obj.loadObject(objtype, h, w, e, a)
 		return result
 		# centroid appears to be at the center of the object
 		# will have to see where it goes on non-symettric features like cone or handle
@@ -93,11 +99,11 @@ class ShapeImageGenerator(object):
 			self.createImagesFromParameters(params)
 
 	def createImagesFromParameters(self, params):
-		shape, h, w, e = self.valuesFromFileName(params['Model'])
-		objLoadSuccess = self.loadObject(shape, h, w, e)
-		self.Obj.changeColor('greenI')
-		self.Hand.changeColor('blueI')
+		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
+		objLoadSuccess = self.loadObject(shape, h, w, e, a)
 		if objLoadSuccess:
+			self.Obj.changeColor('greenI')
+			self.Hand.changeColor('blueI')
 			cam_params = params['Camera Transform']
 			self.vis.setCamera(cam_params[0], cam_params[1], cam_params[2])
 			self.Hand.setJointAngles(params['Joint Angles'])
@@ -254,7 +260,8 @@ class Tester(object):
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
 		pdb.set_trace()
-		self.SIG.createImagesFromParameters(self.SIG.params_list[80])
+		self.SIG.createImagesFromParameters(self.SIG.params_list[323])
+		pdb.set_trace()
 
 
 if __name__ == '__main__':

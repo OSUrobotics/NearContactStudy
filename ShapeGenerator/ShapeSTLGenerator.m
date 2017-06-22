@@ -54,9 +54,9 @@ function Cube(height, width, extent, resolution, filename)
 %saves STL to file
   
     V_val = 0.9;
-    X_span = linspace(0,width,resolution);
-    Y_span = linspace(0,height,resolution);
-    Z_span = linspace(0,extent,resolution);
+    X_span = linspace(-width/2,width/2,resolution);
+    Y_span = linspace(-height/2,height/2,resolution);
+    Z_span = linspace(-extent/2,extent/2,resolution);
     V = V_val * ones(length(X_span), length(X_span), length(Y_span))/10;
     V(1,:,:) = V_val; V(end,:,:) = V_val;
     V(:,1,:) = V_val; V(:,end,:) = V_val;
@@ -82,16 +82,15 @@ function Cylinder(height, width, extent, resolution, filename)
     [X, Z, Y] = cylinder(1, resolution);
     %Scale
     X = X * (width/2);
-    Y = Y * (height);
+    Y = (Y - 0.5) * (height); % move centroid to origin
     Z = Z * (extent/2);
     %add bottom and top
     [x_end, y_end, z_end] = ellipsoid(0,0,0,width/2, 0, extent/2, resolution);
-    y_top = y_end + height;
-    y_bot = y_end;
+    y_top = y_end + height/2;
+    y_bot = y_end - height/2;
     x_surf = [x_end;X;x_end];
     z_surf = [z_end;Z;z_end];
     y_surf = [y_bot;Y;y_top];
-    surf(x_surf,z_surf,y_surf); xlabel('x');ylabel('z');
     fvc = surf2patch(x_surf,y_surf,z_surf,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
 
@@ -99,9 +98,11 @@ end
 
 function Cone(height, width, extent, alpha, resolution, filename)
     % unit cone with specified alpha
-    r_bottom = 0.5;
-    r_top = 0.5 - sind(alpha);
-    [X, Y, Z] = cylinder([r_bottom, r_top], resolution);
+    % top and bottom are switched (based on matlab command) so orients
+    % upward in openrave.  Could fix it there, but seemed easier here
+    r_top = 0.5;
+    r_bottom = 0.5 - sind(alpha);
+    [X, Y, Z] = cylinder([r_top, r_bottom], resolution);
     %add top and bottom;
     [x_bot, y_bot, z_bot] = ellipsoid(0,0,0,r_bottom, r_bottom, 0, resolution);
     [x_top, y_top, z_top] = ellipsoid(0,0,height,r_top, r_top, 0, resolution);
@@ -110,10 +111,10 @@ function Cone(height, width, extent, alpha, resolution, filename)
     Y_surf = [y_bot;Y;y_top];
     %scale
     X_scale = X_surf * width;
-    Y_scale = Z_surf * height;
+    Y_scale = (Z_surf - 0.5) * height;
     Z_scale = Y_surf * extent;
     %save file
-    fvc = surf2patch(X_scale,Y_scale,Z_scale,'triangles');
+    fvc = surf2patch(X_scale,-1 * Y_scale,Z_scale,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
    
 end

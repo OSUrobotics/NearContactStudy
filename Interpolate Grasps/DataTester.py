@@ -1,21 +1,14 @@
-import sys, os
+import sys, os, copy, subprocess, time, pdb
 # import rospkg
 # sys.path.insert(0, '~/Desktop/') # path to ParseGraspData
 # path = rospkg.RosPack().get_path('valid_grasp_generator')
 # sys.path.insert(0, path)
 # print(sys.path)
 from openravepy import *
-import pdb
 from ParseGraspData import ParseGraspData
 from Visualizers import Vis, GenVis, ObjectVis, HandVis
 import numpy as np
-import copy
-import time
-import matplotlib.pyplot as plt
-import subprocess
-import time
-
-
+import matplotlib.pyplot as plt 
 
 class DataTester():
 	# def __init__(self):

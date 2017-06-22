@@ -35,6 +35,7 @@ class Vis(object): #General Class for visualization
 
 	def close(self): # Close Env
 		self.env.Destroy()
+		self.viewer.quitmainloop()
 
 	def reset(self): # Reset Env
 		self.env.Reset()
@@ -61,7 +62,23 @@ class Vis(object): #General Class for visualization
 		except: #this is more robust, but requires that particular window to be selected
 			subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
 
+	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
+		#Thsi can be re-written to be more efficient (unneeded operations)
+		cam_T_zero = np.eye(4)
+		cam_p_zero = poseFromMatrix(np.eye(4))
+		cam_p_dist = cam_p_zero;
+		cam_p_dist[4:] = np.array([0, 0, -1*dist]).astype('float')/100 #Distance should be in cms. Negative so that it faces center
+		cam_T_dist = matrixFromPose(cam_p_dist)
+		rot_AA_el = [el, 0, 0]
+		rot_mat_el = matrixFromAxisAngle(rot_AA_el)
+		rot_el = np.dot(rot_mat_el, cam_T_dist)
+		rot_AA_az = [0, az, 0]
+		rot_mat_az = matrixFromAxisAngle(rot_AA_az)
+		rot_az = np.dot(rot_mat_az, rot_el)
+		rot_new = rot_az
+		self.viewer.SetCamera(rot_new)
 
+		return rot_new
 
 class GenVis(object): # General class for objects in visualization
 	def __init__(self, V):
@@ -128,15 +145,19 @@ class GenVis(object): # General class for objects in visualization
 
 	def clearAxes(self): self.axes = None # clear all axes created relative to this object
 
-	def changeColor(self, color = None): # change color of object.  Sets all sub features to same color
+	def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
 		if color is None: # random color
 			color = np.random.rand(3)
+		if alpha is None: # keep transparency the same
+			alpha = self.obj.GetLinks()[0].GetGeometries()[0].GetTransparency()
+		elif alpha is not None and color is None: #only want to change transparency but keep color the same
+			color = self.obj.GetLinks()[0].GetGeometries()[0].GetDiffuseColor()
 		if type(color) is str: #loads from dictionary
 			color = self.colors[color]
 		for link in self.obj.GetLinks():
 			for geos in link.GetGeometries():
 				geos.SetDiffuseColor(color)
-				geos.SetTransparency(0)
+				geos.SetTransparency(alpha)
 
 	def localRotation(self, R): # apply a local rotation. translate to origin, rotate, translate back
 		T = self.obj.GetTransform()
@@ -211,6 +232,30 @@ class ObjectVis(GenVis):
 		pose_new = np.hstack((pose[:4], centroid_transform.reshape(3,)))
 		return pose_new
 
+class ObjectGenericVis(ObjectVis):
+	def __init__(self, V):
+		super(ObjectVis, self).__init__(V)
+		curdir = os.path.dirname(os.path.realpath(__file__))
+		self.stl_path = curdir +'/../ShapeGenerator/Shapes/'
+		self.features = dict()
+
+	def loadObject(self, objtype, h, w, e, a = None):
+		self.objCheck()
+		if a is not None:
+			self.objFN = self.stl_path + '%s_h%s_w%s_e%s_a%s.stl' %(objtype, int(h), int(w), int(e), int(a))
+		else:
+			self.objFN = self.stl_path + '%s_h%s_w%s_e%s.stl' %(objtype, int(h), int(w), int(e))
+		if os.path.isfile(self.objFN):
+			self.obj = self.env.ReadKinBodyXMLFile(self.objFN)
+			self.env.Add(self.obj,True)
+			return True
+		else:
+			print("STL File Does not Exist! Parameters may be wrong.")
+			return False
+
+
+
+
 
 class HandVis(GenVis):
 	def __init__(self, V):
@@ -244,13 +289,12 @@ class HandVis(GenVis):
 		palm_approach_global = poseTransformPoints(poseFromMatrix(self.obj.GetTransform()), [palm_approach_rel])[0]
 		palm_approach_global = np.array(palm_approach_global)
 		palm_approach_norm = palm_approach_global / np.linalg.norm(palm_approach_global)
-		palm_approach_scale = palm_approach_norm * 0.075
-		return palm_approach_scale
+		palm_approach_scaled = palm_approach_norm * 0.075
+		return palm_approach_scaled
 
 	def getPalmTransform(self):
 		T = self.obj.getTransform()
 		palm_approach_rel = [0,0,1]
-		pdb.set_trace()
 		palm_approach_global = poseTransformPoints(poseFromMatrix(self.obj.GetTransform()), [palm_approach_rel])[0]
 
 

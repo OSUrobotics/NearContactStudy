@@ -130,18 +130,18 @@ filename = 'cylinder.stl';
 [X, Z, Y] = cylinder(1, resolution);
 %Scale
 X = X * (width/2);
-Y = Y * (height);
+Y = (Y-0.5) * (height);
 Z = Z * (extent/2);
 %add bottom and top
 [x_bottom, y_end, z_end] = ellipsoid(0,0,0,width/2, 0, extent/2, resolution);
-y_top = y_end + height;
-y_bot = y_end;
+y_top = y_end + height/2;
+y_bot = y_end - height/2;
 X_surf = [x_bottom;X;x_bottom];
 Z_surf = [z_end;Z;z_end];
 Y_surf = [y_bot;Y;y_top];
 surf(X_surf,Z_surf,Y_surf); xlabel('x');ylabel('z');
-fvc = surf2patch(X_surf,Y_surf,Z_surf,'triangles');
-stlwrite(filename, fvc, 'mode', 'ascii')
+% fvc = surf2patch(X_surf,Y_surf,Z_surf,'triangles');
+% stlwrite(filename, fvc, 'mode', 'ascii')
 % surf([X,x_top],[Y,y_top],[Z,z_top])
 % h = get(gca,'DataAspectRatio'); 
 % if h(3)==1
@@ -169,7 +169,7 @@ Z_surf = [z_bot;Z;z_top];
 Y_surf = [y_bot;Y;y_top];
 %scale
 X_scale = X_surf * width;
-Y_scale = Z_surf * height;
+Y_scale = (Z_surf-0.5) * height;
 Z_scale = Y_surf * extent;
 
 % surf(X,Y,Z)
