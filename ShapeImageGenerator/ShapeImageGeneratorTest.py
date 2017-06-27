@@ -22,7 +22,7 @@ class ShapeImageGenerator(object):
 		self.Obj = ObjectGenericVis(self.vis)
 		self.loadSTLFileList()
 
-	def loadSTLFileList(self): # get all files in directory
+	def loadSTLFileList(self): # get all STL files in directory
 		self.STLFileList = list()
 		directory = curdir + '/../ShapeGenerator/Shapes/'
 		for root, dirs, filenames in os.walk(directory):
@@ -31,7 +31,7 @@ class ShapeImageGenerator(object):
 					if os.path.splitext(fname)[1] == '.stl': #only want text files
 						self.STLFileList.append(root + '/' + fname)
 
-	def valuesFromFileName(self, fn_abs):
+	def valuesFromFileName(self, fn_abs): # gets features of object from file name
 		fn = fn_abs.split('/')[-1]
 		fn_parts = fn.strip('.stl').split('_')
 		shape = fn_parts[0]
@@ -44,7 +44,9 @@ class ShapeImageGenerator(object):
 		return shape, h, w, e, a
 		
 
-	def loadObject(self, objtype, h, w, e, a):
+	def loadObject(self, objtype, h, w, e, a): # loads stl object into scene
+		# only centroid that hasn't been dealt with is the handle.
+		# all centroids shoudl be in the center of the object
 		self.Obj.features['type'] = objtype
 		self.Obj.features['h'] = h
 		self.Obj.features['w'] = w
@@ -53,14 +55,11 @@ class ShapeImageGenerator(object):
 
 		result = self.Obj.loadObject(objtype, h, w, e, a)
 		return result
-		# centroid appears to be at the center of the object
-		# will have to see where it goes on non-symettric features like cone or handle
-		# try to generate files so that centroid is in a sensible spot
 
-	def setObjTransparent(self, alpha = 0.5):
+	def setObjTransparent(self, alpha = 0.5): # change transparency of object
 		self.Obj.changeColor(alpha = alpha) # this can be changed to changeColor
 
-	def readParameterFile(self, fn):
+	def readParameterFile(self, fn): # reads in parameters for creating images from a CSV file
 		params_list = list()
 		with open(fn, 'rb') as file:
 			csvreader = csv.reader(file, delimiter = ',')
@@ -94,11 +93,11 @@ class ShapeImageGenerator(object):
 		self.params_list = params_list
 		return self.params_list
 
-	def createImagesFromParametersList(self):
+	def createImagesFromParametersList(self): # creates images from a list of parameters
 		for params in self.params_list:
 			self.createImagesFromParameters(params)
 
-	def createImagesFromParameters(self, params):
+	def createImagesFromParameters(self, params): # creates image from a single set of parameters
 		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
 		objLoadSuccess = self.loadObject(shape, h, w, e, a)
 		if objLoadSuccess:
@@ -117,7 +116,7 @@ class ShapeImageGenerator(object):
 
 
 
-class Tester(object):
+class Tester(object): # this is just meant to test different parts of the class
 	def __init__(self):
 		## TODO: make gui sliders for moving hand into position to make creating input sheet easier
 		self.SIG = ShapeImageGenerator()

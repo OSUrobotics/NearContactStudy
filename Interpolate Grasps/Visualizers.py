@@ -18,6 +18,23 @@ else: # personal desktop Windows
 	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
 
 
+'''
+Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
+The objects are meant to make it easier to work in OpenRave by dealing with quirks
+
+General overview:
+initialize a Vis class object
+Then initialize other objects (hands, boxes, cones, etc.) with the Vis class
+
+Significantly more commenting is necessary to make this usable
+
+'''
+
+
+
+
+
+
 class Vis(object): #General Class for visualization
 	def __init__(self):
 		self.env = Environment()
@@ -191,31 +208,31 @@ class GenVis(object): # General class for objects in visualization
         
 
 
-class ObjectVis(GenVis):
+class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
 		super(ObjectVis, self).__init__(V)
 		self.loadObjectList()
 		self.stl_path = base_path + "/models/stl_files/"
 		
-	def loadObjectList(self):
+	def loadObjectList(self): # loads a list of objects from a document -- for a previous study
 		import obj_dict
 		self.objectGraspDict = obj_dict.grasp_obj_dict # (name, stl file name, y_rotate??)
 		self.objectCentroidDict = obj_dict.obj_centroid_dict
 
-	def loadObject(self, obj_num):
+	def loadObject(self, obj_num): # loads object that is in the list and moves centroid to origin -- for a previous study
 		self.objCheck()
 		self.obj_num = obj_num
 		self.addObject()
 		self.moveCentroid_to_Origin()
 	
-	def addObject(self):
+	def addObject(self): # adds an object that is in the list -- for previous study
 		# self.objFN = self.stl_path + self.objectGraspDict[self.obj_num][1].replace('STL','dae')
 		self.objFN = self.stl_path + self.objectGraspDict[self.obj_num][1]
 		self.obj = self.env.ReadKinBodyXMLFile(self.objFN, {'scalegeometry':'0.001 0.001 0.001'})
 		self.env.Add(self.obj, True)
 		self.TClass = Transforms(self.obj)
 	
-	def moveCentroid_to_Origin(self):
+	def moveCentroid_to_Origin(self): # gets centroid from list and moves object to that location
 		self.objCentroid = np.array(self.objectCentroidDict[self.obj_num]) / 1000  # some weird scaling factor
 		self.obj.SetVisible(0) #hide object
 		self.vis.drawPoints(([0,0,0])) #draw point at origin
@@ -223,24 +240,24 @@ class ObjectVis(GenVis):
 		self.obj.SetVisible(1) #show object
 		self.adjustByCentroid()
 
-	def adjustByCentroid(self):
+	def adjustByCentroid(self): #moves object locally by centroid
 		pose_new = self.GetCentroidTransform()
 		self.globalTransformation(pose_new)
 
-	def GetCentroidTransform(self):
+	def GetCentroidTransform(self): # create transform to locally move object by centroid
 		pose = poseFromMatrix(self.obj.GetTransform())
 		centroid_transform = poseTransformPoints(pose, -1*self.objCentroid.reshape(1,3)) #effectively a local translation by centroid!
 		pose_new = np.hstack((pose[:4], centroid_transform.reshape(3,)))
 		return pose_new
 
-class ObjectGenericVis(ObjectVis):
+class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near contact study
 	def __init__(self, V):
 		super(ObjectVis, self).__init__(V)
 		curdir = os.path.dirname(os.path.realpath(__file__))
 		self.stl_path = curdir +'/../ShapeGenerator/Shapes/'
 		self.features = dict()
 
-	def loadObject(self, objtype, h, w, e, a = None):
+	def loadObject(self, objtype, h, w, e, a = None): # load object based on features -- for near contact study
 		self.objCheck()
 		if a is not None:
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s_a%s.stl' %(objtype, int(h), int(w), int(e), int(a))
@@ -263,7 +280,7 @@ class HandVis(GenVis):
 		super(HandVis, self).__init__(V)
 		self.stl_path = base_path + "/models/robots/"
 
-	def loadHand(self):
+	def loadHand(self): # load hand from file
 		self.robotFN = self.stl_path + 'bhand.dae'
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
@@ -271,10 +288,10 @@ class HandVis(GenVis):
 		self.obj.SetVisible(1)
 		self.TClass = Transforms(self.obj)
 
-	def setJointAngles(self, JA):
+	def setJointAngles(self, JA): # set hand joint angles
 		self.obj.SetDOFValues(JA)
 
-	def getPalmPoint(self):
+	def getPalmPoint(self): # get the point that is in the center of the palm
 		palm_pose = poseFromMatrix(self.obj.GetTransform())
 		base_pt = numpy.array(palm_pose[4:])
 		palm_pt = base_pt + self.getPalmOffset()
@@ -283,9 +300,9 @@ class HandVis(GenVis):
 
 		return palm_pt
 
+	def getPalmOffset(self): # vector from base of hand to palm in global frame
 		# Finds a vector from the base of the wrist to the middle of he palm by following
-		#	the apporach vector for the depth of the palm (7.5cm)
-	def getPalmOffset(self):
+		# the apporach vector for the depth of the palm (7.5cm)
 		palm_approach_rel = [0,0,1]
 		palm_approach_global = poseTransformPoints(poseFromMatrix(self.obj.GetTransform()), [palm_approach_rel])[0]
 		palm_approach_global = np.array(palm_approach_global)
@@ -293,19 +310,20 @@ class HandVis(GenVis):
 		palm_approach_scaled = palm_approach_norm * 0.075
 		return palm_approach_scaled
 
-	def getPalmTransform(self):
+	def getPalmTransform(self): # I don't know what this is for?
 		T = self.obj.getTransform()
 		palm_approach_rel = [0,0,1]
 		palm_approach_global = poseTransformPoints(poseFromMatrix(self.obj.GetTransform()), [palm_approach_rel])[0]
 
 
-	def orientHandtoObj(self, T_H, T_O, Obj):
+	def orientHandtoObj(self, T_H, T_O, Obj): # based on hand transform and object transform, can orient hand to object -- for previous study
 		HandtoObject = np.dot(np.linalg.inv(T_O), T_H)
 		self.obj.SetTransform(HandtoObject)
 		self.localTranslation(-1 * Obj.objCentroid)
 		return HandtoObject
 
-	def ZSLERP(self, AA1, AA2, alpha, T_zero = None, move = True):
+	def ZSLERP(self, AA1, AA2, alpha, T_zero = None, move = True): #this is actually just a rotation that is meant to fake SLERP.
+		# TODO: make this a real ZSLERP instead of this approximation
 		# from AA1 to AA2
 		AA_interp = AA1 * (1 - alpha) + AA2 * (alpha) #natural to think 10% interp is 10% away from start angle
 		rot = matrixFromAxisAngle(AA_interp)
@@ -317,11 +335,15 @@ class HandVis(GenVis):
 
 		return T_new
 
-	def retractFingers(self, Obj):
+	def retractFingers(self, Obj): # Uses a previous script to move the fingers into contact with object.  
+		# Deals with small errors in recorded data to ensure no weiredness
+		# like fingers going through objects
+		# the script that does this shoudl be examined because it does not seem very effective
 		contact_points, contact_links = retract_finger.retract_fingers(self.env, self.obj, Obj.obj)
 		return contact_points, contact_links
 
-	def addNoiseToGrasp(self, Obj, T_zero = None, Contact_JA = None, TL_n = 0.01, R_n = 0.1, JA_n = 0.1):
+	def addNoiseToGrasp(self, Obj, T_zero = None, Contact_JA = None, TL_n = 0.01, R_n = 0.1, JA_n = 0.1): # adds white noise to position, rotation, and location of grasp
+		# searches for grasp that has all three fingers in contact with object, otherwise grasp can be odd
 		in_contact = [False, False]
 		if Contact_JA is None:
 			Contact_JA = self.obj.GetDOFValues()
@@ -345,11 +367,11 @@ class HandVis(GenVis):
 			# in_contact = [any([True if link in x else False for x in contact_links2]) for link in contact_links1]
 		return T_noise, JA_noise
 
-	def makeEqual(self, HandObj):
+	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
 
-class Transforms(object): #class for holding all transform operations
+class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):
 		self.i = 1
 		self.link = link
