@@ -60,7 +60,6 @@ class DataTester():
 		Hand1.loadHand()
 		Hand2 = HandVis(V)
 		Hand2.loadHand()
-		# pose = [1, 0, 0, 0, 1, 0, 0]
 		pose = np.random.rand(7)
 		pose[:4] = pose[:4] / np.linalg.norm(pose[:4])
 		rot_noTL = rotationMatrixFromQuat(pose[:4])
@@ -329,17 +328,26 @@ class DataTester():
 		# grasp2 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 14, grasptype = 'optimal0', list2check = Data.all_transforms)
 		# obj4_cluster8_sub4_grasp14_extreme1_prime.jpg obj4_cluster8_sub4_grasp9_optimal0_target.jpg -- don't have the data
 
+		case = 4
+
 		#ones that I think look good
+		if case == 1:
+			grasp1 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 11, grasptype = 'optimal0', list2check = Data.all_transforms)
+			grasp2 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 11, grasptype = 'optimal0', list2check = Data.all_transforms)
+			filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 4, 11, 'optimal0', 'optimal0')
+		elif case == 2:
+			grasp1 = Data.findGrasp(objnum = 4, subnum = 5, graspnum = 2, grasptype = 'optimal0', list2check = Data.all_transforms)
+			grasp2 = Data.findGrasp(objnum = 4, subnum = 5, graspnum = 3, grasptype = 'extreme1', list2check = Data.all_transforms)
+			filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 5, '2&3', 'optimal0', 'extreme1')
+		elif case == 3:
+			grasp1 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 14, grasptype = 'extreme1', list2check = Data.all_transforms)
+			grasp2 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 14, grasptype = 'optimal0', list2check = Data.all_transforms)
+			filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 4, 14, 'extreme1', 'optimal0')
+		elif case == 4:
+			grasp1 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 14, grasptype = 'extreme1', list2check = Data.all_transforms)
+			grasp2 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 9, grasptype = 'optimal0', list2check = Data.all_transforms)
+			filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 4, '14&9', 'extreme1', 'optimal0')
 
-		# grasp1 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 11, grasptype = 'optimal0', list2check = Data.all_transforms)
-		# grasp2 = Data.findGrasp(objnum = 4, subnum = 4, graspnum = 11, grasptype = 'optimal0', list2check = Data.all_transforms)
-
-		grasp1 = Data.findGrasp(objnum = 4, subnum = 5, graspnum = 3, grasptype = 'optimal0', list2check = Data.all_transforms)
-		grasp2 = Data.findGrasp(objnum = 4, subnum = 5, graspnum = 3, grasptype = 'extreme0', list2check = Data.all_transforms)
-
-		# filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 4, 11, 'optimal0', 'optimal0')
-		# filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 5, '2&3', 'optimal0', 'extreme1')
-		filename_base = "obj%s_sub%s_graspnum%s_%s_%s" %(4, 5, 3, 'optimal0', 'extreme0')
 		HandT1, ObjT1, Arm_JA1, Hand_JA1 = Data.matricesFromGrasp(grasp1[0])
 		HandT2, ObjT2, Arm_JA2, Hand_JA2 = Data.matricesFromGrasp(grasp2[0])
 		Hand1.orientHandtoObj(HandT1, ObjT1, Obj1)
@@ -359,6 +367,18 @@ class DataTester():
 		Hand3.makeEqual(Hand1)
 		Hand3.changeColor('blueI')
 		alpha = np.linspace(0,1,6)[1:-1]
+		
+		if case == 1:
+			V.setCamera(60, 0, 5/4*np.pi-0.75)
+		elif case == 2:
+			V.setCamera(60, np.pi/4-1.5, -np.pi-1)
+		elif case == 3:
+			V.setCamera(40, np.pi/3+0.2, -np.pi-0.5)
+		elif case == 4:
+			V.setCamera(40, np.pi/3-np.pi, -np.pi-0.75)
+			# pdb.set_trace()
+
+		# function to get out dist, az, el of camera from current view
 		for a in alpha:
 			filename = filename_base + "_alpha%s.png" %(int(10*a))
 			Hand3.ZSLERP(start_axis_angle, end_axis_angle, a, T_zero = Hand1.obj.GetTransform())

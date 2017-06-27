@@ -77,6 +77,7 @@ class Vis(object): #General Class for visualization
 		rot_az = np.dot(rot_mat_az, rot_el)
 		rot_new = rot_az
 		self.viewer.SetCamera(rot_new)
+		# pdb.set_trace()
 
 		return rot_new
 

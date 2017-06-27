@@ -97,15 +97,28 @@ function Cylinder(height, width, extent, resolution, filename)
 end
 
 function Cone(height, width, extent, alpha, resolution, filename)
+%something weird here wtih top, bottom, and -1 multiplaction at end
     % unit cone with specified alpha
     % top and bottom are switched (based on matlab command) so orients
     % upward in openrave.  Could fix it there, but seemed easier here
     r_top = 0.5;
     r_bottom = 0.5 - sind(alpha);
+    % check that alpha is between 0 and 90
+    if ~((0 <= alpha) && (alpha <= 90))
+        disp("STL Not Created: Angle Not in Range")
+        return
+    end
+    % check to make sure it doesn't become an hour glass
+%     r_test_top = min(width, extent);
+%     r_test_bottom = r_test_top - sind(alpha)
+    if ((r_top - r_bottom) * tand(alpha) >= 1)
+        disp("STL Not Created: Not a Cone")
+        return
+    end 
     [X, Y, Z] = cylinder([r_top, r_bottom], resolution);
     %add top and bottom;
-    [x_bot, y_bot, z_bot] = ellipsoid(0,0,0,r_bottom, r_bottom, 0, resolution);
-    [x_top, y_top, z_top] = ellipsoid(0,0,height,r_top, r_top, 0, resolution);
+    [x_top, y_top, z_top] = ellipsoid(0,0,height,r_bottom, r_bottom, 0, resolution);
+    [x_bot, y_bot, z_bot] = ellipsoid(0,0,0,r_top, r_top, 0, resolution);
     X_surf = [x_bot;X;x_top];
     Z_surf = [z_bot;Z;z_top];
     Y_surf = [y_bot;Y;y_top];
@@ -120,10 +133,11 @@ function Cone(height, width, extent, alpha, resolution, filename)
 end
 
 function Handle(height, width, extent, r, resolution, filename)
+    % This needs to be fixed!
     r = ones(1,resolution) * r;
     y = linspace(0,1,resolution);
     theta_handle = linspace(0,2*pi,resolution);
-    theta_height = linspace(0,pi, resolution);
+    theta_height = linspace(0,pi, resolution); % vertical shape is half circle
     % make handle shape
     X = zeros(length(r), length(theta_handle));
     Z = zeros(length(r), length(theta_handle));
@@ -142,9 +156,11 @@ function Handle(height, width, extent, r, resolution, filename)
     Z_surf = [z_end; Z; z_end];
     %scale to size
     Z_scale = Z_surf * extent;
-    X_scale = X_surf * r(1);
-    Y_scale = Y_surf * height;
-    % save file
+    X_scale = (X_surf - (max(X_surf) - min(X_surf))/2) * r(1);
+    Y_scale = (Y_surf-0.5) * height;
+    % show model
+%     surf(X_scale,Z_scale,Y_scale)
+%     xlabel('x'); ylabel('z'); zlabel('y');
     %save file
     fvc = surf2patch(X_scale,Y_scale,Z_scale,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
