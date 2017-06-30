@@ -111,13 +111,13 @@ function Cone(height, width, extent, alpha, resolution, filename)
     % check to make sure it doesn't become an hour glass
 %     r_test_top = min(width, extent);
 %     r_test_bottom = r_test_top - sind(alpha)
-    if ((r_top - r_bottom) * tand(alpha) >= 1)
+    if ((r_top - r_bottom) * tand(alpha) >= 1) || r_bottom < 0
         disp("STL Not Created: Not a Cone")
         return
     end 
     [X, Y, Z] = cylinder([r_top, r_bottom], resolution);
     %add top and bottom;
-    [x_top, y_top, z_top] = ellipsoid(0,0,height,r_bottom, r_bottom, 0, resolution);
+    [x_top, y_top, z_top] = ellipsoid(0,0,1,r_bottom, r_bottom, 0, resolution);
     [x_bot, y_bot, z_bot] = ellipsoid(0,0,0,r_top, r_top, 0, resolution);
     X_surf = [x_bot;X;x_top];
     Z_surf = [z_bot;Z;z_top];

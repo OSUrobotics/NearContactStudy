@@ -14,17 +14,18 @@ import subprocess
 
 class ShapeImageGenerator(object):
 	def __init__(self):
-		self.model_path = 'blah'
+		self.model_path = ''
 		self.vis = Vis()
 		self.Hand = HandVis(self.vis)
 		self.Hand.loadHand()
 		self.Hand.localTranslation(np.array([0,0,-0.075])) #offset so palm is at 0,0,0
 		self.Obj = ObjectGenericVis(self.vis)
+		self.groundPlane = None
 		self.loadSTLFileList()
 
 	def loadSTLFileList(self): # get all STL files in directory
 		self.STLFileList = list()
-		directory = curdir + '/../ShapeGenerator/Shapes/'
+		directory = curdir + '/../ShapeGenerator/Shapes'
 		for root, dirs, filenames in os.walk(directory):
 			if filenames != []:
 				for fname in filenames:
@@ -44,7 +45,7 @@ class ShapeImageGenerator(object):
 		return shape, h, w, e, a
 		
 
-	def loadObject(self, objtype, h, w, e, a): # loads stl object into scene
+	def loadObject(self, objtype, h, w, e, a = None): # loads stl object into scene
 		# only centroid that hasn't been dealt with is the handle.
 		# all centroids shoudl be in the center of the object
 		self.Obj.features['type'] = objtype
@@ -57,7 +58,7 @@ class ShapeImageGenerator(object):
 		return result
 
 	def setObjTransparent(self, alpha = 0.5): # change transparency of object
-		self.Obj.changeColor(alpha = alpha) # this can be changed to changeColor
+		self.Obj.changeColor(alpha = alpha)   # this can be changed to changeColor
 
 	def readParameterFile(self, fn): # reads in parameters for creating images from a CSV file
 		params_list = list()
@@ -73,45 +74,81 @@ class ShapeImageGenerator(object):
 			for k in params_list[ip].keys():
 				if 'Joint Angles' == k:
 					params_list[ip][k] = np.array(params_list[ip][k].split(',')).astype('float')#convert to numpy array
+				elif 'Hand Matrix' == k: # extract array
+					params_list[ip][k] = self.stringToArray(params_list[ip][k])
 				elif 'Image Save Name' == k:
 					params_list[ip][k] += '.png' # add extension
 				elif 'Model' == k:
 					params_list[ip][k] += '.stl' # add extension
-				elif 'Model Matrix' == k: #array had brackets so had to do this!
+				elif 'Model Matrix' == k: # extract array
 					mat_str = params_list[ip][k]
-					mat_re = re.findall(r'\[.*?\]', mat_str)
-					mat_strip = [t.strip('[]') for t in mat_re]
-					# pdb.set_trace()
-					mat_num = np.array([t.split() for t in mat_strip]).astype('float')
+					mat_num = self.stringToArray(mat_str)
 					params_list[ip][k] = mat_num
 				elif 'Camera Transform' == k:
 					params_list[ip][k] = np.array(params_list[ip][k].split(',')).astype('float')#convert to numpy array
 				elif 'Image Size' == k:
 					i = 1 # should do soemthing here
 				else:
-					print('Unexpeted Key: %s' %(k))
+					print('Unexpected Key: %s' %(k))
 		self.params_list = params_list
 		return self.params_list
 
-	def createImagesFromParametersList(self): # creates images from a list of parameters
-		for params in self.params_list:
-			self.createImagesFromParameters(params)
+	def stringToArray(self, mat_str): # Description: convert string to array
+		# had to do this because it is really easy to just copy and paste a matrix into spreadsheet (or save through DictWriter)
+		# The matrix is also much easier to read in the csv file in this form
+		# downside is that when you read it out, the brackets are part of the string.
+		# this can be done in fewer, more efficient steps with regex, but i couldn't figure it out
+		mat_re = re.findall(r'\[.*?\]', mat_str)
+		mat_strip = [t.strip('[]') for t in mat_re]
+		mat_num = np.array([t.split() for t in mat_strip]).astype('float')
+		return mat_num
 
-	def createImagesFromParameters(self, params): # creates image from a single set of parameters
-		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
-		objLoadSuccess = self.loadObject(shape, h, w, e, a)
+	def createImagesFromParametersList(self, shapes = None): # creates images from a list of parameters
+		for params in self.params_list:
+			if ((shapes == None) or (params['Model'].split('_')[0] in shapes)): # allows only a single set of shapes to be made from list. Mostly during development
+				self.createImageFromParameters(params)
+
+	def createImageFromParameters(self, params): # creates image from a single set of parameters
+		objLoadSuccess = self.loadObjectFromParameters(params)
 		if objLoadSuccess:
+			self.addGroundPlane(y_height = self.Obj.h/2.0/100)
 			self.Obj.changeColor('greenI')
 			self.Hand.changeColor('blueI')
 			cam_params = params['Camera Transform']
 			self.vis.setCamera(cam_params[0], cam_params[1], cam_params[2])
 			self.Hand.setJointAngles(params['Joint Angles'])
+			self.Hand.obj.SetTransform(params['Hand Matrix'])
 			self.Obj.obj.SetTransform(params['Model Matrix'])
 			self.vis.takeImage(params['Image Save Name'])
 
 			print("Image Recorded: %s" %params['Image Save Name'])
 		else:
 			print("Model Not Found: %s" %params['Model'])
+
+	def loadObjectFromParameters(self, params): # loads objects from a single set of parameters
+		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
+		objLoadSuccess = self.loadObject(shape, h, w, e, a)
+		return objLoadSuccess
+
+	# maybe make a ground plane class similar to the other visualized objects?
+	# Good project for Kadon -- probably will be confusing, might be too much for a first project
+	def addGroundPlane(self, y_height, x = 1, y = 0, z = 1): # adds a ground plane into the image such that it is below object
+		if self.groundPlane is not None:
+			self.removeGroundPlane() # if it exists, remove it
+		self.groundPlane = RaveCreateKinBody(self.vis.env, '')
+		self.groundPlane.SetName('groundPlane')
+		self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
+		self.vis.env.AddKinBody(self.groundPlane)
+		self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
+
+	def updateGroundPlane(self, yh = 0, x = 0, y = 0, z = 0): # update ground plane featuers
+		# probably only needed for development
+		self.removeGroundPlane()
+		self.addGroundPlane(y_height = yh, x = x, y = y, z = z)
+
+	def removeGroundPlane(self): # Removes the groundplane
+		return self.vis.env.Remove(self.groundPlane)
+
 
 
 
@@ -217,32 +254,48 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.readParameterFile(fn)
 		pdb.set_trace()
 
-	def Test5(self): # Description: Read parameter file and create image
+	def Test5(self): # Description: Read parameter file and create multiple images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImagesFromParametersList()
+		self.SIG.createImagesFromParametersList(shapes = ['cube'])
 
 	def Test6(self): # Description: Create CSV file for making images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.loadSTLFileList()
 		# create list of dictionaries
 		L = list()
-		headers = ['Joint Angles', 'Model', 'Model Matrix', 'Camera Transform', 'Image Save Name', 'Image Size']
+		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform', 'Image Save Name', 'Image Size']
 		CameraTransform = '%s, %s, %s' %(50, -2.355, -.449)
 		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.1,0.1,0,0.1,0.1,0.1,0.1),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(1,0.1,0.4,1,0.1,0.4,0.1,0.4)]
+		handT = list((np.zeros((4,4)), np.zeros((4,4))))
+		handT[0] = np.array([[  0,				1,					2.22044605e-16,		-2.22044605e-17],
+	   						[ -1,				0,					-2.22044605e-16,	-3.00000000e-02],
+	   						[ -2.22044605e-16,	-2.22044605e-16,	1,					-9.50000000e-02],
+	   						[  0,				0,					0,					1]])
+
 		for model in self.SIG.STLFileList:
 			for ip, preshape in enumerate(preshapes):
 				D = dict()
 				D[headers[0]] = preshape
-				D[headers[1]] = model.split('/')[-1].strip('.stl')
-				e =  float(D[headers[1]].split('_')[3].strip('e'))/100/2 + 0.01 #position object extent + buffer away from origin (palm)
+				D[headers[2]] = model.split('/')[-1].strip('.stl')
+				e =  float(D[headers[2]].split('_')[3].strip('e'))/100/2 + 0.01 #position object extent + buffer away from origin (palm)
+				h =  float(D[headers[2]].split('_')[1].strip('h'))/100/2 + 0.01 # position hand above height + buffer away from object centroid
+				h_offset = -(7.5/100 + h)
+				h_limit = -(0.11) # this is specific to this grasp!
+				if (h_offset - h) > h_limit:
+					h_offset = h_limit
+				handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0.   ],
+									[ 0.   ,  0.   ,  1.   , h_offset],
+									[-0.   , -1.   ,  0.   ,  e ],
+									[ 0.   ,  0.   ,  0.   ,  1.   ]])
+				D[headers[1]] = handT[ip]
 				ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  e],  [ 0.,  0.,  0.,  1.]] )
-				D[headers[2]] = ModelMatrix
-				D[headers[3]] = CameraTransform
-				ImageSaveName = '%s_grasp%s' %(D[headers[1]], ip)
-				D[headers[4]] = ImageSaveName
-				D[headers[5]] = '' # need to do something for this step
+				D[headers[3]] = ModelMatrix
+				D[headers[4]] = CameraTransform
+				ImageSaveName = '%s/%s_grasp%s' %('GeneratedImages', D[headers[2]], ip)
+				D[headers[5]] = ImageSaveName
+				D[headers[6]] = '' # need to do something for this step -- image size
 				L.append(D)
 
 
@@ -258,14 +311,38 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
+		self.SIG.createImageFromParameters(self.SIG.params_list[19])
+		# pdb.set_trace()
+
+	def Test8(self): # Description: Adding Ground plane with object
+		self.SIG.loadSTLFileList()
+		fn = curdir + '/ImageGeneratorParameters.csv'
+		self.SIG.readParameterFile(fn)
+		self.SIG.loadObjectFromParameters(self.SIG.params_list[100])
+		# self.SIG.addGroundPlane()
+
+	def Test9(self): # Description: Figure out distance between palm and fingertips
+		self.Test7()
+		self.SIG.Hand.changeColor(alpha = 0.5)
+		links_all = self.SIG.Hand.obj.GetLinks()
+		links_tips = [link for link in links_all if 'dist_link' in link.GetName()]
+		links_T = [link.GetTransform() for link in links_tips]
+		links_point = [T[0:3,3] for T in links_T]
+		self.SIG.vis.drawPoints(links_point)
+		links_pose = [poseFromMatrix(T) for T in links_T]
+		finger_offset = np.array([0, 0.1, 0]).reshape(1,3)
 		pdb.set_trace()
-		self.SIG.createImagesFromParameters(self.SIG.params_list[323])
+		links_point_global = [poseTransformPoints(l, finger_offset) for l in links_pose]
+		links_point_global = np.array(links_point_global).flatten().reshape(-1,3)
+		self.SIG.vis.drawPoints(links_point_global, c = 'blueI')
 		pdb.set_trace()
+
 
 
 if __name__ == '__main__':
 	T = Tester()
-	T.Test5()
+	# T.Test6()
+	T.Test9()
 	
 
 

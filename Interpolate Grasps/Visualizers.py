@@ -71,13 +71,16 @@ class Vis(object): #General Class for visualization
 	def DrawGlobalAxes(self): # Draw axes at origin
 		self.axes = misc.DrawAxes(self.env, [1,0,0,0,0,0,0])
 
-	def takeImage(self, fname): # Take an image of the OpenRave window
+	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
 		Viewer = self.env.GetViewer()
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
 			Im = Viewer.GetCameraImage(640,480,  Viewer.GetCameraTransform(),[640,640,320,240])
 			plt.imshow(Im)
 		except: #this is more robust, but requires that particular window to be selected
-			subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
+			if not delay:
+				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname])
+			else:
+				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
 
 	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
 		#Thsi can be re-written to be more efficient (unneeded operations)
@@ -97,6 +100,26 @@ class Vis(object): #General Class for visualization
 		# pdb.set_trace()
 
 		return rot_new
+
+	#TODO!!!!
+	def getCamera(self): # Get distance, azimuth, and elevation of camera in current scene
+		# this is an inverse kinematics problem.  it will take a little bit of effort
+		# force camera to look at point (0,0,0)
+		cur_T = self.viewer.GetCameraTransform()
+		lookat = [0,0,0] # origin
+		# up_vec = cur_T[0:3,1] # up vector
+		rot_az_el = np.hstack((cur_T[0:3,1:], np.array([0,0,0]).reshape(3,1)))
+		up_vec = np.dot(np.array([0,0,1]), rot_az_el)
+		cam_pos = cur_T[0:3,3] # camera position
+		new_T1 = transformLookat(lookat, cam_pos, up_vec)
+		pdb.set_trace()
+		self.viewer.SetCamera(new_T1)
+		camAA = axisAngleFromRotationMatrix(new_T1)
+		el, az, __ = camAA
+		dist = np.linalg.norm(cam_pos) * 100 # convert to cm
+		new_T2 = self.setCamera(dist, az, el)
+
+
 
 class GenVis(object): # General class for objects in visualization
 	def __init__(self, V):
@@ -259,7 +282,12 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 
 	def loadObject(self, objtype, h, w, e, a = None): # load object based on features -- for near contact study
 		self.objCheck()
+		self.h = int(h)
+		self.w = int(w)
+		self.e = int(w)
+
 		if a is not None:
+			self.a = int(a)
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s_a%s.stl' %(objtype, int(h), int(w), int(e), int(a))
 		else:
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s.stl' %(objtype, int(h), int(w), int(e))
@@ -290,6 +318,18 @@ class HandVis(GenVis):
 
 	def setJointAngles(self, JA): # set hand joint angles
 		self.obj.SetDOFValues(JA)
+		''' Index in Joint Angle array: joint that it affects  |   value limit
+		0: unknown
+		1: unknown
+		2: Finger1-Rotation		|	0 < l < pi
+		3: Finger1-Base			|	0 < l < 2.44
+		4: Finger1-Tip			|	0 < l < 0.837
+		5: Finger2-Rotation		|	0 < l < pi
+		6: Finger2-Base			|	0 < l < 2.44
+		7: Finger2-Tip			|	0 < l < 0.837
+		8: Finger3-Base			|	0 < l < 2.44
+		9: Finger3-Tip			|	0 < l < 0.837
+		'''
 
 	def getPalmPoint(self): # get the point that is in the center of the palm
 		palm_pose = poseFromMatrix(self.obj.GetTransform())
