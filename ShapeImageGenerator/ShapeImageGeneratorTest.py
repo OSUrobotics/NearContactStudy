@@ -4,7 +4,7 @@ import pdb
 curdir = os.path.dirname(os.path.realpath(__file__))
 classdir = curdir +'/../Interpolate Grasps/'
 sys.path.insert(0, classdir) # path to helper classes
-from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis
+from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 import numpy as np 
 import time
 import matplotlib.pyplot as plt
@@ -110,8 +110,9 @@ class ShapeImageGenerator(object):
 
 	def createImageFromParameters(self, params): # creates image from a single set of parameters
 		objLoadSuccess = self.loadObjectFromParameters(params)
+		groundPlane = AddGroundPlane(self.vis)
 		if objLoadSuccess:
-			self.addGroundPlane(y_height = self.Obj.h/2.0/100)
+			groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
 			self.Obj.changeColor('greenI')
 			self.Hand.changeColor('blueI')
 			cam_params = params['Camera Transform']
@@ -129,28 +130,6 @@ class ShapeImageGenerator(object):
 		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
 		objLoadSuccess = self.loadObject(shape, h, w, e, a)
 		return objLoadSuccess
-
-	# maybe make a ground plane class similar to the other visualized objects?
-	# Good project for Kadon -- probably will be confusing, might be too much for a first project
-	def addGroundPlane(self, y_height, x = 1, y = 0, z = 1): # adds a ground plane into the image such that it is below object
-		if self.groundPlane is not None:
-			self.removeGroundPlane() # if it exists, remove it
-		self.groundPlane = RaveCreateKinBody(self.vis.env, '')
-		self.groundPlane.SetName('groundPlane')
-		self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
-		self.vis.env.AddKinBody(self.groundPlane)
-		self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
-
-	def updateGroundPlane(self, yh = 0, x = 0, y = 0, z = 0): # update ground plane featuers
-		# probably only needed for development
-		self.removeGroundPlane()
-		self.addGroundPlane(y_height = yh, x = x, y = y, z = z)
-
-	def removeGroundPlane(self): # Removes the groundplane
-		return self.vis.env.Remove(self.groundPlane)
-
-
-
 
 
 class Tester(object): # this is just meant to test different parts of the class
@@ -257,7 +236,7 @@ class Tester(object): # this is just meant to test different parts of the class
 	def Test5(self): # Description: Read parameter file and create multiple images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImagesFromParametersList(shapes = ['cube'])
+		self.SIG.createImagesFromParametersList()
 
 	def Test6(self): # Description: Create CSV file for making images
 		fn = curdir + '/ImageGeneratorParameters.csv'
@@ -307,7 +286,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		print("Successfully wrote to CSV file")
 
 	def Test7(self): # Description: Read parameter file and create a single image
-		#print('\n'.join(['%s:%s' %(it,t['Model']) for it,t in enumerate(self.SIG.params_list)]))
+		# print('\n'.join(['%s:%s' %(it,t['Model']) for it,t in enumerate(self.SIG.params_list)]))
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
@@ -338,12 +317,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		pdb.set_trace()
 
 
-
 if __name__ == '__main__':
 	T = Tester()
 	# T.Test6()
-	T.Test9()
-	
-
-
-
+	T.Test5()
+	pdb.set_trace()

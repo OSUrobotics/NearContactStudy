@@ -3,7 +3,7 @@ from openravepy import *
 curdir = os.path.dirname(os.path.realpath(__file__))
 classdir = curdir +'/../Interpolate Grasps/'
 sys.path.insert(0, classdir) # path to helper classes
-from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis
+from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 imagegendir = curdir +'/../ShapeImageGenerator/' # path to image, stl generator classes
 sys.path.insert(0, imagegendir)
 from ShapeImageGeneratorTest import ShapeImageGenerator

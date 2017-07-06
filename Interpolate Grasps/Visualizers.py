@@ -13,7 +13,8 @@ elif platform.node() == 'Desktop': #personal desktop Linux
 	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
 	sys.path.append(retract_fingers_path)
 	import retract_finger
-
+elif platform.node() == 'REU3':
+	base_path = os.path.dirname(os.path.realpath(__file__))
 else: # personal desktop Windows
 	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
 
@@ -83,7 +84,7 @@ class Vis(object): #General Class for visualization
 				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
 
 	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
-		#Thsi can be re-written to be more efficient (unneeded operations)
+		#This can be re-written to be more efficient (unneeded operations)
 		cam_T_zero = np.eye(4)
 		cam_p_zero = poseFromMatrix(np.eye(4))
 		cam_p_dist = cam_p_zero;
@@ -299,10 +300,6 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 			print("STL File Does not Exist! Parameters may be wrong.")
 			return False
 
-
-
-
-
 class HandVis(GenVis):
 	def __init__(self, V):
 		super(HandVis, self).__init__(V)
@@ -411,6 +408,26 @@ class HandVis(GenVis):
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
 
+# Kadon Engle - last edited 07/06/17
+class AddGroundPlane(object): #General class for adding a ground plane into the environment.
+		def __init__(self, V):
+			self.vis = V
+			self.groundPlane = None
+
+		def createGroundPlane(self, y_height, x = 1, y = 0, z = 1): #Removes any existing ground plane (if any), then creates a ground plane.
+			with self.vis.env:
+				self.removeGroundPlane()
+				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
+				self.groundPlane.SetName('groundPlane')
+				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
+				self.vis.env.AddKinBody(self.groundPlane)
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
+
+		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
+			for i in self.vis.env.GetBodies():
+				if i.GetName() == 'groundPlane':
+					self.vis.env.Remove(i)
+
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):
 		self.i = 1
@@ -441,3 +458,17 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		T = self.R2T(R)
 		T = self.AddTranslation(Tl, T)
 		return T
+
+		
+		
+if __name__ == '__main__': #For testing classes (put code below and run in terminal)
+	# V = Vis()
+	# H = HandVis(V)
+	# O = ObjectGenericVis(V)
+	# H.loadHand()
+	# O.loadObject('cube', 3, 3, 3)
+	G = AddGroundPlane(V)
+	G.createGroundPlane(0)
+	Gr = AddGroundPlane(V)
+	Gr.createGroundPlane(0)
+	pdb.set_trace()
