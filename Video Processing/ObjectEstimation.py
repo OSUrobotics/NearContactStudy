@@ -3,6 +3,10 @@ import os, pdb, copy, time
 import numpy as np
 import rosbag
 import sensor_msgs.point_cloud2
+curdir = os.path.dirname(os.path.realpath(__file__))
+classdir = curdir +'/../Interpolate Grasps/'
+sys.path.insert(0, classdir) # path to helper classes
+from Visualizers import Vis, ArmVis
 
 class BagReader(object):
 	# Do general bag operations
@@ -19,6 +23,14 @@ class BagReader(object):
 			self.end_time = copy.deepcopy(self.start_time)
 			self.end_time.secs += duration
 			self.bag_gen = self.bag.read_messages(start_time = self.start_time, end_time = self.end_time)
+
+	def createEnv(self): # create scene and arm to it
+		self.vis = Vis()
+		self.arm = ArmVis(self.vis)
+		self.arm.loadArm()
+
+	def setJA(self, JA): # set joint angles of arm
+		self.arm.setJointAngles(JA)
 
 	def loadBag(self): # load bag file into object
 		# does some error correction
@@ -40,7 +52,7 @@ class BagReader(object):
 			fn += '.bag' # add .bag if it isn't in the file name?  I suppose you could have a file that doesn't end in bag but that seems confusing
 		self.fn = fn
 
-	def readNextMsg(self):
+	def readNextMsg(self): # read one message from bag file
 		try:
 			topic, msg, t = next(self.bag_gen)
 			# print("Topic: %s" %topic)
@@ -82,8 +94,7 @@ class BagReader(object):
 
 	def parseData(self, topic, msg, t):
 		if len(self.all_data) == 0: #first message
-			self.addNewTimeStamp(t)
-		# check if time in list
+			self.addNewTimeStamp(t) # check if time in list
 		'''
 		TOPICS
 		/camera/rgb/image_color
@@ -150,15 +161,10 @@ class BagReader(object):
 			except:
 				data_remains = False #break statement?
 
-
-
-class STLGenerator(object):
-	def __init__(self):
-		self.i = 1
-		self.arm_path = '../NearContactStudy/Interpolate Grasps/models/robots/barrett_wam.dae'
-	# def createArmSTL(self, pose_arm, pose_hand): # create an stl for Barrett arm with hand based on pose
-
-
+	def createSTL(self, arm_pose, hand_pose):
+		pdb.set_trace()
+		JA = np.append((arm_pose, hand_pose))
+		self.setJA(JA)
 
 
 
@@ -178,5 +184,5 @@ if __name__ == '__main__':
 	topic, msg, t = B.readNextMsg()
 	B.parseAllData()
 	pdb.set_trace()
-
+	B.createEnv()
 	B.closeBag()
