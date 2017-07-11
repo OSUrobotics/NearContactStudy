@@ -545,22 +545,22 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		
 if __name__ == '__main__': #For testing classes (put code below and run in terminal)
 	V = Vis()
-	# H = HandVis(V)
-	# O = ObjectGenericVis(V)
-	# H.loadHand()
-	# O.loadObject('cube', 3, 3, 3)
+	H = HandVis(V)
+	O = ObjectGenericVis(V)
+	H.loadHand()
+	O.loadObject('cube', 3, 3, 3)
 	# G = AddGroundPlane(V)
 	# G.createGroundPlane(0)
 	# Gr = AddGroundPlane(V)
 	# Gr.createGroundPlane(0)
 
-	A = ArmVis(V)
-	A.loadArm()
-	A.generateSTL('test1.stl')
+	#A = ArmVis(V)
+	#A.loadArm()
+	#A.generateSTL('test1.stl')
 	# for i in range(10):
 	# 	JA = np.zeros(17)
 	# 	JA[0:7] = np.random.rand(7) * 2 - 1
 	# 	A.setJointAngles(JA)
 	# 	raw_input('Continue?')
-	pdb.set_trace(
+	pdb.set_trace()
 
