@@ -443,6 +443,12 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
+		pdb.set_trace()
+		self.vis.DrawGlobalAxes()
+		self.addObjectAxes()
+		self.localTranslation([0,0,-1]) #moves base to (0,0,0). centroid of model is off?
+		self.localRotation(np.array(([1, 0, 0],[0, 1, 0], [0, 0, 1]))) #make up Z
+		pdb.set_trace()
 		self.TClass = Transforms(self.obj)
 
 	def getJointAngles(self):
@@ -452,6 +458,7 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		if len(jointAngles) != 17:
 			print('Input array should be 1x17')
 			return
+		self.obj.SetDOFValues(jointAngles)
 		'''
 		Index in Joint Angle array: joint that it affects  |   value limit
 		0 : J1						|-2.6 < l < 2.6
@@ -463,19 +470,20 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		6 : J7						|  -3 < l < 3
 		7 : Unknown
 		8 : Unknown
-		10: Finger1-Rotation		|	0 < l < pi
-		11: Finger1-Base			|	0 < l < 2.44
-		12: Finger1-Tip				|	0 < l < 0.837
-		13: Finger2-Rotation		|	0 < l < pi
-		14: Finger2-Base			|	0 < l < 2.44
-		15: Finger2-Tip				|	0 < l < 0.837
-		16: Finger3-Base			|	0 < l < 2.44
-		17: Finger3-Tip				|	0 < l < 0.837
+		9 : Finger1-Rotation		|	0 < l < pi
+		10: Finger1-Base			|	0 < l < 2.44
+		11: Finger1-Tip				|	0 < l < 0.837
+		12: Finger2-Rotation		|	0 < l < pi
+		13: Finger2-Base			|	0 < l < 2.44
+		14: Finger2-Tip				|	0 < l < 0.837
+		15: Finger3-Base			|	0 < l < 2.44
+		16: Finger3-Tip				|	0 < l < 0.837
 		'''
-		self.obj.SetDOFValues(jointAngles)
+
+		# TODO: function that returns a 'name' for a given index -- helps with troubleshooting
 
 	#can all STL functions go into GenVis?
-	def getSTLFeatures(self):
+	def getSTLFeatures(self): # gets the mesh of the arm from openrave
 		links = self.obj.GetLinks()
 		all_vertices = []
 		all_faces = []
@@ -501,7 +509,7 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		self.all_faces = all_faces
 		self.all_vertices = all_vertices
 
-	def writeSTL(self, save_filename):
+	def writeSTL(self, save_filename): # writes mesh created by getSTLFeatures to file
 		faces_points = []
 		for vec in self.all_faces:
 			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
@@ -512,11 +520,9 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 			writer.add_faces(faces_points)
 			writer.close()
 
-	def generateSTL(self, save_filename):
+	def generateSTL(self, save_filename): # helper function to create STL from current scene
 		self.getSTLFeatures()
 		self.writeSTL(save_filename)
-
-
 
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):

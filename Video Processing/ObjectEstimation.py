@@ -1,5 +1,5 @@
 import cv2
-import os, pdb, copy, time
+import os, pdb, copy, time, sys
 import numpy as np
 import rosbag
 import sensor_msgs.point_cloud2
@@ -10,24 +10,32 @@ from Visualizers import Vis, ArmVis
 
 class BagReader(object):
 	# Do general bag operations
-	def __init__(self, fn, duration = None):
+	def __init__(self, fn, start_time = 0, duration = None):
 		self.bagFileNameCheck(fn)
 		self.bag = self.loadBag()
 		self.bag_gen = self.bag.read_messages() # generator of each time step in bag file
 		self.all_data = list() # list of dicts for each frame by time?
 		self.frame_exists_count = 0
 		topic, msg, t = self.readNextMsg()
-		self.start_time = t
+		self.start_time = copy.deepcopy(t)
+		self.start_time.secs += start_time # change start time of reading
+		self.end_time = None
 
 		if duration is not None: #limiting section of bag file to read
 			self.end_time = copy.deepcopy(self.start_time)
 			self.end_time.secs += duration
-			self.bag_gen = self.bag.read_messages(start_time = self.start_time, end_time = self.end_time)
+
+		self.bag_gen = self.bag.read_messages(start_time = self.start_time, end_time = self.end_time)
 
 	def createEnv(self): # create scene and arm to it
 		self.vis = Vis()
 		self.arm = ArmVis(self.vis)
 		self.arm.loadArm()
+		self.cameraT = np.array([[-0.21123264, -0.25296545,  0.94413413, -2.66172409],
+       [-0.96114868,  0.22935609, -0.15358708,  0.70581472],
+       [-0.17769068, -0.93989588, -0.2915849 ,  1.37028074],
+       [ 0.        ,  0.        ,  0.        ,  1.        ]])
+		self.vis.viewer.SetCamera(50, np.pi, 0)
 
 	def setJA(self, JA): # set joint angles of arm
 		self.arm.setJointAngles(JA)
@@ -61,13 +69,31 @@ class BagReader(object):
 			print("There was an error")
 			pdb.set_trace()
 
+	def viewAllPoses(self): #read a message, display pose
+		print('Showing All Poses from Robot in openRAVE')
+		for topic, msg, t in self.bag_gen:
+			self.parseData(topic,msg,t)
+
+			if '/wam/joint_states' in self.all_data[-1].keys() and '/bhand/joint_states' in self.all_data[-1].keys():
+				# pdb.set_trace()
+				# if the necessary data is in the last entry of list to show a pose
+				JA = self.robotStateToArray(self.all_data[-1]['/wam/joint_states'], self.all_data[-1]['/bhand/joint_states'])
+				self.setJA(JA)
+				print('Pose at time: %s' %self.all_data[-1]['time'])
+				time.sleep(0.01)
+
+			for idx, frame in enumerate(self.all_data):
+				if frame['time'] < self.all_data[-1]['time']: #if entry time is less than current time, pop
+					self.all_data.pop(idx)
+					print('List Entry Popped')
+
 
 	def parseAllData(self): # get messages from each frame of bag_gen and do any manipulation
 		# this method won't work on large segments of bag file.
 		# need to read a frame and write to file in a more condensed format
 		print('Getting data from Each Frame')
 		for topic, msg, t in self.bag_gen:
-			self.parseData(topic, msg, t)
+			self.parseData(topic, msg, t) # add message to list
 
 		# clean list. Remove entries that only have a time stamp
 		print('Converting messages and taking only interesting values')
@@ -109,17 +135,6 @@ class BagReader(object):
 					break
 			else:  # if pass through list and nothing, add new message
 				self.addMessage(None, topic, msg, t)
-				# 	print('Frame Exists %s \r' %self.frame_exists_count)
-				# 	self.frame_exists_count += 1
-				# 	if self.frame_exists_count % 100000 == 0:
-				# 		pdb.set_trace()
-				# 	if topic not in time_step.keys() and topic not in ignore_topics: #check if that message has been saved
-				# 		# pdb.set_trace()
-				# 		# use ros opencv bridge to create image!
-				# 		time_step[topic] = msg # extract important information here
-
-				# else: #if it doesn't exist
-				# 	self.addNewTimeStamp(t) # adding time stamp
 
 	def addNewTimeStamp(self, t): # Create a dict with only a time value
 		new_timestamp = dict()
@@ -149,6 +164,9 @@ class BagReader(object):
 		pose.append(msg.pose.orientation.w)
 		return pose
 
+	def JAToList(self, msg): #gets JA from sensor_msgs_JointState
+		return msg.position
+
 	def closeBag(self):
 		self.bag.close()
 
@@ -161,10 +179,23 @@ class BagReader(object):
 			except:
 				data_remains = False #break statement?
 
-	def createSTL(self, arm_pose, hand_pose):
+	def createSTL(self, arm_JA, hand_JA, stl_filename): # create stl file of arm from pose
 		pdb.set_trace()
-		JA = np.append((arm_pose, hand_pose))
+		JA = self.robotStateToArray(arm_JA, hand_JA)
 		self.setJA(JA)
+		self.arm.generateSTL('%s.stl' %stl_filename)
+
+	def robotStateToArray(self, arm_JA, hand_JA): # convert from bag messages to array to set joint angles in openrave
+		# can handle full message or arrays
+		if type(arm_JA).__name__ == '_sensor_msgs__JointState':
+			arm_JA = self.JAToList(arm_JA)
+		if type(hand_JA).__name__ == '_sensor_msgs__JointState':
+			hand_JA = self.JAToList(hand_JA)
+		JA = np.zeros(17)
+		JA[0:7] = arm_JA
+		JA[10:] = hand_JA
+		return JA
+
 
 
 
@@ -179,10 +210,14 @@ class DataExtraction(object):
 
 
 if __name__ == '__main__':
-	B = BagReader('DataCollectionTest/DataCollectionTest2', 5)
+	B = BagReader('DataCollectionTest/DataCollectionTest2', 10, 10)
 	
 	topic, msg, t = B.readNextMsg()
-	B.parseAllData()
-	pdb.set_trace()
+	# B.parseAllData()
 	B.createEnv()
+	# for idx, frame in enumerate(B.all_data):
+	# 	pdb.set_trace()
+	# 	B.createSTL(frame['/wam/joint_states'], frame['/bhand/joint_states'], "frame%s" %idx)
+	B.viewAllPoses()
+	pdb.set_trace()
 	B.closeBag()
