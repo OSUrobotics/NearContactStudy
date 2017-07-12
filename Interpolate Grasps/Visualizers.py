@@ -45,7 +45,14 @@ class Vis(object): #General Class for visualization
 										[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
 										[ 0.        ,  0.        ,  0.        ,  1.        ]])
 		self.viewer.SetCamera(self.cameraTransform)
-
+	
+	def changeBackgroundColor(self, color):
+		#values should be between 0 and 1.  values are scaled up to a point, and then outside of that I don't know what happens
+		if len(color) != 3:
+			print('Invalid Color Array.  Must have only 3 elements')
+			return
+		self.viewer.SetBkgndColor(color)
+		
 	def close(self): # Close Env
 		self.env.Destroy()
 		self.viewer.quitmainloop()
