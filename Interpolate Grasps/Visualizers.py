@@ -76,9 +76,11 @@ class Vis(object): #General Class for visualization
 		self.axes = misc.DrawAxes(self.env, [1,0,0,0,0,0,0])
 
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
-		Viewer = self.env.GetViewer()
+		dirname, filename = os.path.split(fname)
+		if not os.path.exists(dirname): #check if folder exists, if not, make folder
+			os.mkdir(dirname)
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
-			Im = Viewer.GetCameraImage(640,480,  Viewer.GetCameraTransform(),[640,640,320,240])
+			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
 			plt.imshow(Im)
 		except: #this is more robust, but requires that particular window to be selected
 			if not delay:
@@ -123,7 +125,12 @@ class Vis(object): #General Class for visualization
 		dist = np.linalg.norm(cam_pos) * 100 # convert to cm
 		new_T2 = self.setCamera(dist, az, el)
 
-
+	def changeBackgroundColor(self, color): # change the world color
+		#values should be between 0 and 1.  values are scaled up to a point, and then outside of that I don't know what happens
+		if len(color) != 3:
+			print('Invalid Color Array.  Must have only 3 elements')
+			return
+		self.viewer.SetBkgndColor(color)
 
 class GenVis(object): # General class for objects in visualization
 	def __init__(self, V):
@@ -408,6 +415,14 @@ class HandVis(GenVis):
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
+
+	def moveX(self, x_dist): self.localTranslation([x_dist, 0, 0]) # move hand in x direction
+
+	def moveY(self, y_dist): self.localTranslation([0, y_dist, 0]) # move hand in y direction
+
+	def moveZ(self, z_dist): self.localTranslation([0, 0, z_dist]) # move hand in z direction
+
+
 
 # Kadon Engle - last edited 07/06/17
 class AddGroundPlane(object): #General class for adding a ground plane into the environment.

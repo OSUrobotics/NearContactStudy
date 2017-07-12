@@ -73,9 +73,17 @@ class ShapeImageGenerator(object):
 		for ip in range(len(params_list)):
 			for k in params_list[ip].keys():
 				if 'Joint Angles' == k:
-					params_list[ip][k] = np.array(params_list[ip][k].split(',')).astype('float')#convert to numpy array
+					try:
+						params_list[ip][k] = np.array(params_list[ip][k].split(',')).astype('float')#convert to numpy array
+					except Exception: # for when that entry is blank like when no hand in image
+						# params_list[ip][k] = np.zeros(10) # set to some position so error is not thrown
+						pass
 				elif 'Hand Matrix' == k: # extract array
-					params_list[ip][k] = self.stringToArray(params_list[ip][k])
+					try:
+						params_list[ip][k] = self.stringToArray(params_list[ip][k])
+					except Exception: # for when that entry is blank like when no hand in image
+						# params_list[ip][k] = np.eye(4) # set to some position so error is not thrown
+						pass
 				elif 'Image Save Name' == k:
 					params_list[ip][k] += '.png' # add extension
 				elif 'Model' == k:
@@ -116,10 +124,14 @@ class ShapeImageGenerator(object):
 			self.Hand.changeColor('blueI')
 			cam_params = params['Camera Transform']
 			self.vis.setCamera(cam_params[0], cam_params[1], cam_params[2])
-			self.Hand.setJointAngles(params['Joint Angles'])
-			self.Hand.obj.SetTransform(params['Hand Matrix'])
+			if params['Joint Angles'] is not '' and params['Hand Matrix'] is not '':
+				self.Hand.show()
+				self.Hand.setJointAngles(params['Joint Angles'])
+				self.Hand.obj.SetTransform(params['Hand Matrix'])
+			else: #for images where no hand is shown
+				self.Hand.hide()
 			self.Obj.obj.SetTransform(params['Model Matrix'])
-			self.vis.takeImage(params['Image Save Name'])
+			self.vis.takeImage(params['Image Save Name'], delay = False)
 
 			print("Image Recorded: %s" %params['Image Save Name'])
 		else:
@@ -129,6 +141,11 @@ class ShapeImageGenerator(object):
 		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
 		objLoadSuccess = self.loadObject(shape, h, w, e, a)
 		return objLoadSuccess
+
+	def loadHandFromParameters(self, params): # sets hand features from a single set of parameters
+		self.Hand.show()
+		self.Hand.setJointAngles(params['Joint Angles'])
+		self.Hand.obj.SetTransform(params['Hand Matrix'])
 
 	# maybe make a ground plane class similar to the other visualized objects?
 	# Good project for Kadon -- probably will be confusing, might be too much for a first project
@@ -163,7 +180,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		cube_list = [f for f in SIG.STLFileList if 'cube' in f]
 		for f in cube_list[0:10]:
 		# for f in SIG.STLFileList:
-			shape, h, w, e = SIG.valuesFromFileName(f)
+			shape, h, w, e, a = SIG.valuesFromFileName(f)
 			SIG.loadObject(shape, h, w, e)
 			# SIG.vis.drawPoints([0,0,0])
 
@@ -219,8 +236,10 @@ class Tester(object): # this is just meant to test different parts of the class
 			# 	time.sleep(0.05)
 
 			# pdb.set_trace()
+			SIG.addGroundPlane(h/100.0/2)
 			SIG.vis.setCamera(50, -3*np.pi/4, -np.pi/7)
 			f_dict = SIG.Obj.features
+			pdb.set_trace()
 			image_fn = '%s_%s_h%s_w%s_e%s.png' %(f_dict['type'], int(f_dict['h']), int(f_dict['w']), int(f_dict['e']), 'pregrasp1')
 			SIG.vis.takeImage(image_fn)
 
@@ -258,45 +277,60 @@ class Tester(object): # this is just meant to test different parts of the class
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
 		self.SIG.createImagesFromParametersList(shapes = ['cube'])
+		# self.SIG.createImagesFromParametersList()
 
 	def Test6(self): # Description: Create CSV file for making images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.loadSTLFileList()
 		# create list of dictionaries
 		L = list()
-		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform', 'Image Save Name', 'Image Size']
-		CameraTransform = '%s, %s, %s' %(50, -2.355, -.449)
+		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform','Image Save Name', 'Image Size']
+		CameraTransform = ['%s, %s, %s' %(50, -2.355, -.449), '%s, %s, %s' %(50, 2.355, -.449)]
 		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.1,0.1,0,0.1,0.1,0.1,0.1),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(1,0.1,0.4,1,0.1,0.4,0.1,0.4)]
 		handT = list((np.zeros((4,4)), np.zeros((4,4))))
-		handT[0] = np.array([[  0,				1,					2.22044605e-16,		-2.22044605e-17],
-	   						[ -1,				0,					-2.22044605e-16,	-3.00000000e-02],
-	   						[ -2.22044605e-16,	-2.22044605e-16,	1,					-9.50000000e-02],
-	   						[  0,				0,					0,					1]])
+		handT[0] = np.array([[  0,				1,					0,	0],
+	   						[  -1,				0,					0,	-3.00000000e-02],
+	   						[   0,				0,					1,	-9.50000000e-02],
+	   						[   0,				0,					0,	1]])
 
 		for model in self.SIG.STLFileList:
 			for ip, preshape in enumerate(preshapes):
-				D = dict()
-				D[headers[0]] = preshape
-				D[headers[2]] = model.split('/')[-1].strip('.stl')
-				e =  float(D[headers[2]].split('_')[3].strip('e'))/100/2 + 0.01 #position object extent + buffer away from origin (palm)
-				h =  float(D[headers[2]].split('_')[1].strip('h'))/100/2 + 0.01 # position hand above height + buffer away from object centroid
-				h_offset = -(7.5/100 + h)
-				h_limit = -(0.11) # this is specific to this grasp!
-				if (h_offset - h) > h_limit:
-					h_offset = h_limit
-				handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0.   ],
-									[ 0.   ,  0.   ,  1.   , h_offset],
-									[-0.   , -1.   ,  0.   ,  e ],
-									[ 0.   ,  0.   ,  0.   ,  1.   ]])
-				D[headers[1]] = handT[ip]
-				ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  e],  [ 0.,  0.,  0.,  1.]] )
-				D[headers[3]] = ModelMatrix
-				D[headers[4]] = CameraTransform
-				ImageSaveName = '%s/%s_grasp%s' %('GeneratedImages', D[headers[2]], ip)
-				D[headers[5]] = ImageSaveName
-				D[headers[6]] = '' # need to do something for this step -- image size
-				L.append(D)
+				for ic, cameraT in enumerate(CameraTransform):
+					D = dict.fromkeys(headers)
+					D['Joint Angles'] = preshape
+					D['Model'] = model.split('/')[-1].strip('.stl')
+					e =  float(D['Model'].split('_')[3].strip('e'))/100# position hand object extent away from origin (palm)
+					h =  float(D['Model'].split('_')[1].strip('h'))/100# position hand above height away from object centroid
+					w =  float(D['Model'].split('_')[2].strip('w'))/100# position hand width away from object centroid
+					clearance = 0.01
+					# i think the limit should be applied for each grasp?
+					h_limit = -(0.03) # this is specific to this grasp!
+					h_offset = -(-h/2 + clearance)
+					if h_offset > h_limit:
+						# pdb.set_trace()
+						h_offset = h_limit
+					h_offset -= 0.075 # origin of hand is the base of the hand
+					handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
+										[ 0.   ,  0.   ,  1.   , h_offset],
+										[-0.   , -1.   ,  0.   ,  e],
+										[ 0.   ,  0.   ,  0.   ,  1.   ]])
+					D['Hand Matrix'] = handT[ip]
+					ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  e/2],  [ 0.,  0.,  0.,  1.]] )
+					D['Model Matrix'] = ModelMatrix
+					D['Camera Transform'] = cameraT
+					ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
+					D['Image Save Name'] = ImageSaveName
+					D['Image Size'] = '' # need to do something for this step -- image size
+					L.append(D)
+
+		for model in self.SIG.STLFileList:
+			D = dict.fromkeys(headers)
+			D['Camera Transform'] = CameraTransform[0]
+			D['Model'] = model.split('/')[-1].strip('.stl')
+			D['Model Matrix'] = np.eye(4)
+			D['Image Save Name'] = '%s/%s_nohand' %('GeneratedImages/ObjectsOnly', D['Model'])
+			L.append(D)
 
 
 		with open(fn, 'wb') as file:
@@ -311,7 +345,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImageFromParameters(self.SIG.params_list[19])
+		# pdb.set_trace()
+		self.SIG.createImageFromParameters(self.SIG.params_list[-1])
 		# pdb.set_trace()
 
 	def Test8(self): # Description: Adding Ground plane with object
@@ -331,17 +366,22 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.vis.drawPoints(links_point)
 		links_pose = [poseFromMatrix(T) for T in links_T]
 		finger_offset = np.array([0, 0.1, 0]).reshape(1,3)
+		self.SIG.Hand.show()
+		self.SIG.loadObjectFromParameters(self.SIG.params_list[99])
+		self.SIG.loadHandFromParameters(self.SIG.params_list[99])
+		self.SIG.addGroundPlane(self.SIG.Obj.h / 100.0 / 2)
 		pdb.set_trace()
 		links_point_global = [poseTransformPoints(l, finger_offset) for l in links_pose]
 		links_point_global = np.array(links_point_global).flatten().reshape(-1,3)
 		self.SIG.vis.drawPoints(links_point_global, c = 'blueI')
-		pdb.set_trace()
+
 
 
 
 if __name__ == '__main__':
 	T = Tester()
 	# T.Test6()
+	# T.Test5()
 	T.Test9()
 	
 
