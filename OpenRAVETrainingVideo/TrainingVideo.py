@@ -43,51 +43,27 @@ class TrainingVideo(object):
 				for k in range(frames):
 					Angles[k].append(current[k])
 			for i in Angles:
+				iP = 
 				self.Hand.setJointAngles(np.array(i))
+				if len(self.Hand.getContactPoints()) > 0:
+
+					break
 				self.recordFrame()
 		except:
 			print "Invalid Joint Angle"
 
-	def handRecord(self, x, y, z):
+	def handRecord(self, x, y, z): # Records frames as hand moves in x, y, and/or z direction
 		self.T_current = self.Hand.obj.GetTransform()
 		T = copy.deepcopy(self.T_current)
-		frames = 20
-		xyz  = [x, y, z]
-		for i in xyz:
-			if i == x:
-				X = np.linspace(self.T_current[0,3], x, frames)
-				for n in X:
-					T[0,3] = n
+		frames = 20 # Arbitrary value, needs to be changed so that when x, y, or z moves shorter distances, it records less frames.
+		xyz = [x, y, z]
+		for idx, i in enumerate(xyz):
+			if abs(i - self.T_current[idx,3]) > 0.1e-5:
+				V = np.linspace(self.T_current[idx,3], i, frames)
+				for n in V:
+					T[idx,3] = n
 					self.Hand.obj.SetTransform(T)
 					self.recordFrame()
-			elif i == y:
-				Y = np.linspace(self.T_current[1,3], y, frames)
-				for n in Y:
-					T[1,3] = n
-					self.Hand.obj.SetTransform(T)
-					self.recordFrame()
-			elif i == z:
-				Z = np.linspace(self.T_current[2,3], z, frames)
-				for n in Z:
-					T[2,3] = n
-					self.Hand.obj.SetTransform(T)
-					self.recordFrame()
-
-	# def handRecord(self, positions, dim):
-	# 	if dim == 'z':
-	# 		idx = 2
-	# 	elif dim == 'x':
-	# 		idx = 0
-	# 	elif dim == 'y':
-	# 		idx = 1
-	# 	else:
-	# 		print('Not a valid Dimension')
-	# 		return
-	# 	T = copy.deepcopy(self.T_start)
-	# 	for i in positions:
-	# 		T[idx,3] = i + self.T_start[idx,3]
-	# 		self.Hand.obj.SetTransform(T)
-	# 		self.recordFrame()
 
 	def stationaryRecord(self, frames):
 		for i in range(int(frames)):
@@ -140,7 +116,7 @@ class TrainingVideo(object):
 		rot = matrixFromAxisAngle([0,0, np.pi/2])
 		self.Hand.localRotation(rot) # rotate hand to put stationary finger on one side of object
 		self.T_start = self.Hand.obj.GetTransform() # get starting transform so everything can be done relative to this
-		oHand = np.array([0, 0, 0.0, 0.1, 0.1, 0.0, 0.1, 0.1, 0.1, 0.1]) # position fingers such that hand can move in x, y, and z without hitting object
+		oHand = np.array([0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) # position fingers such that hand can move in x, y, and z without hitting object
 		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4]) # position fingers such that the hand will be closed around the object without hititng it
 		self.Hand.setJointAngles(oHand)
 		dist_range_min = -0.1
@@ -149,67 +125,45 @@ class TrainingVideo(object):
 		# TODO: **************
 		# fix camera angle so it is easier to see
 		# self.vis.setCamera(60,3*np.pi/4,-np.pi/4-0.1)
+		# self.vis.setCamera(60, np.pi, -np.pi/2)
 		self.vis.setCamera(60, -2.25, -0.75) # Numbers are completely arbitrary, gives a good view of object and hand.
 		
-		print self.T_start
+
+
+
+		self.fingerRecord(oHand, cHand)
+		# self.fingerRecord(cHand, oHand)
 		pdb.set_trace()
-
-
-		self.handRecord(.04, .05, -.03)
-
-		# # movement in z direction
-		# d_max = 0.00
-		# d_min = -0.1
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max,d_min,frames), 'z')
-		# self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# d_max = -0.1
-		# d_min = 0.0
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max, d_min, frames), 'z')
-
-		# # movement in y direction
-		# d_max = 0.0
-		# d_min = 0.10
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max,d_min,frames), 'y')
-		# self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-
-		# d_max = 0.10
-		# d_min = -0.10
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max, d_min, frames), 'y')
-		# self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-
-		# d_max = -0.10
-		# d_min = 0.0
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max, d_min, frames), 'y')
 		
-		# # movement in x direction
-		# d_max = 0.0
-		# d_min = -0.04
-		# frames = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max,d_min,frames), 'x')
-		# self.stationaryRecord(10)
 
-		# d_max = -0.04
-		# d_min = 0.04
-		# frame = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max, d_min, frames), 'x')
-		# self.stationaryRecord(10)
+		# # Moves the hand and closes the fingers in a suitable manner for this video
+		# self.handRecord(0, 0, -0.17)
+		# self.handRecord(0, -0.13, -0.17)
+		# self.handRecord(0, -0.13, -0.115)
+		# self.fingerRecord(oHand, cHand)
+		# self.stationaryRecord(5)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0, -0.13, -0.17)
+		# self.handRecord(0, 0.1, -0.17)
+		# self.handRecord(0, 0.1, -0.115)
+		# self.fingerRecord(oHand, cHand)
+		# self.stationaryRecord(5)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0, 0.1, -0.17)
+		# self.handRecord(0, 0, -0.17)
+		# self.handRecord(-0.05, 0, -0.17)
+		# self.handRecord(-0.05, 0, -0.115)
+		# self.stationaryRecord(5)
+		# self.handRecord(-0.05, 0, -0.17)
+		# self.handRecord(0.05, 0, -0.17)
+		# self.handRecord(0.05, 0, -0.115)
+		# self.stationaryRecord(5)
+		# self.handRecord(0.05, 0, -0.17)
+		# self.handRecord(0, 0, -0.17)
 
-		# d_max = 0.04
-		# d_min = 0.0
-		# frame = abs(d_max - d_min) * frame_rate
-		# self.handRecord(np.linspace(d_max, d_min, frames), 'x')
-		# self.stationaryRecord(10)
+
+
+
 
 
 
