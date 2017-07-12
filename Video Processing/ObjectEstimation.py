@@ -1,5 +1,5 @@
 import cv2
-import os, pdb, copy, time, sys
+import os, pdb, copy, time, sys, csv, shutil
 import numpy as np
 import rosbag
 import sensor_msgs.point_cloud2
@@ -20,6 +20,7 @@ class BagReader(object):
 		self.start_time = copy.deepcopy(t)
 		self.start_time.secs += start_time # change start time of reading
 		self.end_time = None
+		self.frame_count = 0
 
 		if duration is not None: #limiting section of bag file to read
 			self.end_time = copy.deepcopy(self.start_time)
@@ -35,7 +36,7 @@ class BagReader(object):
        [-0.96114868,  0.22935609, -0.15358708,  0.70581472],
        [-0.17769068, -0.93989588, -0.2915849 ,  1.37028074],
        [ 0.        ,  0.        ,  0.        ,  1.        ]])
-		self.vis.viewer.SetCamera(50, np.pi, 0)
+		self.vis.viewer.SetCamera(self.cameraT)
 
 	def setJA(self, JA): # set joint angles of arm
 		self.arm.setJointAngles(JA)
@@ -69,8 +70,19 @@ class BagReader(object):
 			print("There was an error")
 			pdb.set_trace()
 
-	def viewAllPoses(self): #read a message, display pose
+	def viewAllPoses(self, save_poses = False, dir_name = None): #read a message, display pose
 		print('Showing All Poses from Robot in openRAVE')
+		if save_poses:
+			if dir_name is not None:
+				try:
+					shutil.rmtree(dir_name)
+					print("Folder Exists.  Deleting Folder")
+				except:
+					print("Folder Did not Exist")
+				os.mkdir(dir_name, 0777)
+			else:
+				print("no directory name")
+				return
 		for topic, msg, t in self.bag_gen:
 			self.parseData(topic,msg,t)
 
@@ -81,11 +93,35 @@ class BagReader(object):
 				self.setJA(JA)
 				print('Pose at time: %s' %self.all_data[-1]['time'])
 				time.sleep(0.01)
+				if save_poses:
+					if '/kinect2/hd/points' in self.all_data[-1].keys() and '/camera/depth/points' in self.all_data[-1].keys():
+						camera1_pts = self.pc2ToXYZ(self.all_data[-1]['/camera/depth/points'])
+						camera2_pts = self.pc2ToXYZ(self.all_data[-1]['/kinect2/hd/points'])
+						# self.showPointCloud(self.all_data[-1]['/camera/depth/points'])
+						
+						# save point clouds
+						camera_pts = [camera1_pts, camera2_pts]
+						camera_filename = ['%s/frame%s_pc%s.csv' %(dir_name,self.frame_count,ci) for ci in range(len(camera_pts))]
+						for i in range(2):
+							with open(camera_filename[i], 'wb') as f:
+								cam_writer = csv.writer(f, delimiter = ',')
+								for pt in camera_pts[i]:
+									cam_writer.writerow(pt)
+							print("CSV File Created")
+
+						# save STL
+						self.arm.generateSTL('%s/frame%s.stl' %(dir_name, self.frame_count))
+
+
+						self.frame_count += 1
 
 			for idx, frame in enumerate(self.all_data):
 				if frame['time'] < self.all_data[-1]['time']: #if entry time is less than current time, pop
 					self.all_data.pop(idx)
 					print('List Entry Popped')
+
+	def writeAllPosesToFile(self, dir_name):
+		self.viewAllPoses(dir_name = dir_name, save_poses = True)
 
 
 	def parseAllData(self): # get messages from each frame of bag_gen and do any manipulation
@@ -149,7 +185,7 @@ class BagReader(object):
 			self.all_data[-1][topic] = msg #recursively call addMessage here?
 
 	def pc2ToXYZ(self, msg): #converts pointcloud2 message into a set of points -- significant reduction in array size
-		pt = [point for point in sensor_msgs.point_cloud2.read_points(msg, skip_nans = True)]
+		pt = [point[0:3] for point in sensor_msgs.point_cloud2.read_points(msg, skip_nans = True)]
 		return pt
 
 	def poseToList(self, msg): # converts geometry_msg_PoseStamped to 7 element list of pose [pos, quaternion]
@@ -196,6 +232,12 @@ class BagReader(object):
 		JA[10:] = hand_JA
 		return JA
 
+	def showPointCloud(self,point_cloud):  # shows point cloud from message
+		# check point_cloud to handle list of points and message
+		pts = self.pc2ToXYZ(point_cloud)
+		out = [self.vis.drawPoints(pt[0:3]) for pt in pts] #this will likely crash openRAVE
+
+
 
 
 
@@ -210,14 +252,15 @@ class DataExtraction(object):
 
 
 if __name__ == '__main__':
-	B = BagReader('DataCollectionTest/DataCollectionTest2', 10, 10)
+	B = BagReader('DataCollectionTest/DataCollectionTest2', 20, 10)
 	
-	topic, msg, t = B.readNextMsg()
+	# topic, msg, t = B.readNextMsg()
 	# B.parseAllData()
 	B.createEnv()
 	# for idx, frame in enumerate(B.all_data):
 	# 	pdb.set_trace()
 	# 	B.createSTL(frame['/wam/joint_states'], frame['/bhand/joint_states'], "frame%s" %idx)
-	B.viewAllPoses()
+	# B.viewAllPoses()
+	B.writeAllPosesToFile('test1')
 	pdb.set_trace()
 	B.closeBag()

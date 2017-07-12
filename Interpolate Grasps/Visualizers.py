@@ -443,12 +443,10 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
-		pdb.set_trace()
-		self.vis.DrawGlobalAxes()
-		self.addObjectAxes()
+		# self.vis.DrawGlobalAxes()
+		# self.addObjectAxes()
 		self.localTranslation([0,0,-1]) #moves base to (0,0,0). centroid of model is off?
 		self.localRotation(np.array(([1, 0, 0],[0, 1, 0], [0, 0, 1]))) #make up Z
-		pdb.set_trace()
 		self.TClass = Transforms(self.obj)
 
 	def getJointAngles(self):
@@ -514,7 +512,6 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		for vec in self.all_faces:
 			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
 		
-		pdb.set_trace()
 		with open(save_filename,'wb') as fp:
 			writer = Binary_STL_Writer(fp)
 			writer.add_faces(faces_points)
