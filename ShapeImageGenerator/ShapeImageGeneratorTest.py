@@ -131,7 +131,7 @@ class ShapeImageGenerator(object):
 			else: #for images where no hand is shown
 				self.Hand.hide()
 			self.Obj.obj.SetTransform(params['Model Matrix'])
-			self.vis.takeImage(params['Image Save Name'], delay = False)
+			self.vis.takeImage(params['Image Save Name'], delay = True)
 
 			print("Image Recorded: %s" %params['Image Save Name'])
 		else:
@@ -276,8 +276,8 @@ class Tester(object): # this is just meant to test different parts of the class
 	def Test5(self): # Description: Read parameter file and create multiple images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImagesFromParametersList(shapes = ['cube'])
-		# self.SIG.createImagesFromParametersList()
+		# self.SIG.createImagesFromParametersList(shapes = ['cube'])
+		self.SIG.createImagesFromParametersList()
 
 	def Test6(self): # Description: Create CSV file for making images
 		fn = curdir + '/ImageGeneratorParameters.csv'
@@ -300,23 +300,24 @@ class Tester(object): # this is just meant to test different parts of the class
 					D = dict.fromkeys(headers)
 					D['Joint Angles'] = preshape
 					D['Model'] = model.split('/')[-1].strip('.stl')
-					e =  float(D['Model'].split('_')[3].strip('e'))/100# position hand object extent away from origin (palm)
-					h =  float(D['Model'].split('_')[1].strip('h'))/100# position hand above height away from object centroid
-					w =  float(D['Model'].split('_')[2].strip('w'))/100# position hand width away from object centroid
+					e =  float(D['Model'].split('_')[3].strip('e'))/100.0# position hand object extent away from origin (palm)
+					h =  float(D['Model'].split('_')[1].strip('h'))/100.0# position hand above height away from object centroid
+					w =  float(D['Model'].split('_')[2].strip('w'))/100.0# position hand width away from object centroid
 					clearance = 0.01
 					# i think the limit should be applied for each grasp?
-					h_limit = -(0.03) # this is specific to this grasp!
-					h_offset = -(-h/2 + clearance)
+					h_limit = -(0.12) # this is specific to this grasp!
+					h_offset = -(h/2 + clearance)
 					if h_offset > h_limit:
 						# pdb.set_trace()
-						h_offset = h_limit
+						h_offset = h_limit + h/2
 					h_offset -= 0.075 # origin of hand is the base of the hand
+					handT[0][2,3] = -e/2.0 - clearance - 0.075
 					handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
 										[ 0.   ,  0.   ,  1.   , h_offset],
-										[-0.   , -1.   ,  0.   ,  e],
+										[-0.   , -1.   ,  0.   ,  0],
 										[ 0.   ,  0.   ,  0.   ,  1.   ]])
 					D['Hand Matrix'] = handT[ip]
-					ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  e/2],  [ 0.,  0.,  0.,  1.]] )
+					ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  0],  [ 0.,  0.,  0.,  1.]] )
 					D['Model Matrix'] = ModelMatrix
 					D['Camera Transform'] = cameraT
 					ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
@@ -353,7 +354,10 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.loadObjectFromParameters(self.SIG.params_list[100])
+		self.SIG.loadObjectFromParameters(self.SIG.params_list[41])
+		self.SIG.loadHandFromParameters(self.SIG.params_list[41])
+		self.SIG.addGroundPlane(self.SIG.Obj.h / 100.0 / 2)
+		pdb.set_trace()
 		# self.SIG.addGroundPlane()
 
 	def Test9(self): # Description: Figure out distance between palm and fingertips
@@ -380,9 +384,9 @@ class Tester(object): # this is just meant to test different parts of the class
 
 if __name__ == '__main__':
 	T = Tester()
-	# T.Test6()
-	# T.Test5()
-	T.Test9()
+	T.Test6()
+	T.Test5()
+	# T.Test8()
 	
 
 
