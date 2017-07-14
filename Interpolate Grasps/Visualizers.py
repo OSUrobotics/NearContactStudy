@@ -407,6 +407,21 @@ class HandVis(GenVis):
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
+	
+	# Kadon Engle - last edited 07/14/17
+	def getContactPoints(self): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
+		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
+		report = CollisionReport()
+		positions = []
+		for link in self.obj.GetLinks():
+			collision = self.env.CheckCollision(link,report=report)
+			# if collision == True:
+			# 	print link
+			if len(report.contacts) > 0:
+				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
+				positions += [c.pos for c in report.contacts]
+		return positions
+
 
 # Kadon Engle - last edited 07/06/17
 class AddGroundPlane(object): #General class for adding a ground plane into the environment.
