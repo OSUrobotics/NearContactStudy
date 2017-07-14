@@ -2,9 +2,9 @@ from openravepy import *
 from Colors import ColorsDict, bcolors
 import numpy as np
 import sys, os, pdb, copy, subprocess
-
-
+from stlwriter import Binary_STL_Writer
 import platform
+
 if platform.node() == 'Sonny': #lab computer
 	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
 	import retract_finger
@@ -15,9 +15,8 @@ elif platform.node() == 'Desktop': #personal desktop Linux
 	import retract_finger
 elif platform.node() == 'REU3':
 	base_path = os.path.dirname(os.path.realpath(__file__))
-else: # personal desktop Windows
-	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
-
+else:
+	base_path = os.path.dirname(os.path.realpath(__file__))
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -32,10 +31,6 @@ Significantly more commenting is necessary to make this usable
 '''
 
 
-
-
-
-
 class Vis(object): #General Class for visualization
 	def __init__(self):
 		self.env = Environment()
@@ -46,11 +41,18 @@ class Vis(object): #General Class for visualization
 		self.points = list()
 		# an arbitrary camera Angle that I picked
 		self.cameraTransform = np.array([[-0.46492937, -0.50410198,  0.72781995, -0.32667211],
-   										[-0.10644389, -0.78428209, -0.6112048 ,  0.29396212],
-       									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
-       									[ 0.        ,  0.        ,  0.        ,  1.        ]])
+										[-0.10644389, -0.78428209, -0.6112048 ,  0.29396212],
+										[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
+										[ 0.        ,  0.        ,  0.        ,  1.        ]])
 		self.viewer.SetCamera(self.cameraTransform)
-
+	
+	def changeBackgroundColor(self, color):
+		#values should be between 0 and 1.  values are scaled up to a point, and then outside of that I don't know what happens
+		if len(color) != 3:
+			print('Invalid Color Array.  Must have only 3 elements')
+			return
+		self.viewer.SetBkgndColor(color)
+		
 	def close(self): # Close Env
 		self.env.Destroy()
 		self.viewer.quitmainloop()
@@ -188,11 +190,11 @@ class GenVis(object): # General class for objects in visualization
 	def clearAxes(self): self.axes = None # clear all axes created relative to this object
 
 	def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
-		if color is None: # random color
+		if color is None and alpha is None: # random color
 			color = np.random.rand(3)
-		if alpha is None: # keep transparency the same
+		elif color is not None and alpha is None: # keep transparency the same
 			alpha = self.obj.GetLinks()[0].GetGeometries()[0].GetTransparency()
-		elif alpha is not None and color is None: #only want to change transparency but keep color the same
+		elif color is None and alpha is not None: #only want to change transparency but keep color the same
 			color = self.obj.GetLinks()[0].GetGeometries()[0].GetDiffuseColor()
 		if type(color) is str: #loads from dictionary
 			color = self.colors[color]
@@ -229,9 +231,7 @@ class GenVis(object): # General class for objects in visualization
 	def linearInterp(self, array1, array2, alpha): # linear interpolation between two arrays
 		array_interp = array1 * (1 - alpha) + array2 * (alpha)
 		return array_interp
-        
-
-
+		
 class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
 		super(ObjectVis, self).__init__(V)
@@ -443,6 +443,95 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 				if i.GetName() == 'groundPlane':
 					self.vis.env.Remove(i)
 
+# Ammar Kothari - last edited 07/10/17
+class ArmVis(GenVis): # general class for importing arm into an openrave scene
+	# it would be nice to reuse the functions from Hand here
+
+	# can't use changeColor -- links do not have geometries
+	def __init__(self, V):
+		super(ArmVis, self).__init__(V)
+		self.stl_path = base_path + "/models/robots/"
+
+	def loadArm(self): # load arm from file
+		self.robotFN = self.stl_path + 'barrett_wam.dae'
+		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
+		self.env.Add(self.obj, True)
+		self.obj.SetVisible(1)
+		self.TClass = Transforms(self.obj)
+
+	def getJointAngles(self):
+		return self.obj.GetDOFValues()
+
+	def setJointAngles(self, jointAngles):
+		if len(jointAngles) != 17:
+			print('Input array should be 1x17')
+			return
+		'''
+		Index in Joint Angle array: joint that it affects  |   value limit
+		0 : J1						|-2.6 < l < 2.6
+		1 : J2						|-1.98< l < 1.98
+		2 : J3						|-2.8 < l < 2.8
+		3 : J4						|-0.9 < l < 3.14
+		4 : J5						|-4.55< l < 1.25
+		5 : J6						|-1.57< l < 1.57
+		6 : J7						|  -3 < l < 3
+		7 : Unknown
+		8 : Unknown
+		10: Finger1-Rotation		|	0 < l < pi
+		11: Finger1-Base			|	0 < l < 2.44
+		12: Finger1-Tip				|	0 < l < 0.837
+		13: Finger2-Rotation		|	0 < l < pi
+		14: Finger2-Base			|	0 < l < 2.44
+		15: Finger2-Tip				|	0 < l < 0.837
+		16: Finger3-Base			|	0 < l < 2.44
+		17: Finger3-Tip				|	0 < l < 0.837
+		'''
+		self.obj.SetDOFValues(jointAngles)
+
+	#can all STL functions go into GenVis?
+	def getSTLFeatures(self):
+		links = self.obj.GetLinks()
+		all_vertices = []
+		all_faces = []
+		ind = 0
+		# I don't know what is happening here
+		for link in links:
+			vertices = link.GetCollisionData().vertices
+			faces = link.GetCollisionData().indices
+			if ind == 0:
+				faces = np.add(faces,ind)
+			else:
+				faces = np.add(faces,ind+1)
+			try:
+				ind = faces[-1][-1]
+			except:
+				pass
+		
+			#print "link: ", link, "\nStarting index for this link: ", len(all_vertices)
+			link_pose = poseFromMatrix(link.GetTransform())
+			transform_vertices = poseTransformPoints(link_pose, vertices)
+			all_vertices.extend(transform_vertices.tolist())
+			all_faces.extend(faces.tolist())
+		self.all_faces = all_faces
+		self.all_vertices = all_vertices
+
+	def writeSTL(self, save_filename):
+		faces_points = []
+		for vec in self.all_faces:
+			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
+		
+		pdb.set_trace()
+		with open(save_filename,'wb') as fp:
+			writer = Binary_STL_Writer(fp)
+			writer.add_faces(faces_points)
+			writer.close()
+
+	def generateSTL(self, save_filename):
+		self.getSTLFeatures()
+		self.writeSTL(save_filename)
+
+
+
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):
 		self.i = 1
@@ -477,13 +566,23 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		
 		
 if __name__ == '__main__': #For testing classes (put code below and run in terminal)
-	# V = Vis()
-	# H = HandVis(V)
-	# O = ObjectGenericVis(V)
-	# H.loadHand()
-	# O.loadObject('cube', 3, 3, 3)
-	G = AddGroundPlane(V)
-	G.createGroundPlane(0)
-	Gr = AddGroundPlane(V)
-	Gr.createGroundPlane(0)
+	V = Vis()
+	H = HandVis(V)
+	O = ObjectGenericVis(V)
+	H.loadHand()
+	O.loadObject('cube', 3, 3, 3)
+	# G = AddGroundPlane(V)
+	# G.createGroundPlane(0)
+	# Gr = AddGroundPlane(V)
+	# Gr.createGroundPlane(0)
+
+	#A = ArmVis(V)
+	#A.loadArm()
+	#A.generateSTL('test1.stl')
+	# for i in range(10):
+	# 	JA = np.zeros(17)
+	# 	JA[0:7] = np.random.rand(7) * 2 - 1
+	# 	A.setJointAngles(JA)
+	# 	raw_input('Continue?')
 	pdb.set_trace()
+
