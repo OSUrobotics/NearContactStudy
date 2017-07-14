@@ -1,16 +1,16 @@
 import sys, os, copy, csv, re, pdb, time, subprocess
+import numpy as np 
+import matplotlib.pyplot as plt
+from PIL import Image
+import cv2
 from openravepy import *
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../Interpolate Grasps/'
+classdir = curdir +'/../InterpolateGrasps/'
 sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 imagegendir = curdir +'/../ShapeImageGenerator/' # path to image, stl generator classes
 sys.path.insert(0, imagegendir)
 from ShapeImageGeneratorTest import ShapeImageGenerator
-import numpy as np 
-import matplotlib.pyplot as plt
-from PIL import Image
-import cv2
 
 
 
@@ -131,6 +131,8 @@ class TrainingVideo(object):
 		self.vis.setCamera(60, -2.25, -0.75) # Numbers are completely arbitrary, gives a good view of object and hand.
 
 
+<<<<<<< HEAD
+=======
 		# Moves the hand and closes the fingers in a suitable manner for this video
 		self.handRecord(0, 0, -0.17)
 		self.handRecord(0, -0.13, -0.17)
@@ -161,6 +163,7 @@ class TrainingVideo(object):
 
 
 
+>>>>>>> 1da6194f7e10240926bd56aa6e95bac27321c07b
 if __name__ == '__main__':
 	TV = TrainingVideo()
 	TV.Video1()
