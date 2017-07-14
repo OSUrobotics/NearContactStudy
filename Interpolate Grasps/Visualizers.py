@@ -5,18 +5,16 @@ import sys, os, pdb, copy, subprocess
 
 
 import platform
+print platform.node()
 if platform.node() == 'Sonny': #lab computer
 	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
 	import retract_finger
-elif platform.node() == 'Desktop': #personal desktop Linux
+elif platform.node()[0:3] == 'reu': #personal desktop Linux
 	base_path = os.path.dirname(os.path.realpath(__file__))
-	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
-	sys.path.append(retract_fingers_path)
-	import retract_finger
+	retract_fingers_path = os.path.expanduser('~/NearContactStudy/Interpolate Grasps/')
 
 else: # personal desktop Windows
 	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
-
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -29,9 +27,6 @@ Then initialize other objects (hands, boxes, cones, etc.) with the Vis class
 Significantly more commenting is necessary to make this usable
 
 '''
-
-
-
 
 
 

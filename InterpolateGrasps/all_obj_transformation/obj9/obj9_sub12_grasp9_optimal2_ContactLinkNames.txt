@@ -1,6 +1,0 @@
-palm contact
-finger_1_prox
-finger_1_med
-finger_1_dist
-finger_2_prox
-finger_2_dist
