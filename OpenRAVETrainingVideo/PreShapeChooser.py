@@ -1,6 +1,7 @@
 import wx, pdb
 import HandView
 import os
+import math
 
 
 class ChooserGUI(wx.Frame):
@@ -8,35 +9,43 @@ class ChooserGUI(wx.Frame):
 		self.pregrasp_list = ['The Claw', 'The Pinch', 'The Cup', 'The Two-fer']
 		self.currentShapeSize = {"shape":"cube", "h":"3", "w":"3", "e":"3", "a":"10"}
 		self.sizeOptions = {}
-		self.shape_list = []
+		self.shape_list = {}
 		self.findAllShapeSizeOptions()
-		self.wristAngle = 0
-		self.offset = 20
+		self.wristAngle = {'X':0, 'Y':0, 'Z':0}
+		self.offset = {'X':50, 'Y':50, 'Z':50}
 		self.view = HandView.HandView()
 		wx.Frame.__init__(self, parent=None, title="PreGrasp Chooser", pos=(-1, -1));
-		self.sizer = wx.FlexGridSizer(2, 1, 20)
 		self.addEverything()
 		self.SetSizer(self.sizer)
 		self.sizer.Fit(self)
 		self.Show()		
 
 	def addEverything(self):
-		self.sizer = wx.FlexGridSizer(5, 1, 20)
+		self.sizer = wx.FlexGridSizer(8, 2, 20)
+		self.TitleFont = wx.Font(10,wx.DEFAULT, wx.NORMAL, wx.BOLD)
+		self.addShapeButtons()
+		self.sizer.Add(self.shapePnl, 0, wx.EXPAND)
+		self.addPreGraspButtons()
+		self.sizer.Add(self.pgPnl, 0, wx.EXPAND)
 		self.addShapeSizes()
 		self.sizer.Add(self.sizesPnl, 0, wx.EXPAND)
-		self.addShapeButtons()
-		self.sizer.Add(self.shapeButtonSizer, 0, wx.EXPAND)
-		self.addPreGraspButtons()
-		self.sizer.Add(self.pgButtonSizer, 0, wx.EXPAND)
-		self.addWristAndOffset()
-		self.sizer.Add(self.wristOffPnl, 0, wx.EXPAND)
+		self.addWristSliders()
+		self.sizer.Add(self.wristPnl, 0, wx.EXPAND)
+		self.addOffsetSliders()
+		self.sizer.Add(self.offPnl, 0, wx.EXPAND)
 		self.addFingers()
 		self.sizer.Add(self.fingerPnl, 0, wx.EXPAND)
 
 	def parseImageFileName(self, name):
 		underscore = name.find("_")
-		if name[0:underscore] not in self.shape_list:
-			self.shape_list.append(name[0:underscore])
+		current_shape = name[0:underscore]
+		if current_shape not in self.shape_list:
+			self.shape_list[current_shape] = []
+			for character in name[underscore:]:
+				if character.isalpha():
+					self.shape_list[current_shape].append(character)
+				if character == '.':
+					break
 		while underscore != -1:
 			dimension = name[underscore+1]
 			value = ""
@@ -55,27 +64,41 @@ class ChooserGUI(wx.Frame):
 			self.parseImageFileName(image)
 		for dimension in self.sizeOptions:
 			self.sizeOptions[dimension] = [str(value) for value in sorted(self.sizeOptions[dimension])]
+		print self.shape_list
+	
+	def addOffsetSliders(self):
+		self.offPnl= wx.Panel(self)
+		self.offPnl.SetBackgroundColour((0xd9,0xfc,0xd9))
+		offSizer = wx.FlexGridSizer(7,1,10)
+		self.offsetSliders = {}
+		offLabel = wx.StaticText(self.offPnl, label='Object Offset', style=wx.ALIGN_CENTER)
+		offLabel.SetFont(self.TitleFont)
+		offSizer.Add(offLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
+		for dimension in ['X', 'Y', 'Z']:
+			dimensionLabel = wx.StaticText(self.offPnl, label = '\t'+dimension, style=wx.ALIGN_LEFT)
+			offSizer.Add(dimensionLabel, 1, wx.ALIGN_LEFT)
+			self.offsetSliders[dimension] = wx.Slider(self.offPnl, value = self.offset[dimension], minValue = 0, maxValue = 100, size=(250,40),
+				style = wx.SL_HORIZONTAL|wx.SL_LABELS)
+			self.offsetSliders[dimension].Bind(wx.EVT_SLIDER, self.OnOffset)
+			offSizer.Add(self.offsetSliders[dimension],1,flag = wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border = 10)
+		self.offPnl.SetSizer(offSizer)
 
-	def addOffsetSlider(self):
-		self.offLabel = wx.StaticText(self.wristOffPnl, label='Object Offset', style=wx.ALIGN_CENTER)
-		self.wristOffSizer.Add(self.offLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
-		self.offSlider = wx.Slider(self.wristOffPnl, value = self.offset, minValue = 0, maxValue = 100, size=(200,40),
-				style = wx.SL_HORIZONTAL|wx.SL_LABELS)
-		self.offSlider.Bind(wx.EVT_SLIDER, self.OnOffset)
-		self.wristOffSizer.Add(self.offSlider,1,flag = wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border = 10)
-	def addWristSlider(self):
-		self.wristLabel = wx.StaticText(self.wristOffPnl, label='Wrist Angle', style=wx.ALIGN_CENTER)
-		self.wristOffSizer.Add(self.wristLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
-		self.wristSlider = wx.Slider(self.wristOffPnl, value = 0, minValue = 0, maxValue = 100, size=(200,40),
-				style = wx.SL_HORIZONTAL|wx.SL_LABELS)
-		self.wristSlider.Bind(wx.EVT_SLIDER, self.OnRotation)
-		self.wristOffSizer.Add(self.wristSlider,1,flag = wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border = 10)
-	def addWristAndOffset(self):
-		self.wristOffPnl = wx.Panel(self)
-		self.wristOffSizer = wx.FlexGridSizer(2,2,10)
-		self.addWristSlider()
-		self.addOffsetSlider()
-		self.wristOffPnl.SetSizer(self.wristOffSizer)
+	def addWristSliders(self):
+		self.wristPnl = wx.Panel(self)
+		self.wristPnl.SetBackgroundColour((0xdd,0xd9,0xfc))
+		wristSizer = wx.FlexGridSizer(7,1,10)
+		self.wristSliders = {}
+		wristLabel = wx.StaticText(self.wristPnl, label="Wrist Rotation", style=wx.ALIGN_CENTER)
+		wristLabel.SetFont(self.TitleFont)
+		wristSizer.Add(wristLabel, 1, wx.ALIGN_CENTER_HORIZONTAL)
+		for dimension in ['X', 'Y', 'Z']:
+			dimensionLabel = wx.StaticText(self.wristPnl, label='\t'+dimension, style=wx.ALIGN_LEFT)
+			wristSizer.Add(dimensionLabel, 1, wx.ALIGN_LEFT)
+			self.wristSliders[dimension] = wx.Slider(self.wristPnl, value=self.wristAngle[dimension], minValue=0, maxValue=100, size=(250,40),
+				style=wx.SL_HORIZONTAL|wx.SL_LABELS)
+			self.wristSliders[dimension].Bind(wx.EVT_SLIDER, self.OnRotation)
+			wristSizer.Add(self.wristSliders[dimension],1,flag=wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border=10)
+		self.wristPnl.SetSizer(wristSizer)
 
 	def addFingerLabels(self):
 		for i in range(1, 4):
@@ -89,40 +112,50 @@ class ChooserGUI(wx.Frame):
 			self.fingerSizer.Add(self.fingers[-1],1,flag = wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.TOP, border = 20)
 	def addFingers(self):
 		self.fingers = []
-		self.fingerPnl = wx.Panel(self) 
+		self.fingerPnl = wx.Panel(self)
+		self.fingerPnl.SetBackgroundColour((0xdd,0xd9,0xfc))
 		self.fingerSizer = wx.FlexGridSizer(2, 3, 10)
 		self.addFingerLabels()
 		self.addFingerSliders()
 		self.fingerPnl.SetSizer(self.fingerSizer)
 
 	def addShapeButtons(self):
-		self.shapeButtonSizer = wx.FlexGridSizer(1, len(self.shape_list), 10)
+		self.shapePnl = wx.Panel(self)
+		self.shapePnl.SetBackgroundColour((0xd9,0xfc,0xd9))
+		shapeButtonSizer = wx.FlexGridSizer(math.ceil(len(self.pregrasp_list)/3), 3, 10)
 		self.shape_buttons = []
 		for shape in self.shape_list:
-			current_button = wx.Button(self, -1, shape)
+			current_button = wx.Button(self.shapePnl, -1, shape)
 			self.shape_buttons.append(current_button)
 			current_button.Bind(wx.EVT_BUTTON, self.objectChosen)
-			self.shapeButtonSizer.Add(current_button, 1, wx.EXPAND)
+			shapeButtonSizer.Add(current_button, 1, wx.EXPAND)
+		self.shapePnl.SetSizer(shapeButtonSizer)
 
 	def addPreGraspButtons(self):
-		self.pgButtonSizer = wx.FlexGridSizer(1, len(self.pregrasp_list), 10)
+		self.pgPnl = wx.Panel(self)
+		self.pgPnl.SetBackgroundColour((0xdd,0xd9,0xfc))
+		pgButtonSizer = wx.FlexGridSizer(math.ceil(len(self.pregrasp_list)/3), 3, 10)
 		self.pg_buttons = []
 		for pg in self.pregrasp_list:
-			current_button = wx.Button(self, -1, pg)
+			current_button = wx.Button(self.pgPnl, -1, pg)
 			self.pg_buttons.append(current_button)
 			current_button.Bind(wx.EVT_BUTTON, self.graspChosen)
-			self.pgButtonSizer.Add(current_button, 1, wx.EXPAND)
+			pgButtonSizer.Add(current_button, 1, wx.EXPAND)
+		self.pgPnl.SetSizer(pgButtonSizer)
 
 	def addShapeSizes(self):
 		self.sizesPnl = wx.Panel(self)
+		self.sizesPnl.SetBackgroundColour((0xd9,0xfc,0xd9))
 		self.sizesSizer = wx.FlexGridSizer(len(self.sizeOptions), 1, 10)
-		self.sizeRbs ={}
+		self.sizeRbs = {}
 		for dimension in self.sizeOptions:
-			rBox = wx.RadioBox(self.sizesPnl, 1, dimension, choices=self.sizeOptions[dimension])
-			rBox.SetSelection(0)
-			rBox.Bind(wx.EVT_RADIOBOX, self.OnSizeSelection)
-			self.sizesSizer.Add(rBox, 1, wx.EXPAND)
+			self.sizeRbs[dimension] = wx.RadioBox(self.sizesPnl, 1, dimension, choices=self.sizeOptions[dimension])
+			self.sizeRbs[dimension].SetSelection(0)
+			self.sizeRbs[dimension].Bind(wx.EVT_RADIOBOX, self.OnSizeSelection)
+			self.sizesSizer.Add(self.sizeRbs[dimension], 1, wx.EXPAND)
 			self.currentShapeSize[dimension] = self.sizeOptions[dimension][0]
+			if dimension == 'a':
+				self.sizeRbs[dimension].Disable()
 		self.sizesPnl.SetSizer(self.sizesSizer)
 
 	"--------------------------------------------------------------------------"
@@ -145,12 +178,11 @@ class ChooserGUI(wx.Frame):
 	def objectChosen(self, event):
 		clicked = event.GetEventObject().GetLabel()
 		self.currentShapeSize["shape"] = clicked
-		if clicked != "cone" and "a" in self.sizeRbs:
-			for rb in self.sizeRbs["a"]:
-				rb.Disable()
-		elif clicked == "cone" and "a" in self.sizeRbs:
-			for rb in self.sizeRbs["a"]:
-				rb.Enable()
+		for dimension in self.sizeRbs:
+			if dimension not in self.shape_list[clicked]:
+				self.sizeRbs[dimension].Disable()
+			else:
+				self.sizeRbs[dimension].Enable()
 		self.view.setObject(self.currentShapeSize)
 	
 	def OnFinger(self, event):
@@ -159,15 +191,22 @@ class ChooserGUI(wx.Frame):
 		print self.view.changeFingerPosition(finger, slider.GetValue())
 
 	def OnRotation(self, event):
-		slider = event.GetEventObject()
-		newAngle = slider.GetValue()
-		self.view.setWristRotation(newAngle-self.wristAngle)
-		self.wristAngle = newAngle
+		for dimension in self.wristSliders:
+			if self.wristSliders[dimension] == event.GetEventObject():
+				direction = dimension
+				break
+		newAngle = event.GetEventObject().GetValue()
+		self.view.setWristRotation(direction, newAngle-self.wristAngle[direction])
+		self.wristAngle[direction] = newAngle
 
 	def OnOffset(self, event):
+		for dimension in self.offsetSliders:
+			if self.offsetSliders[dimension] == event.GetEventObject():
+				direction = dimension
+				break
 		newOffset = event.GetEventObject().GetValue()
-		self.view.setObjectOffset(float(self.offset-newOffset)/200)
-		self.offset = newOffset
+		self.view.setObjectOffset(direction, float(self.offset[direction]-newOffset)/200)
+		self.offset[direction] = newOffset
 
 "----------------------------------------------------------------------------"
 
