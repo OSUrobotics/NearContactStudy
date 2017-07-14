@@ -1,16 +1,16 @@
 import sys, os, copy, csv, re, pdb, time, subprocess
+import numpy as np 
+import matplotlib.pyplot as plt
+from PIL import Image
+import cv2
 from openravepy import *
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../Interpolate Grasps/'
+classdir = curdir +'/../InterpolateGrasps/'
 sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis
 imagegendir = curdir +'/../ShapeImageGenerator/' # path to image, stl generator classes
 sys.path.insert(0, imagegendir)
 from ShapeImageGeneratorTest import ShapeImageGenerator
-import numpy as np 
-import matplotlib.pyplot as plt
-from PIL import Image
-import cv2
 
 
 
@@ -124,12 +124,6 @@ class TrainingVideo(object):
 		d_min = -0.2
 		frames = abs(d_max - d_min) * frame_rate
 		self.handRecord(np.linspace(d_max,d_min,frames), 'y')
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

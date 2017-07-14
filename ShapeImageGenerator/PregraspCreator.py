@@ -46,7 +46,7 @@ class Tester(wx.Frame): # would be cool to do this directly in OpenRave by click
 		self.panel.SetSizer(self.box)
 		self.box.Fit(self)
 		self.UpdateSlidersEvent, self.EVT_UPDATESLIDERS = wx.lib.newevent.NewEvent()
-		self.Bind(self.EVT_UPDATESLIDERS, self.updateSliders)
+		self.Bind(self.EVT_UPDATESLIDERS, self.update_sliders)
 
 	def update_sliders(self):
 		for (name,joint_info) in self.joint_map.items():
