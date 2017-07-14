@@ -408,6 +408,7 @@ class HandVis(GenVis):
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
 	
+	# Kadon Engle - last edited 07/14/17
 	def getContactPoints(self): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
 		report = CollisionReport()

@@ -30,6 +30,7 @@ class TrainingVideo(object):
 		self.vis.takeImage(fn, delay = False)
 		self.frameCount += 1
 
+	# Kadon Engle - last edited 07/14/17
 	def fingerRecord(self, oldJA, newJA): # Records a frame for multiple join angles between the starting array (OldJA) amd the ending array (newJA)
 		try:
 			frame_rate = 20 # An arbitrary base line for the frames in each hand movement
@@ -42,20 +43,21 @@ class TrainingVideo(object):
 				current = np.linspace(oldJA[i], newJA[i], frames)
 				for k in range(frames):
 					Angles[k].append(current[k])
-			for i in Angles:
-				iP = 
+			for i in Angles: #More work is necessary on detecting finger collision to stop the fingers
 				self.Hand.setJointAngles(np.array(i))
-				if len(self.Hand.getContactPoints()) > 0:
-
-					break
+				# if len(self.Hand.getContactPoints()) > 0:
+				# 	pdb.set_trace()
+				# 	self.Hand.setJointAngles(Angles[-2])
+				# 	break
 				self.recordFrame()
 		except:
 			print "Invalid Joint Angle"
 
+	# Kadon Engle - last edited 07/14/17
 	def handRecord(self, x, y, z): # Records frames as hand moves in x, y, and/or z direction
 		self.T_current = self.Hand.obj.GetTransform()
 		T = copy.deepcopy(self.T_current)
-		frames = 20 # Arbitrary value, needs to be changed so that when x, y, or z moves shorter distances, it records less frames.
+		frames = 20 # Arbitrary value, needs to be changed so that when x, y, or z moves shorter distances, it records less frames. Should be changed so that it records less frames for shorter movements and more frames for longer movements.
 		xyz = [x, y, z]
 		for idx, i in enumerate(xyz):
 			if abs(i - self.T_current[idx,3]) > 0.1e-5:
@@ -127,42 +129,32 @@ class TrainingVideo(object):
 		# self.vis.setCamera(60,3*np.pi/4,-np.pi/4-0.1)
 		# self.vis.setCamera(60, np.pi, -np.pi/2)
 		self.vis.setCamera(60, -2.25, -0.75) # Numbers are completely arbitrary, gives a good view of object and hand.
-		
 
 
-
+		# Moves the hand and closes the fingers in a suitable manner for this video
+		self.handRecord(0, 0, -0.17)
+		self.handRecord(0, -0.13, -0.17)
+		self.handRecord(0, -0.13, -0.115)
 		self.fingerRecord(oHand, cHand)
-		# self.fingerRecord(cHand, oHand)
-		pdb.set_trace()
-		
-
-		# # Moves the hand and closes the fingers in a suitable manner for this video
-		# self.handRecord(0, 0, -0.17)
-		# self.handRecord(0, -0.13, -0.17)
-		# self.handRecord(0, -0.13, -0.115)
-		# self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0, -0.13, -0.17)
-		# self.handRecord(0, 0.1, -0.17)
-		# self.handRecord(0, 0.1, -0.115)
-		# self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0, 0.1, -0.17)
-		# self.handRecord(0, 0, -0.17)
-		# self.handRecord(-0.05, 0, -0.17)
-		# self.handRecord(-0.05, 0, -0.115)
-		# self.stationaryRecord(5)
-		# self.handRecord(-0.05, 0, -0.17)
-		# self.handRecord(0.05, 0, -0.17)
-		# self.handRecord(0.05, 0, -0.115)
-		# self.stationaryRecord(5)
-		# self.handRecord(0.05, 0, -0.17)
-		# self.handRecord(0, 0, -0.17)
-
-
-
+		self.stationaryRecord(5)
+		self.fingerRecord(cHand, oHand)
+		self.handRecord(0, -0.13, -0.17)
+		self.handRecord(0, 0.1, -0.17)
+		self.handRecord(0, 0.1, -0.115)
+		self.fingerRecord(oHand, cHand)
+		self.stationaryRecord(5)
+		self.fingerRecord(cHand, oHand)
+		self.handRecord(0, 0.1, -0.17)
+		self.handRecord(0, 0, -0.17)
+		self.handRecord(-0.05, 0, -0.17)
+		self.handRecord(-0.05, 0, -0.115)
+		self.stationaryRecord(5)
+		self.handRecord(-0.05, 0, -0.17)
+		self.handRecord(0.05, 0, -0.17)
+		self.handRecord(0.05, 0, -0.115)
+		self.stationaryRecord(5)
+		self.handRecord(0.05, 0, -0.17)
+		self.handRecord(0, 0, -0.17)
 
 
 
