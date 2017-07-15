@@ -77,7 +77,7 @@ class Vis(object): #General Class for visualization
 
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
 		dirname, filename = os.path.split(fname)
-		if not os.path.exists(dirname): #check if folder exists, if not, make folder
+		if not os.path.exists(dirname) and dirname != '': #check if folder exists, if not, make folder
 			os.mkdir(dirname)
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
 			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
@@ -293,7 +293,7 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 		self.objCheck()
 		self.h = int(h)
 		self.w = int(w)
-		self.e = int(w)
+		self.e = int(e)
 
 		if a is not None:
 			self.a = int(a)

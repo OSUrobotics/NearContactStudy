@@ -29,7 +29,7 @@ class ShapeImageGenerator(object):
 		for root, dirs, filenames in os.walk(directory):
 			if filenames != []:
 				for fname in filenames:
-					if os.path.splitext(fname)[1] == '.stl': #only want text files
+					if os.path.splitext(fname)[1] == '.stl': #only want stl files
 						self.STLFileList.append(root + '/' + fname)
 
 	def valuesFromFileName(self, fn_abs): # gets features of object from file name
@@ -112,9 +112,13 @@ class ShapeImageGenerator(object):
 		return mat_num
 
 	def createImagesFromParametersList(self, shapes = None): # creates images from a list of parameters
+		print("Total: %s" %(len(self.params_list)))
+		counter = 0
 		for params in self.params_list:
+			counter += 1
 			if ((shapes == None) or (params['Model'].split('_')[0] in shapes)): # allows only a single set of shapes to be made from list. Mostly during development
 				self.createImageFromParameters(params)
+				print("Current: %s" %counter)
 
 	def createImageFromParameters(self, params): # creates image from a single set of parameters
 		objLoadSuccess = self.loadObjectFromParameters(params)
@@ -277,7 +281,11 @@ class Tester(object): # this is just meant to test different parts of the class
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
 		# self.SIG.createImagesFromParametersList(shapes = ['cube'])
-		self.SIG.createImagesFromParametersList()
+		self.SIG.createImagesFromParametersList(shapes = ['ellipse'])
+		# self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
+		# self.SIG.createImagesFromParametersList(shapes = ['cone'])
+		# self.SIG.createImagesFromParametersList()
+		print("Image Generation Complete!")
 
 	def Test6(self): # Description: Create CSV file for making images
 		fn = curdir + '/ImageGeneratorParameters.csv'
@@ -308,23 +316,24 @@ class Tester(object): # this is just meant to test different parts of the class
 					h_limit = -(0.12) # this is specific to this grasp!
 					h_offset = -(h/2 + clearance)
 					if h_offset > h_limit:
-						# pdb.set_trace()
 						h_offset = h_limit + h/2
 					h_offset -= 0.075 # origin of hand is the base of the hand
-					handT[0][2,3] = -e/2.0 - clearance - 0.075
+					handT[0][2,3] = -.01 + -e/2.0 - clearance - 0.075
 					handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
 										[ 0.   ,  0.   ,  1.   , h_offset],
 										[-0.   , -1.   ,  0.   ,  0],
 										[ 0.   ,  0.   ,  0.   ,  1.   ]])
-					D['Hand Matrix'] = handT[ip]
+					D['Hand Matrix'] = copy.deepcopy(handT[ip])
 					ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  0],  [ 0.,  0.,  0.,  1.]] )
 					D['Model Matrix'] = ModelMatrix
 					D['Camera Transform'] = cameraT
 					ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
 					D['Image Save Name'] = ImageSaveName
 					D['Image Size'] = '' # need to do something for this step -- image size
-					L.append(D)
 
+					# if len(L) >= 9:
+					# 	pdb.set_trace()
+					L.append(D)
 		for model in self.SIG.STLFileList:
 			D = dict.fromkeys(headers)
 			D['Camera Transform'] = CameraTransform[0]
@@ -337,7 +346,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		with open(fn, 'wb') as file:
 			writer = csv.DictWriter(file, headers)
 			writer.writeheader()
-			for l in L:
+			for i,l in enumerate(L):
 				writer.writerow(l)
 		print("Successfully wrote to CSV file")
 
@@ -346,9 +355,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		# pdb.set_trace()
-		self.SIG.createImageFromParameters(self.SIG.params_list[-1])
-		# pdb.set_trace()
+		self.SIG.createImageFromParameters(self.SIG.params_list[8])
+		pdb.set_trace()
 
 	def Test8(self): # Description: Adding Ground plane with object
 		self.SIG.loadSTLFileList()
@@ -384,8 +392,9 @@ class Tester(object): # this is just meant to test different parts of the class
 
 if __name__ == '__main__':
 	T = Tester()
-	T.Test6()
+	# T.Test6()
 	T.Test5()
+	# T.Test7()
 	# T.Test8()
 	
 

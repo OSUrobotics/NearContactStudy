@@ -41,7 +41,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 	def cropOpenRAVEBoarder(self,image1): # crops image.  image1 is a PIL.Image object
 		im1 = self.imageTypeCheck(image1)
 		cur_box = im1.getbbox()
-		if cur_box != (0,0,640,480):
+		if cur_box != (0,0,640,480): #should crop images down to desired size if they are larger
 			print("Image has been cropped already")
 			return image1
 		crop_box = (30,20,600,420)
@@ -86,13 +86,13 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		im_reduced = im.resize(size, resample = Image.NEAREST)
 		return im_reduced
 
-	def reduceSizeAllImages(self, dir_name_in, dir_name_out): # reduce the size of all images in a folder and subfolders:
+	def reduceSizeAllImages(self, dir_name_in, dir_name_out, size = (128, 128)): # reduce the size of all images in a folder and subfolders:
 		for files in os.walk(dir_name_in):
 			for im_path in files[2]:
 				if os.path.splitext(im_path)[1] == '.png':
 					image_fn = os.path.join(files[0], im_path)
 					image_orig = Image.open(image_fn)
-					image_reduced = self.reduceSize(image_orig)
+					image_reduced = self.reduceSize(image_orig, size)
 					#putting images in the same folder based on source folder structure
 					image_reduced_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
 					self.folderCheck(os.path.split(image_reduced_fn)[0])
@@ -115,8 +115,8 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
-	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
-	# SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced')
-	# SIM.uploadMultipleImages('GeneratedImagesReduced/')
+	SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
+	SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced', size = (285, 200))
+	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
-	SIM.combineImagesTopRight('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png', 'GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam1.png', percent_image2 = 30)
+	# SIM.combineImagesTopRight('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png', 'GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam1.png', percent_image2 = 30)

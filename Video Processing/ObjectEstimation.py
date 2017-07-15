@@ -238,19 +238,6 @@ class BagReader(object):
 		out = [self.vis.drawPoints(pt[0:3]) for pt in pts] #this will likely crash openRAVE
 
 
-
-
-
-# Description: Class that can parse data from bag file
-# seperate out depth cloud data
-# create STL file for frame
-
-class DataExtraction(object):
-	def __init__(self):
-		self.i = 1
-
-
-
 if __name__ == '__main__':
 	B = BagReader('DataCollectionTest/DataCollectionTest2', 20, 10)
 	

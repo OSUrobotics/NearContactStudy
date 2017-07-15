@@ -40,10 +40,10 @@ class Estimation(object):
 			if cv2.waitKey(1) & 0xFF == ord('q'):
 				break
 			if cv2.waitKey(1) & 0xFF == ord('r'):
-				print('R Pressed')
+				print('R Pressed, returning image')
 				return frame
 			if cv2.waitKey(1) & 0xFF == ord('s'):
-				print('S Pressed')
+				print('S Pressed, saving image')
 				cv2.imwrite('test_image.png', frame)
 				return frame
 
@@ -53,46 +53,76 @@ class Estimation(object):
 		frame = cv2.imread(fn)
 		return frame
 
-	def showImage(self, frame, frame_title = 'Frame Preview'):
+	def showImage(self, frame, frame_title = 'Frame Preview', time_open = 0, new_window = True):
 		cv2.namedWindow(frame_title, flags = cv2.WINDOW_NORMAL)
 		cv2.imshow(frame_title, frame)
-		if cv2.waitKey(0) & 0xFF == ord('q'):
+		if cv2.waitKey(time_open) & 0xFF == ord('q'):
 			return
-		cv2.destroyAllWindows() # displays image
+		if new_window == True:
+			cv2.destroyAllWindows() # displays image
 
-	def harrisCorners(self, image):
+	def gridCorners(self, image, showImage = False):
 		# convert to gray scale
 		grey = self.convertToGray(image)
 		# self.showImage(grey, frame_title = 'Grey Scale')
 		# grey = np.float32(grey)
-		# self.showImage(grey)
+		self.showImage(grey)
 
 		# blur image
-		grey_blur = cv2.GaussianBlur(grey, (0, 0), 11) #arbitrarily choose blurring parameter
+		# grey_blur = cv2.GaussianBlur(grey, (0, 0), 11) #arbitrarily choose blurring parameter
 		# self.showImage(grey_blur, frame_title = 'Blurred Image')
 
 		# find harris corners
 		blockSize = 2
-		aperatureSize = 21
+		aperatureSize = 11
 		k = 0.01
+		pdb.set_trace()
 		image_out = cv2.cornerHarris(grey, blockSize, aperatureSize, k)
 		# self.showImage(image_out, 'Harris Corners Detected') # very small white dots on black background
 		
 		# get location of harris corners
-		x, y = np.where(image_out >= 0.5 * image_out.max()) # can change threshold if necessary
+		x, y = np.where(image_out >= 0.1 * image_out.max()) # can change threshold if necessary
 
-		# show harris corners on original image
+		# remove corners that are sufficiently close
+		xy = np.array(zip(x,y))
+		xy_trimmed = self.uniquePointsNoOverlap(xy, distance_limit = 20)
+
+		# for the cylinder, 952 pixels = 32.75 mm --> i am not sure what this conversion should be
+		# get actual distance between points to do triangle inequality
+		xy_pos = xy_trimmed.astype(float) / 3.275 # locations in "image" in pixels
+
+		if showImage:
+			self.plotPointsOnImage(image, xy_trimmed)
+			pdb.set_trace()
+
+			# image_out = cv2.dilate(image_out, None)
+			# self.showImage(image_out, frame_title = 'Dilated Image')
+
+			# image_out[image_out>0.5*image_out.max()]=[0,0,255] # threshold for being a corner!
+			# self.showImage(image_out, frame_title = 'Harris Corners Marked')
+
+		return xy_pos
+
+	def uniquePointsNoOverlap(self, xy, distance_limit = 100):
+		pop_indxs = np.ones(xy.shape[0], dtype = bool) #keeps which locations are repeats
+		for i,p in enumerate(xy[:-1]): #for all points. don't need to check last point
+			for ie, pe in enumerate(xy[i+1:], i+1): # for all remaining points in list
+				dist = p - pe
+				if np.linalg.norm(dist) < distance_limit: # if sufficiently close
+					pop_indxs[ie] = False # add point to be removed
+			print("Unique Points Percent Complete: %s \r" %(i/float(len(xy)))),
+		xy_trimmed = np.array([p for i,p in enumerate(xy) if pop_indxs[i]])
+		xy_trimmed = xy_trimmed[xy_trimmed[:,0].argsort()] #sort by first value (x dim in picture)
+		return xy_trimmed
+
+	def plotPointsOnImage(self, image, points):
+		# show points on original image
 		image_circle = copy.deepcopy(image)
-		for i in range(min(len(x), len(y))):
-			image_circle = cv2.circle(image_circle, center = (x[i], y[i]), radius = 50, color = [0, 255, 0], thickness  = -1)
+		for i in range(len(points)):
+			image_circle = cv2.circle(image_circle, center = (points[i,0], points[i,1]), radius = 10, color = [0, 255, 0], thickness  = -1)
+			self.showImage(image_circle, frame_title = 'Harris Corners:', time_open = 100, new_window = False)
 		self.showImage(image_circle, frame_title = 'Harris Corners: %s' %i)
-		pdb.set_trace()
 
-		image_out = cv2.dilate(image_out, None)
-		# self.showImage(image_out, frame_title = 'Dilated Image')
-
-		image_out[image_out>0.5*image_out.max()]=[0,0,255] # threshold for being a corner!
-		self.showImage(image_out, frame_title = 'Harris Corners Marked')
 
 	def convertToGray(self, image):
 		gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
@@ -136,6 +166,19 @@ class Estimation(object):
 			pdb.set_trace()
 			self.showImage(image, frame_title = 'Optimized Chessboard')
 
+	def cannyEdgeDetection(self, frame, showImage = False): # canny edge to a an image
+		edges = cv2.Canny(frame,200,300)
+		if showImage:
+			self.showImage(edges, frame_title = 'Edge Image')
+		return edges
+
+	def cannyEdgeDetectionTest(self, frame, showImage = False): # test various values of canny edge detector
+		# detection limits may have to be different for different locations or image sources
+		for i in range(400):
+			edges = cv2.Canny(frame,i + 100,i + 200)
+			self.showImage(edges, frame_title = 'Edge Image', time_open = 100, new_window = False)
+
+
 
 
 
@@ -149,11 +192,16 @@ if __name__ == '__main__':
 	# frame = E.viewer('Videos/test2_realsense.avi')
 	# frame = E.loadImage('test_image_kinect.png')
 	# frame = E.loadImage('Checkerboard_pattern.png')
-	frame = E.loadImage('Colored Checkerboard/CylinderColoredCheckerboard.png') # works with calibration
+	# frame = E.loadImage('Colored Checkerboard/CylinderColoredCheckerboard.png') # works with calibration
+	# frame = E.loadImage('ColoredCheckerboard.png')
+	frame = E.loadImage('test_image_kinect.png')
+	# frame = E.loadImage('test_image_realsense.png')
+
 	# E.calibration(frame, grid_x = 5, grid_y = 7)
 
 	# E.showImage(frame)
-	E.harrisCorners(frame)
+	E.cannyEdgeDetectionTest(frame, showImage = True)
+	# E.gridCorners(frame, showImage = True)
 	pdb.set_trace()
 
 
