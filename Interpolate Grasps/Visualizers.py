@@ -42,6 +42,7 @@ Significantly more commenting is necessary to make this usable
 class Vis(object): #General Class for visualization
 	def __init__(self):
 		self.env = Environment()
+		# self.env.SetViewer('qtosg')
 		self.env.SetViewer('qtcoin')
 		self.viewer = self.env.GetViewer()
 		self.colors = dict()
