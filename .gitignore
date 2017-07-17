@@ -1,0 +1,5 @@
+*.pyc
+ShapeGenerator/Shapes/*.stl
+ShapeImageGenerator/GeneratedImages/*
+ShapeImageGenerator/GeneratedImagesCropped/*
+ShapeImageGenerator/GeneratedImagesReduced/*
