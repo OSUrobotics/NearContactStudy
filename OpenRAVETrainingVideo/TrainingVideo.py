@@ -107,7 +107,7 @@ class TrainingVideo(object):
 	def VLCPlay(self, fn):
 		subprocess.call(["vlc", fn])
 
-	def Video1(self):
+	def Video1(self): 
 		# setup
 		self.Obj.loadObject('cube',36,18,3,None)  # TODO: Object with larger extent!
 		self.Obj.changeColor('purpleI')
@@ -148,34 +148,34 @@ class TrainingVideo(object):
 
 
 		# Moves the hand and closes the fingers in a suitable manner for this video
-		self.handRecord(0, 0, -0.15)
-		cHand = self.fingerRecord(oHand, cHand)
-		self.stationaryRecord(5)
-		self.fingerRecord(cHand, oHand)
-		self.handRecord(0, -0.13, -0.15)
-		self.handRecord(0, -0.13, -0.115)
-		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
-		cHand = self.fingerRecord(oHand, cHand)
-		self.stationaryRecord(5)
-		self.fingerRecord(cHand, oHand)
-		self.handRecord(0, -0.13, -0.15)
-		self.handRecord(0, 0.1, -0.15)
-		self.handRecord(0, 0.1, -0.115)
-		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
-		cHand = self.fingerRecord(oHand, cHand)
-		self.stationaryRecord(5)
-		self.fingerRecord(cHand, oHand)
-		self.handRecord(0, 0.1, -0.15)
-		self.handRecord(0, 0, -0.15)
-		self.handRecord(-0.05, 0, -0.15)
-		self.handRecord(-0.05, 0, -0.115)
-		self.stationaryRecord(5)
-		self.handRecord(-0.05, 0, -0.15)
-		self.handRecord(0.05, 0, -0.15)
-		self.handRecord(0.05, 0, -0.115)
-		self.stationaryRecord(5)
-		self.handRecord(0.05, 0, -0.15)
-		self.handRecord(0, 0, -0.15)
+		# self.handRecord(0, 0, -0.15)
+		# cHand = self.fingerRecord(oHand, cHand)
+		# self.stationaryRecord(5)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0, -0.13, -0.15)
+		# self.handRecord(0, -0.13, -0.115)
+		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
+		# cHand = self.fingerRecord(oHand, cHand)
+		# self.stationaryRecord(5)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0, -0.13, -0.15)
+		# self.handRecord(0, 0.1, -0.15)
+		# self.handRecord(0, 0.1, -0.115)
+		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
+		# cHand = self.fingerRecord(oHand, cHand)
+		# self.stationaryRecord(5)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0, 0.1, -0.15)
+		# self.handRecord(0, 0, -0.15)
+		# self.handRecord(-0.05, 0, -0.15)
+		# self.handRecord(-0.05, 0, -0.115)
+		# self.stationaryRecord(5)
+		# self.handRecord(-0.05, 0, -0.15)
+		# self.handRecord(0.05, 0, -0.15)
+		# self.handRecord(0.05, 0, -0.115)
+		# self.stationaryRecord(5)
+		# self.handRecord(0.05, 0, -0.15)
+		# self.handRecord(0, 0, -0.15)
 
 
 

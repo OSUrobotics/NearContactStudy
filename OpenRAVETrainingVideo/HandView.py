@@ -4,7 +4,7 @@ import numpy as np
 
 from openravepy import *
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../InterpolateGrasps/'
+classdir = curdir +'/../Interpolate Grasps/'
 sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis
 
