@@ -428,8 +428,18 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 		def __init__(self, V):
 			self.vis = V
 			self.groundPlane = None
+			self.colors = dict()
+			self.colors = ColorsDict.colors
 
-		def createGroundPlane(self, y_height, x = 1, y = 0, z = 1): #Removes any existing ground plane (if any), then creates a ground plane.
+		def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
+			# pdb.set_trace()
+			if type(color) is str: #loads from dictionary
+				color = self.colors[color]
+			for link in self.groundPlane.GetLinks():
+				for geos in link.GetGeometries():
+					geos.SetDiffuseColor(color)
+
+		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
 			with self.vis.env:
 				self.removeGroundPlane()
 				self.groundPlane = RaveCreateKinBody(self.vis.env, '')

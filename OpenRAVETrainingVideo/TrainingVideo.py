@@ -35,21 +35,24 @@ class TrainingVideo(object):
 		try:
 			frame_rate = 20 # An arbitrary base line for the frames in each hand movement
 			frames = int(max(abs(newJA - oldJA)) * frame_rate)
-			print frames
 			Angles = []
+			self.Hand.setJointAngles(oldJA)
+			if len(self.Hand.getContactPoints()) > 0:
+				self.Hand.setJointAngles(iP[-1])
 			for i in range(frames):
 				Angles.append(list())
 			for i in range(len(oldJA)):
 				current = np.linspace(oldJA[i], newJA[i], frames)
 				for k in range(frames):
 					Angles[k].append(current[k])
-			for i in Angles: #More work is necessary on detecting finger collision to stop the fingers
+			for n, i in enumerate(Angles): #More work is necessary on detecting finger collision to stop the fingers
 				self.Hand.setJointAngles(np.array(i))
-				# if len(self.Hand.getContactPoints()) > 0:
-				# 	pdb.set_trace()
-				# 	self.Hand.setJointAngles(Angles[-2])
-				# 	break
+				if len(self.Hand.getContactPoints()) > 0:
+					self.Hand.setJointAngles(Angles[n-1])
+					return Angles[n-1]
 				self.recordFrame()
+			return Angles[n-1]
+
 		except:
 			print "Invalid Joint Angle"
 
@@ -57,8 +60,8 @@ class TrainingVideo(object):
 	def handRecord(self, x, y, z): # Records frames as hand moves in x, y, and/or z direction
 		self.T_current = self.Hand.obj.GetTransform()
 		T = copy.deepcopy(self.T_current)
-		frames = 20 # Arbitrary value, needs to be changed so that when x, y, or z moves shorter distances, it records less frames. Should be changed so that it records less frames for shorter movements and more frames for longer movements.
 		xyz = [x, y, z]
+		frames = 20 # Arbitrary value, needs to be changed so that when x, y, or z moves shorter distances, it records less frames. Should be changed so that it records less frames for shorter movements and more frames for longer movements.
 		for idx, i in enumerate(xyz):
 			if abs(i - self.T_current[idx,3]) > 0.1e-5:
 				V = np.linspace(self.T_current[idx,3], i, frames)
@@ -107,8 +110,8 @@ class TrainingVideo(object):
 	def Video1(self):
 		# setup
 		self.Obj.loadObject('cube',36,18,3,None)  # TODO: Object with larger extent!
-		self.Obj.changeColor('greenI')
-		self.Hand.changeColor('blueI')
+		self.Obj.changeColor('purpleI')
+		self.Hand.changeColor('mustard')
 		self.GP.createGroundPlane(0.175)
 		extent_offset = -3.0/100 # offset by thickness of object
 		palm_offset = -0.075 #offset so palm is at 0,0,0
@@ -124,37 +127,55 @@ class TrainingVideo(object):
 		dist_range_min = -0.1
 		dist_range_max = 0.1
 		frame_rate = 20/0.1 # frames/cm
-		# TODO: **************
-		# fix camera angle so it is easier to see
+		# Different arbitrary camera angles for needed viewpoints
 		# self.vis.setCamera(60,3*np.pi/4,-np.pi/4-0.1)
-		# self.vis.setCamera(60, np.pi, -np.pi/2)
+		# self.vis.setCamera(60, np.pi, -np.pi/2) # top view
+		# self.vis.setCamera(60, -2.25, -np.pi/2.10)
 		self.vis.setCamera(60, -2.25, -0.75) # Numbers are completely arbitrary, gives a good view of object and hand.
+
+		
+
+		# self.handRecord(0,0,-0.15)
+		# cHand = self.fingerRecord(oHand, cHand)
+		# self.fingerRecord(cHand, oHand)
+		# self.handRecord(0,0,-0.115)
+		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
+		# cHand = self.fingerRecord(oHand, cHand)
+		# self.fingerRecord(cHand, oHand)
+		# pdb.set_trace()
+
+
 
 
 		# Moves the hand and closes the fingers in a suitable manner for this video
-		self.handRecord(0, 0, -0.17)
-		self.handRecord(0, -0.13, -0.17)
+		self.handRecord(0, 0, -0.15)
+		cHand = self.fingerRecord(oHand, cHand)
+		self.stationaryRecord(5)
+		self.fingerRecord(cHand, oHand)
+		self.handRecord(0, -0.13, -0.15)
 		self.handRecord(0, -0.13, -0.115)
-		self.fingerRecord(oHand, cHand)
+		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
+		cHand = self.fingerRecord(oHand, cHand)
 		self.stationaryRecord(5)
 		self.fingerRecord(cHand, oHand)
-		self.handRecord(0, -0.13, -0.17)
-		self.handRecord(0, 0.1, -0.17)
+		self.handRecord(0, -0.13, -0.15)
+		self.handRecord(0, 0.1, -0.15)
 		self.handRecord(0, 0.1, -0.115)
-		self.fingerRecord(oHand, cHand)
+		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
+		cHand = self.fingerRecord(oHand, cHand)
 		self.stationaryRecord(5)
 		self.fingerRecord(cHand, oHand)
-		self.handRecord(0, 0.1, -0.17)
-		self.handRecord(0, 0, -0.17)
-		self.handRecord(-0.05, 0, -0.17)
+		self.handRecord(0, 0.1, -0.15)
+		self.handRecord(0, 0, -0.15)
+		self.handRecord(-0.05, 0, -0.15)
 		self.handRecord(-0.05, 0, -0.115)
 		self.stationaryRecord(5)
-		self.handRecord(-0.05, 0, -0.17)
-		self.handRecord(0.05, 0, -0.17)
+		self.handRecord(-0.05, 0, -0.15)
+		self.handRecord(0.05, 0, -0.15)
 		self.handRecord(0.05, 0, -0.115)
 		self.stationaryRecord(5)
-		self.handRecord(0.05, 0, -0.17)
-		self.handRecord(0, 0, -0.17)
+		self.handRecord(0.05, 0, -0.15)
+		self.handRecord(0, 0, -0.15)
 
 
 
