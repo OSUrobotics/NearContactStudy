@@ -1,0 +1,4 @@
+palm contact
+finger_1_prox
+finger_1_med
+finger_1_dist

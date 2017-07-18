@@ -1,0 +1,3 @@
+palm contact
+finger_1_dist
+finger_2_prox
