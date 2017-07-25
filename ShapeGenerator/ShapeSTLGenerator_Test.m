@@ -210,7 +210,7 @@ zz = repmat(z',1,length(theta));
 surf(xx,yy,zz)
 axis equal
 %%
-height = 4; width = 0.5; extent = 0.2; r = 0.1; resolution = 100;
+height = 4; width = 0.5; extent = 0.2; r = 0.1; resolution = 50;
 r = ones(1,resolution) * r;
 y = linspace(0,1,resolution);
 theta_handle = linspace(0,2*pi,resolution);
@@ -239,8 +239,52 @@ surf(XX_scale,ZZ_scale,YY_scale)
 axis equal
 
 %% Handle Test
-ShapeSTLGenerator('handle', 100, 'handle1.stl', 5, 0.5, 0.5, 0.1);
-ShapeSTLGenerator('handle', 100, 'handle2', 5, 0.2, 0.1, 0.5);
+% ShapeSTLGenerator('handle', 100, 'handle1.stl', 5, 0.5, 0.5, 0.1);
+% ShapeSTLGenerator('handle', 100, 'handle2', 5, 0.2, 0.1, 0.5);
+ShapeSTLGenerator('handle', 100, 'handle2', 5, 0.1, 0.1, 0.1);
 
+%% Vase Discovery
+height = 10;
+width = 7;
+extent = 5;
+alpha = 2;
+resolution = 20;
+filename = 'vase_test.stl';
 
+% cylinder with a path for the outer dimension
+t = linspace(0,2*pi,resolution); % half circle
+contour = 1 + cos(t)/2 * alpha/width; contour = contour / max(contour);
+figure(6); plot(contour)
+min_r = 1 + alpha/width; % min inner radius of shape (radius is actually 1 less than this value because of cos)
+[X, Z, Y] = cylinder(contour);
+figure(1)
+surf(X,Z,Y)
+xlabel('x'); ylabel('z'); zlabel('y');axis('square')
 
+% ends
+[x_end, y_end, z_end] = ellipsoid(0,0,0,1, 0, 1, resolution);
+figure(2)
+surf(x_end,z_end,y_end)
+xlabel('x'); ylabel('z'); zlabel('y');axis('square')
+
+%
+y_top = y_end + 1;
+y_bot = y_end - 0;
+x_unit = [x_end;X;x_end];
+z_unit = [z_end;Z;z_end];
+y_unit = [y_bot;Y;y_top];
+figure(3)
+surf(x_unit, z_unit, y_unit);
+xlabel('x'); ylabel('z'); zlabel('y');axis('square')
+
+%Scale
+X_scale = x_unit * (width/2);
+Y_scale = (y_unit - 0.5) * (height); % move centroid to origin
+Z_scale = z_unit * (extent/2);
+figure(4)
+surf(X_scale, Z_scale, Y_scale);
+xlabel('x'); ylabel('z'); zlabel('y');axis('square')
+
+fvc = surf2patch(X_scale, Y_scale, Z_scale,'triangles');
+stlwrite(filename, fvc, 'mode', 'ascii')
+%% Vase Test

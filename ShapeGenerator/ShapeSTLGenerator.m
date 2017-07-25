@@ -105,14 +105,14 @@ function Cone(height, width, extent, alpha, resolution, filename)
     r_bottom = 0.5 - sind(alpha);
     % check that alpha is between 0 and 90
     if ~((0 <= alpha) && (alpha <= 90))
-        disp("STL Not Created: Angle Not in Range")
+        disp('STL Not Created: Angle Not in Range')
         return
     end
     % check to make sure it doesn't become an hour glass
 %     r_test_top = min(width, extent);
 %     r_test_bottom = r_test_top - sind(alpha)
     if ((r_top - r_bottom) * tand(alpha) >= 1) || r_bottom < 0
-        disp("STL Not Created: Not a Cone")
+        disp('STL Not Created: Not a Cone')
         return
     end 
     [X, Y, Z] = cylinder([r_top, r_bottom], resolution);
@@ -132,9 +132,10 @@ function Cone(height, width, extent, alpha, resolution, filename)
    
 end
 
-function Handle(height, width, extent, r, resolution, filename)
+function Handle(height, width, extent, wr, resolution, filename)
     % This needs to be fixed!
-    r = ones(1,resolution) * r;
+%     r = ones(1,resolution) * wr;
+    r = ones(1,resolution);
     y = linspace(0,1,resolution);
     theta_handle = linspace(0,2*pi,resolution);
     theta_height = linspace(0,pi, resolution); % vertical shape is half circle
@@ -144,7 +145,7 @@ function Handle(height, width, extent, r, resolution, filename)
     Y = repmat(y',1,length(theta_handle));
     for i1 = 1:length(r)
         for i2 = 1:length(theta_handle)
-            X(i1,i2) = cos(theta_handle(i2)) + width/r(1) * sin(theta_height(i1));
+            X(i1,i2) = cos(theta_handle(i2)) + width/wr * sin(theta_height(i1));
             Z(i1,i2) = sin(theta_handle(i2));
         end
     end
@@ -154,14 +155,55 @@ function Handle(height, width, extent, r, resolution, filename)
     y_top = y_end + 1;
     Y_surf = [y_end; Y; y_top];
     Z_surf = [z_end; Z; z_end];
+%     figure(1)
+%     surf(X_surf,Z_surf,Y_surf)
+%     xlabel('x'); ylabel('z'); zlabel('y');
+%     
     %scale to size
-    Z_scale = Z_surf * extent;
-    X_scale = (X_surf - (max(X_surf) - min(X_surf))/2) * r(1);
+    Z_scale = Z_surf * extent/2;
+%     X_scale = (X_surf - (max(X_surf) - min(X_surf))/2) * r(1);
+    X_scale = X_surf * wr + (width - wr);
     Y_scale = (Y_surf-0.5) * height;
-    % show model
+%     
+%     figure(2)
+%     title('Z Scale')
+%     surf(X_surf,Z_scale,Y_surf)
+%     xlabel('x'); ylabel('z'); zlabel('y');
+%     
+%     figure(3)
+%     title('Y Scale')
+%     surf(X_surf,Z_surf,Y_scale)
+%     xlabel('x'); ylabel('z'); zlabel('y');
+%     
+%     figure(4)
+%     title('X Scale')
+%     surf(X_scale,Z_surf,Y_surf)
+%     xlabel('x'); ylabel('z'); zlabel('y');
+%     
+%     % show model
+%     figure(5)
 %     surf(X_scale,Z_scale,Y_scale)
 %     xlabel('x'); ylabel('z'); zlabel('y');
     %save file
     fvc = surf2patch(X_scale,Y_scale,Z_scale,'triangles');
+    stlwrite(filename, fvc, 'mode', 'ascii')
+end
+
+function Vase(height, width, extent, d, resolution, filename) %makes a vase like cup
+    % cylinder with a path for the outer dimension
+    [X, Z, Y] = cylinder(sin(linspace(0,pi,resolution)));
+    
+    %Scale
+    X = X * (width/2);
+    Y = (Y - 0.5) * (height); % move centroid to origin
+    Z = Z * (extent/2);
+    %add bottom and top
+    [x_end, y_end, z_end] = ellipsoid(0,0,0,width/2, 0, extent/2, resolution);
+    y_top = y_end + height/2;
+    y_bot = y_end - height/2;
+    x_surf = [x_end;X;x_end];
+    z_surf = [z_end;Z;z_end];
+    y_surf = [y_bot;Y;y_top];
+    fvc = surf2patch(x_surf,y_surf,z_surf,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
 end
