@@ -2,6 +2,8 @@ from openravepy import *
 from Colors import ColorsDict, bcolors
 import numpy as np
 import sys, os, pdb, copy, subprocess
+from Colors import ColorsDict, bcolors
+from stlwriter import Binary_STL_Writer
 
 import platform
 print "\n\n" + platform.node() + "\n\n"
@@ -12,9 +14,8 @@ elif platform.node() == 'Desktop': #personal desktop Linux
 	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
 	sys.path.append(retract_fingers_path)
 	import retract_finger
-
-else: # personal desktop Windows
-	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
+else:
+	base_path = os.path.dirname(os.path.realpath(__file__))
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -27,11 +28,6 @@ Then initialize other objects (hands, boxes, cones, etc.) with the Vis class
 Significantly more commenting is necessary to make this usable
 
 '''
-
-
-
-
-
 
 class Vis(object): #General Class for visualization
 	def __init__(self):
@@ -48,7 +44,17 @@ class Vis(object): #General Class for visualization
        									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
        									[ 0.        ,  0.        ,  0.        ,  1.        ]])
 		self.viewer.SetCamera(self.cameraTransform)
-		
+		# pdb.set_trace()
+		# sensor = RaveCreateSensor(self.env, 'offscreen_render_camera')
+		# sensor.SendCommand('setintrinsic 529 525 328 267 0.01 10')
+		# sensor.SendCommand('setdims 640 480')
+		# sensor.Configure(Sensor.ConfigureCommand.PowerOn)
+
+		# sensor.SetTransform([])
+		# data = sensor.GetSensorData();
+		# matplotlib.pyplot.imshow(img)
+
+
 	def close(self): # Close Env
 		self.env.Destroy()
 		self.viewer.quitmainloop()
@@ -80,6 +86,7 @@ class Vis(object): #General Class for visualization
 				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname])
 			else:
 				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
+				time.sleep(1)
 
 	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
 		#Thsi can be re-written to be more efficient (unneeded operations)
@@ -185,14 +192,16 @@ class GenVis(object): # General class for objects in visualization
 	def clearAxes(self): self.axes = None # clear all axes created relative to this object
 
 	def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
-		if color is None: # random color
+		if color is None and alpha is None: # random color
 			color = np.random.rand(3)
-		if alpha is None: # keep transparency the same
 			alpha = self.obj.GetLinks()[0].GetGeometries()[0].GetTransparency()
-		elif alpha is not None and color is None: #only want to change transparency but keep color the same
+		elif color is not None and alpha is None: # keep transparency the same
+			alpha = self.obj.GetLinks()[0].GetGeometries()[0].GetTransparency()
+		elif color is None and alpha is not None: #only want to change transparency but keep color the same
 			color = self.obj.GetLinks()[0].GetGeometries()[0].GetDiffuseColor()
 		if type(color) is str: #loads from dictionary
 			color = self.colors[color]
+		#TODO: add a check to cycle through and verify colors are correct.  sometimes color change doesn't seem to work
 		for link in self.obj.GetLinks():
 			for geos in link.GetGeometries():
 				geos.SetDiffuseColor(color)
@@ -226,8 +235,18 @@ class GenVis(object): # General class for objects in visualization
 	def linearInterp(self, array1, array2, alpha): # linear interpolation between two arrays
 		array_interp = array1 * (1 - alpha) + array2 * (alpha)
 		return array_interp
-        
 
+	def moveX(self, x_dist): self.localTranslation([x_dist, 0, 0]) # move in x direction
+
+	def moveY(self, y_dist): self.localTranslation([0, y_dist, 0]) # move in y direction
+        
+	def moveZ(self, z_dist): self.localTranslation([0, 0, z_dist]) # move in z direction
+
+	def rotX(self, x_rot): self.localRotation(matrixFromAxisAngle([x_rot, 0, 0])) # rot in x direction
+
+	def rotY(self, y_rot): self.localRotation(matrixFromAxisAngle([0, y_rot, 0])) # rot in y direction
+
+	def rotZ(self, z_rot): self.localRotation(matrixFromAxisAngle([0, 0, z_rot])) # rot in z direction
 
 class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
@@ -281,13 +300,23 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 
 	def loadObject(self, objtype, h, w, e, a = None): # load object based on features -- for near contact study
 		self.objCheck()
+		self.objType = objtype
 		self.h = int(h)
 		self.w = int(w)
-		self.e = int(w)
+		self.e = int(e)
 
 		if a is not None:
 			self.a = int(a)
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s_a%s.stl' %(objtype, int(h), int(w), int(e), int(a))
+			if objtype == 'handle': #dimensions are much smaller on handle so had to add a 0 in front of dims
+				self.objFN = self.stl_path + '%s_h%s_w0%s_e0%s_a0%s.stl' %(objtype, int(h), int(w), int(e), int(a))
+				if int(w) > 9: #weirdness with filename -- need to find a better solution
+					self.objFN = self.objFN.replace('w0','w')
+				if int(a) > 9:
+					self.objFN = self.objFN.replace('a0','a')
+				if int(e) > 9:
+					self.objFN = self.objFN.replace('e0','e')
+
 		else:
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s.stl' %(objtype, int(h), int(w), int(e))
 		if os.path.isfile(self.objFN):
@@ -296,11 +325,120 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 			return True
 		else:
 			print("STL File Does not Exist! Parameters may be wrong.")
+			print('Filename: %s' %self.objFN)
 			return False
 
+# Kadon Engle - last edited 07/06/17
+class AddGroundPlane(object): #General class for adding a ground plane into the environment.
+		def __init__(self, V):
+			self.vis = V
+			self.groundPlane = None
 
+		def createGroundPlane(self, y_height, x = 3, y = 0, z = 3): #Removes any existing ground plane (if any), then creates a ground plane.
+			with self.vis.env:
+				self.removeGroundPlane()
+				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
+				self.groundPlane.SetName('groundPlane')
+				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
+				self.vis.env.AddKinBody(self.groundPlane)
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
 
+		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
+			for i in self.vis.env.GetBodies():
+				if i.GetName() == 'groundPlane':
+					self.vis.env.Remove(i)
 
+# Ammar Kothari - last edited 07/10/17
+class ArmVis(GenVis): # general class for importing arm into an openrave scene
+	# it would be nice to reuse the functions from Hand here
+
+	# can't use changeColor -- links do not have geometries
+	def __init__(self, V):
+		super(ArmVis, self).__init__(V)
+		self.stl_path = base_path + "/models/robots/"
+
+	def loadArm(self): # load arm from file
+		self.robotFN = self.stl_path + 'barrett_wam.dae'
+		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
+		self.env.Add(self.obj, True)
+		self.obj.SetVisible(1)
+		# self.vis.DrawGlobalAxes()
+		# self.addObjectAxes()
+		self.localTranslation([0,0,-1]) #moves base to (0,0,0). centroid of model is off?
+		self.localRotation(np.array(([1, 0, 0],[0, 1, 0], [0, 0, 1]))) #make up Z
+		self.TClass = Transforms(self.obj)
+
+	def getJointAngles(self):
+		return self.obj.GetDOFValues()
+
+	def setJointAngles(self, jointAngles):
+		if len(jointAngles) != 17:
+			print('Input array should be 1x17')
+			return
+		self.obj.SetDOFValues(jointAngles)
+		'''
+		Index in Joint Angle array: joint that it affects  |   value limit
+		0 : J1						|-2.6 < l < 2.6
+		1 : J2						|-1.98< l < 1.98
+		2 : J3						|-2.8 < l < 2.8
+		3 : J4						|-0.9 < l < 3.14
+		4 : J5						|-4.55< l < 1.25
+		5 : J6						|-1.57< l < 1.57
+		6 : J7						|  -3 < l < 3
+		7 : Unknown
+		8 : Unknown
+		9 : Finger1-Rotation		|	0 < l < pi
+		10: Finger1-Base			|	0 < l < 2.44
+		11: Finger1-Tip				|	0 < l < 0.837
+		12: Finger2-Rotation		|	0 < l < pi
+		13: Finger2-Base			|	0 < l < 2.44
+		14: Finger2-Tip				|	0 < l < 0.837
+		15: Finger3-Base			|	0 < l < 2.44
+		16: Finger3-Tip				|	0 < l < 0.837
+		'''
+
+		# TODO: function that returns a 'name' for a given index -- helps with troubleshooting
+
+	#can all STL functions go into GenVis?
+	def getSTLFeatures(self): # gets the mesh of the arm from openrave
+		links = self.obj.GetLinks()
+		all_vertices = []
+		all_faces = []
+		ind = 0
+		# I don't know what is happening here
+		for link in links:
+			vertices = link.GetCollisionData().vertices
+			faces = link.GetCollisionData().indices
+			if ind == 0:
+				faces = np.add(faces,ind)
+			else:
+				faces = np.add(faces,ind+1)
+			try:
+				ind = faces[-1][-1]
+			except:
+				pass
+		
+			#print "link: ", link, "\nStarting index for this link: ", len(all_vertices)
+			link_pose = poseFromMatrix(link.GetTransform())
+			transform_vertices = poseTransformPoints(link_pose, vertices)
+			all_vertices.extend(transform_vertices.tolist())
+			all_faces.extend(faces.tolist())
+		self.all_faces = all_faces
+		self.all_vertices = all_vertices
+
+	def writeSTL(self, save_filename): # writes mesh created by getSTLFeatures to file
+		faces_points = []
+		for vec in self.all_faces:
+			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
+		
+		with open(save_filename,'wb') as fp:
+			writer = Binary_STL_Writer(fp)
+			writer.add_faces(faces_points)
+			writer.close()
+
+	def generateSTL(self, save_filename): # helper function to create STL from current scene
+		self.getSTLFeatures()
+		self.writeSTL(save_filename)
 
 class HandVis(GenVis):
 	def __init__(self, V):
@@ -312,7 +450,6 @@ class HandVis(GenVis):
 		self.robotFN = self.stl_path + 'bhand.dae'
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
-		self.changeColor(color = self.colors['grey'])
 		self.obj.SetVisible(1)
 		self.TClass = Transforms(self.obj)
 
@@ -331,12 +468,13 @@ class HandVis(GenVis):
 		9: Finger3-Tip			|	0 < l < 0.837
 		'''
 
-	def getPalmPoint(self): # get the point that is in the center of the palm
+	def getPalmPoint(self, draw = False): # get the point that is in the center of the palm
 		palm_pose = poseFromMatrix(self.obj.GetTransform())
 		base_pt = numpy.array(palm_pose[4:])
 		palm_pt = base_pt + self.getPalmOffset()
-		self.vis.drawPoints(base_pt)
-		self.vis.drawPoints(palm_pt)
+		if draw:
+			self.vis.drawPoints(base_pt)
+			self.vis.drawPoints(palm_pt)
 
 		return palm_pt
 
@@ -361,6 +499,17 @@ class HandVis(GenVis):
 		self.obj.SetTransform(HandtoObject)
 		self.localTranslation(-1 * Obj.objCentroid)
 		return HandtoObject
+
+	def localRotation(self, R): # apply a local rotation. translate to origin, rotate, translate back
+		# pdb.set_trace()
+		T = self.obj.GetTransform() # current transform
+		palm_point = self.getPalmPoint() # get palm point in global frame
+		P_origin = self.localTranslation(-palm_point) # move palm to origin
+		T_origin = matrixFromPose(P_origin) # palm at origin without rotation
+		T_origin_rot = np.dot(R, T_origin) # palm at origin with rotation
+		self.obj.SetTransform(T_origin_rot) # apply rotation at origin
+		T_rot = self.localTranslation(palm_point) # move back to original location
+		return T_rot
 
 	def ZSLERP(self, AA1, AA2, alpha, T_zero = None, move = True): #this is actually just a rotation that is meant to fake SLERP.
 		# TODO: make this a real ZSLERP instead of this approximation

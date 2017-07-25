@@ -1,6 +1,9 @@
-import subprocess, os, pdb
+import subprocess, os, pdb, copy
 import paramiko
 from  PIL import Image
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
 
 #Editted: Ammar Kothari -- Last Update: 7/13/17
 class ShapeImageManipulator: #manipulate images that have been produced (most likely with ShapeImageGenerator)
@@ -40,13 +43,94 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 	def cropOpenRAVEBoarder(self,image1): # crops image.  image1 is a PIL.Image object
 		im1 = self.imageTypeCheck(image1)
-		cur_box = im1.getbbox()
-		if cur_box != (0,0,640,480): #should crop images down to desired size if they are larger
-			print("Image has been cropped already")
-			return image1
-		crop_box = (30,20,600,420)
-		im1_cropped = im1.crop(crop_box)
+		try:
+			cur_box = im1.getbbox()
+			if cur_box != (0,0,640,480): #should crop images down to desired size if they are larger
+				print("Image has been cropped already")
+				return im1
+			# crop_box = (30,20,600,420)
+			crop_box = (150, 0, 490, 310)
+			im1_cropped = im1.crop(crop_box)
+		except:
+			print("File may be damaged.  Unable to crop file: %s" %(im1.filename))
+			return False
 		return im1_cropped
+
+	def cropToHand(self, image1): #crop images so only hand and object remain
+		# this depends on the choice of hand color and object color.
+		# potentially do some smart sampling, but it is unclear
+
+		ground_plane_color = np.array([137, 132, 132])
+		obj_color = np.array([238, 183, 4])
+		hand_color = np.array([118, 46, 152])
+		im = self.imageTypeCheck(image1)
+		im_grey = im.convert('L')
+		hist = im_grey.histogram()
+		indx_sorted = np.argsort(hist)
+		data = np.asarray(im)
+		data_old = copy.deepcopy(data)
+		data.setflags(write = 1) # make image writable
+		# pdb.set_trace()
+		box_limits = np.array([1000, 1000, 0, 0]) #xmax, xmin, ymax, ymin
+		box_bool = [False, False] #track if last point was in box
+		for xind in range(data.shape[0]):
+			# limit from top side
+			for yind in range(data.shape[1]):
+				if np.linalg.norm(data[xind, yind] - obj_color) < 50 \
+				or np.linalg.norm(data[xind, yind] - hand_color) < 50:
+					# update limits
+					if yind < box_limits[1]:
+						box_limits[1] = yind
+					elif yind > box_limits[3]:
+						box_limits[3] = yind
+
+					if xind < box_limits[0]:
+						box_limits[0] = xind
+					elif xind > box_limits[2]:
+						box_limits[2] = xind
+
+					# break
+				else: #say that it wasn't in the box
+					data[xind, yind] = [0,0,0]
+			# # limit from the bottom side
+			# for yind in range(data.shape[1]-1, 0, -1):
+			# 	if np.linalg.norm(data[xind, yind] - obj_color) < 50 \
+			# 	or np.linalg.norm(data[xind, yind] - hand_color) < 50:
+			# 		# update limits
+			# 		if yind > box_limits[3]:
+						
+			# 		break
+			# 	else: #say that it wasn't in the box
+			# 		data[xind, yind] = [0,0,0]
+
+		# crop original image
+		# pdb.set_trace()
+		box_limits += [-10, -10, 10, 10] # padding around limit
+		# box_limits = np.clip(box_limits, [0,0,0,0], [im.size[0],im.size[1],im.size[0],im.size[1]]) #clamp values
+		fig, ax = plt.subplots(1)
+		ax.imshow(data_old)
+		rect = patches.Rectangle((box_limits[0], box_limits[1]), box_limits[2] - box_limits[0], box_limits[3] - box_limits[1], edgecolor = 'r', facecolor = 'none')
+		ax.add_patch(rect)
+		# plt.imshow(data)
+		plt.show()
+		pdb.set_trace()
+		# pdb.set_trace()
+		# # box_limits = np.clip(box_limits, [0, 0, box_limits[0],box_limits[1]], [box_limits[2], box_limits[3], im.size[0], im.size[1]])
+		# im_box_limits = copy.deepcopy(box_limits[[1,0,3,2]]) # swap around between matrix and image dimensions
+		# im_cropped = im.crop(box_limits)
+		# self.previewImage(im_cropped)
+
+
+
+				# if np.linalg.norm(data[xind, yind] - ground_plane_color) < 10: #almost the same color
+				# 	data[xind, yind] = [0,0,0]
+				# elif np.linalg.norm(data[xind, yind] - obj_color) < 50: #almost the same color
+				# 	data[xind, yind] = [255,255,255]
+				# elif np.linalg.norm(data[xind, yind] - hand_color) < 50: #almost the same color
+				# 	data[xind, yind] = [120,120,120]
+		plt.imshow(data)
+		# plt.plot(hist)
+
 
 	def previewImage(self, image1): # preview image
 		im = self.imageTypeCheck(image1)
@@ -71,15 +155,16 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 					image_fn = os.path.join(files[0], im_path)
 					image_orig = Image.open(image_fn)
 					image_cropped = self.cropOpenRAVEBoarder(image_orig)
-					#putting images in the same folder based on source folder structure
-					image_cropped_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
-					self.folderCheck(os.path.split(image_cropped_fn)[0])
-					self.saveImage(image_cropped, image_cropped_fn) #overwrite previous image
-					try:
-						self.closeImage(image_orig)
-						self.closeImage(image_cropped)
-					except:
-						pass
+					if image_cropped is not False:
+						#putting images in the same folder based on source folder structure
+						image_cropped_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
+						self.folderCheck(os.path.split(image_cropped_fn)[0])
+						self.saveImage(image_cropped, image_cropped_fn) #overwrite previous image
+						try:
+							self.closeImage(image_orig)
+							self.closeImage(image_cropped)
+						except:
+							pass
 
 	def reduceSize(self, image1, size = (128, 128)): # reduce the size of an image
 		im = self.imageTypeCheck(image1)
@@ -92,16 +177,19 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 				if os.path.splitext(im_path)[1] == '.png':
 					image_fn = os.path.join(files[0], im_path)
 					image_orig = Image.open(image_fn)
-					image_reduced = self.reduceSize(image_orig, size)
-					#putting images in the same folder based on source folder structure
-					image_reduced_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
-					self.folderCheck(os.path.split(image_reduced_fn)[0])
-					self.saveImage(image_reduced, image_reduced_fn) #overwrite previous image
 					try:
-						self.closeImage(image_orig)
-						self.closeImage(image_reduced)
+						image_reduced = self.reduceSize(image_orig, size)
+						#putting images in the same folder based on source folder structure
+						image_reduced_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
+						self.folderCheck(os.path.split(image_reduced_fn)[0])
+						self.saveImage(image_reduced, image_reduced_fn) #overwrite previous image
+						try:
+							self.closeImage(image_orig)
+							self.closeImage(image_reduced)
+						except:
+							pass
 					except:
-						pass
+						print("File may be damaged.  Unable to reduce size of file: %s" %(image_orig.filename))
 
 	# def uploadSingleImage(self): #upload images, specific to Ammar's folder
 	# 	ssh = paramiko.SSHClient() 
@@ -120,3 +208,7 @@ if __name__ == '__main__':
 	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
 	# SIM.combineImagesTopRight('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png', 'GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam1.png', percent_image2 = 30)
+	# SIM.cropToHand('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png')
+	# im1 = SIM.cropOpenRAVEBoarder('GeneratedImages/Grasps/cone_h12_w12_e12_a10_grasp0_cam1.png')
+	# im1 = SIM.cropOpenRAVEBoarder('GeneratedImages/Grasps/handle_h6_w60_e12_a12_grasp1_cam1.png')
+	# SIM.previewImage(im1)

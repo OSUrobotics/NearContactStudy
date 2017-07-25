@@ -13,6 +13,9 @@ class ColorsDict(object): # General class for holding colors
 	colors['greyI'] = np.array([148, 146, 148]).astype('float') / 255 # from paper
 	colors['blueI'] = np.array([132, 132, 228]).astype('float') / 255 # from paper
 
+	colors['yellowI'] = np.array([255, 196, 2]).astype('float') / 255 # from Experimentation for surveys
+	colors['purpleI'] = np.array([138, 0, 204]).astype('float') / 255 # from Experimentation for surveys
+
 
 class bcolors():
 	def __init__(self):

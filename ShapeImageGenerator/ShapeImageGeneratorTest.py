@@ -2,12 +2,11 @@ import sys, os, copy, csv, re
 from openravepy import *
 import pdb
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../Interpolate Grasps/'
+classdir = curdir +'/../InterpolateGrasps/'
 sys.path.insert(0, classdir) # path to helper classes
-from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis
+from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 import numpy as np 
 import time
-import matplotlib.pyplot as plt
 import subprocess
 
 
@@ -20,7 +19,7 @@ class ShapeImageGenerator(object):
 		self.Hand.loadHand()
 		self.Hand.localTranslation(np.array([0,0,-0.075])) #offset so palm is at 0,0,0
 		self.Obj = ObjectGenericVis(self.vis)
-		self.groundPlane = None
+		self.groundPlane = AddGroundPlane(self.vis)
 		self.loadSTLFileList()
 
 	def loadSTLFileList(self): # get all STL files in directory
@@ -44,16 +43,9 @@ class ShapeImageGenerator(object):
 			a = int(fn_parts[4].strip('a'))
 		return shape, h, w, e, a
 		
-
 	def loadObject(self, objtype, h, w, e, a = None): # loads stl object into scene
 		# only centroid that hasn't been dealt with is the handle.
 		# all centroids shoudl be in the center of the object
-		self.Obj.features['type'] = objtype
-		self.Obj.features['h'] = h
-		self.Obj.features['w'] = w
-		self.Obj.features['e'] = e
-		self.Obj.features['a'] = a
-
 		result = self.Obj.loadObject(objtype, h, w, e, a)
 		return result
 
@@ -117,15 +109,16 @@ class ShapeImageGenerator(object):
 		for params in self.params_list:
 			counter += 1
 			if ((shapes == None) or (params['Model'].split('_')[0] in shapes)): # allows only a single set of shapes to be made from list. Mostly during development
-				self.createImageFromParameters(params)
+				imageSuccess = self.createImageFromParameters(params)
+				# if not imageSuccess:
+				# 	pdb.set_trace()
 				print("Current: %s" %counter)
 
 	def createImageFromParameters(self, params): # creates image from a single set of parameters
 		objLoadSuccess = self.loadObjectFromParameters(params)
 		if objLoadSuccess:
-			self.addGroundPlane(y_height = self.Obj.h/2.0/100)
-			self.Obj.changeColor('greenI')
-			self.Hand.changeColor('blueI')
+			self.Obj.changeColor('yellowI')
+			self.Hand.changeColor('purpleI')
 			cam_params = params['Camera Transform']
 			self.vis.setCamera(cam_params[0], cam_params[1], cam_params[2])
 			if params['Joint Angles'] is not '' and params['Hand Matrix'] is not '':
@@ -135,11 +128,17 @@ class ShapeImageGenerator(object):
 			else: #for images where no hand is shown
 				self.Hand.hide()
 			self.Obj.obj.SetTransform(params['Model Matrix'])
+			if np.sum(self.Obj.obj.GetTransform() - matrixFromAxisAngle([0,0,np.pi/2])) < 1e-4: #if object is rotated 90, use different dimension
+				self.groundPlane.createGroundPlane(y_height = self.Obj.w/2.0/100)
+			else: #offset by height if no rotation -- this is not a great solution when object starts to rotate!
+				self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
 			self.vis.takeImage(params['Image Save Name'], delay = True)
 
 			print("Image Recorded: %s" %params['Image Save Name'])
+			return True
 		else:
 			print("Model Not Found: %s" %params['Model'])
+			return False
 
 	def loadObjectFromParameters(self, params): # loads objects from a single set of parameters
 		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
@@ -151,26 +150,7 @@ class ShapeImageGenerator(object):
 		self.Hand.setJointAngles(params['Joint Angles'])
 		self.Hand.obj.SetTransform(params['Hand Matrix'])
 
-	# maybe make a ground plane class similar to the other visualized objects?
-	# Good project for Kadon -- probably will be confusing, might be too much for a first project
-	def addGroundPlane(self, y_height, x = 1, y = 0, z = 1): # adds a ground plane into the image such that it is below object
-		if self.groundPlane is not None:
-			self.removeGroundPlane() # if it exists, remove it
-		self.groundPlane = RaveCreateKinBody(self.vis.env, '')
-		self.groundPlane.SetName('groundPlane')
-		self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
-		self.vis.env.AddKinBody(self.groundPlane)
-		self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
-
-	def updateGroundPlane(self, yh = 0, x = 0, y = 0, z = 0): # update ground plane featuers
-		# probably only needed for development
-		self.removeGroundPlane()
-		self.addGroundPlane(y_height = yh, x = x, y = y, z = z)
-
-	def removeGroundPlane(self): # Removes the groundplane
-		return self.vis.env.Remove(self.groundPlane)
-
-
+	def getParameterFromList(self, list_indx): return self.params_list[list_indx] #get parameters from a location in the list
 
 
 
@@ -280,10 +260,11 @@ class Tester(object): # this is just meant to test different parts of the class
 	def Test5(self): # Description: Read parameter file and create multiple images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		# self.SIG.createImagesFromParametersList(shapes = ['cube'])
+		self.SIG.createImagesFromParametersList(shapes = ['cube'])
 		self.SIG.createImagesFromParametersList(shapes = ['ellipse'])
-		# self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
-		# self.SIG.createImagesFromParametersList(shapes = ['cone'])
+		self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
+		self.SIG.createImagesFromParametersList(shapes = ['cone'])
+		self.SIG.createImagesFromParametersList(shapes = ['handle'])
 		# self.SIG.createImagesFromParametersList()
 		print("Image Generation Complete!")
 
@@ -302,38 +283,49 @@ class Tester(object): # this is just meant to test different parts of the class
 	   						[   0,				0,					1,	-9.50000000e-02],
 	   						[   0,				0,					0,	1]])
 
+		ModelMatrix = list()
+		ModelMatrix.append(np.eye(4))
+		ModelMatrix.append(np.array([[ 0, -1,  0,  0], [ 1,  0,  0,  0], [ 0,  0,  1,  0], [ 0,  0,  0,  1]])) # rotated 90 degrees around e
 		for model in self.SIG.STLFileList:
 			for ip, preshape in enumerate(preshapes):
 				for ic, cameraT in enumerate(CameraTransform):
-					D = dict.fromkeys(headers)
-					D['Joint Angles'] = preshape
-					D['Model'] = model.split('/')[-1].strip('.stl')
-					e =  float(D['Model'].split('_')[3].strip('e'))/100.0# position hand object extent away from origin (palm)
-					h =  float(D['Model'].split('_')[1].strip('h'))/100.0# position hand above height away from object centroid
-					w =  float(D['Model'].split('_')[2].strip('w'))/100.0# position hand width away from object centroid
-					clearance = 0.01
-					# i think the limit should be applied for each grasp?
-					h_limit = -(0.12) # this is specific to this grasp!
-					h_offset = -(h/2 + clearance)
-					if h_offset > h_limit:
-						h_offset = h_limit + h/2
-					h_offset -= 0.075 # origin of hand is the base of the hand
-					handT[0][2,3] = -.01 + -e/2.0 - clearance - 0.075
-					handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
-										[ 0.   ,  0.   ,  1.   , h_offset],
-										[-0.   , -1.   ,  0.   ,  0],
-										[ 0.   ,  0.   ,  0.   ,  1.   ]])
-					D['Hand Matrix'] = copy.deepcopy(handT[ip])
-					ModelMatrix = np.array([[ 1.,  0.,  0.,  0.],  [ 0.,  1.,  0.,  0.],  [ 0.,  0.,  1.,  0],  [ 0.,  0.,  0.,  1.]] )
-					D['Model Matrix'] = ModelMatrix
-					D['Camera Transform'] = cameraT
-					ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
-					D['Image Save Name'] = ImageSaveName
-					D['Image Size'] = '' # need to do something for this step -- image size
+					for im, modelT in enumerate(ModelMatrix):
+						model_type = model.split('/')[-1].strip('.stl')
+						if im == 1 and 'cylinder' not in model_type: # skip second model matrix orientation for all objects except cylinder
+							continue
+						else: # only if it is a cylinder, do the second pass
+							D = dict.fromkeys(headers)
+							D['Joint Angles'] = preshape
+							D['Model'] = model_type
+							h =  float(D['Model'].split('_')[1].strip('h'))/100.0# position hand above height away from object centroid
+							w =  float(D['Model'].split('_')[2].strip('w'))/100.0# position hand width away from object centroid
+							e =  float(D['Model'].split('_')[3].strip('e'))/100.0# position hand object extent away from origin (palm)
+							if w >12: pdb.set_trace()
+							clearance = 0.01
+							# i think the limit should be applied for each grasp?
+							h_limit = -(0.12) # this is specific to this grasp!
+							h_offset = -(h/2 + clearance)
+							if h_offset > h_limit:
+								h_offset = h_limit + h/2
+							h_offset -= 0.075 # origin of hand is the base of the hand
+							handT[0][2,3] = -.01 + -e/2.0 - clearance - 0.075
+							handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
+												[ 0.   ,  0.   ,  1.   , h_offset],
+												[-0.   , -1.   ,  0.   ,  0],
+												[ 0.   ,  0.   ,  0.   ,  1.   ]])
+							D['Hand Matrix'] = copy.deepcopy(handT[ip])
+							D['Model Matrix'] = ModelMatrix[im]
+							D['Camera Transform'] = cameraT
+							if im == 0: #normal save name
+								ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
+							elif im == 1: #sidways cylinder save name
+								ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'].replace('cylinder', 'cylinderRot'), ip, ic)
+							D['Image Save Name'] = ImageSaveName
+							D['Image Size'] = '' # need to do something for this step -- image size
 
-					# if len(L) >= 9:
-					# 	pdb.set_trace()
-					L.append(D)
+							# if len(L) >= 9:
+							# 	pdb.set_trace()
+							L.append(D)
 		for model in self.SIG.STLFileList:
 			D = dict.fromkeys(headers)
 			D['Camera Transform'] = CameraTransform[0]
@@ -355,7 +347,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImageFromParameters(self.SIG.params_list[8])
+		# self.SIG.createImageFromParameters(self.SIG.params_list[8])
+		self.SIG.loadObject('cylinder', 9, 6, 3)
 		pdb.set_trace()
 
 	def Test8(self): # Description: Adding Ground plane with object
@@ -387,6 +380,19 @@ class Tester(object): # this is just meant to test different parts of the class
 		links_point_global = np.array(links_point_global).flatten().reshape(-1,3)
 		self.SIG.vis.drawPoints(links_point_global, c = 'blueI')
 
+	def Test10(self): #single object test case
+		self.SIG.loadSTLFileList()
+		fn = curdir + '/ImageGeneratorParameters.csv'
+		self.SIG.readParameterFile(fn)
+		# self.SIG.loadObject('cylinder', 9, 6, 3)
+		params = self.SIG.getParameterFromList(9)
+		# pdb.set_trace()
+		self.SIG.loadHandFromParameters(params)
+		self.SIG.loadObjectFromParameters(params)
+		pdb.set_trace()
+
+
+
 
 
 
@@ -394,7 +400,7 @@ if __name__ == '__main__':
 	T = Tester()
 	# T.Test6()
 	T.Test5()
-	# T.Test7()
+	# T.Test10()
 	# T.Test8()
 	
 
