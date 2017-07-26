@@ -13,7 +13,7 @@ elif platform.node()[0:3] == 'reu': #personal desktop Linux
 	retract_fingers_path = os.path.expanduser('~/NearContactStudy/Interpolate Grasps/')
 	print base_path
 else: # personal desktop Windows
-	base_path = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
+	base_path = os.path.dirname(os.path.realpath(__file__))
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -317,12 +317,12 @@ class HandVis(GenVis):
 		1: unknown
 		2: Finger1-Rotation		|	0 < l < pi
 		3: Finger1-Base			|	0 < l < 2.44
-		4: Finger1-Tip			|	0 < l < 0.837
+		4: Finger1-Tip			|	-0.785 < l < 0.837
 		5: Finger2-Rotation		|	0 < l < pi
 		6: Finger2-Base			|	0 < l < 2.44
-		7: Finger2-Tip			|	0 < l < 0.837
+		7: Finger2-Tip			|	-0.785 < l < 0.837
 		8: Finger3-Base			|	0 < l < 2.44
-		9: Finger3-Tip			|	0 < l < 0.837
+		9: Finger3-Tip			|	-0.785 < l < 0.837
 		'''
 
 	def getPalmPoint(self): # get the point that is in the center of the palm
@@ -439,8 +439,18 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 		def __init__(self, V):
 			self.vis = V
 			self.groundPlane = None
+			self.colors = dict()
+			self.colors = ColorsDict.colors
 
-		def createGroundPlane(self, y_height, x = 1, y = 0, z = 1): #Removes any existing ground plane (if any), then creates a ground plane.
+		def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
+			# pdb.set_trace()
+			if type(color) is str: #loads from dictionary
+				color = self.colors[color]
+			for link in self.groundPlane.GetLinks():
+				for geos in link.GetGeometries():
+					geos.SetDiffuseColor(color)
+
+		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
 			with self.vis.env:
 				self.removeGroundPlane()
 				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
