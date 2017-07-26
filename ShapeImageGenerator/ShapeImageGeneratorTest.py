@@ -132,6 +132,12 @@ class ShapeImageGenerator(object):
 				self.groundPlane.createGroundPlane(y_height = self.Obj.w/2.0/100)
 			else: #offset by height if no rotation -- this is not a great solution when object starts to rotate!
 				self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
+			# this should definitely be taken care of when making the spreadsheet
+			pts = self.Hand.getContactPoints()
+			while len(pts) > 0:
+				self.Hand.moveY(-0.001)
+				pts = self.Hand.getContactPoints()
+				# pdb.set_trace()
 			self.vis.takeImage(params['Image Save Name'], delay = True)
 
 			print("Image Recorded: %s" %params['Image Save Name'])
@@ -141,8 +147,7 @@ class ShapeImageGenerator(object):
 			return False
 
 	def loadObjectFromParameters(self, params): # loads objects from a single set of parameters
-		shape, h, w, e, a = self.valuesFromFileName(params['Model'])
-		objLoadSuccess = self.loadObject(shape, h, w, e, a)
+		objLoadSuccess = self.Obj.loadObjectFN(self.Obj.stl_path + params['Model'])
 		return objLoadSuccess
 
 	def loadHandFromParameters(self, params): # sets hand features from a single set of parameters
@@ -260,11 +265,12 @@ class Tester(object): # this is just meant to test different parts of the class
 	def Test5(self): # Description: Read parameter file and create multiple images
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImagesFromParametersList(shapes = ['cube'])
-		self.SIG.createImagesFromParametersList(shapes = ['ellipse'])
-		self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
-		self.SIG.createImagesFromParametersList(shapes = ['cone'])
-		self.SIG.createImagesFromParametersList(shapes = ['handle'])
+		# self.SIG.createImagesFromParametersList(shapes = ['cube'])
+		# self.SIG.createImagesFromParametersList(shapes = ['ellipse'])
+		# self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
+		# self.SIG.createImagesFromParametersList(shapes = ['cone'])
+		# self.SIG.createImagesFromParametersList(shapes = ['handle'])
+		self.SIG.createImagesFromParametersList(shapes = ['vase'])
 		# self.SIG.createImagesFromParametersList()
 		print("Image Generation Complete!")
 
@@ -276,7 +282,13 @@ class Tester(object): # this is just meant to test different parts of the class
 		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform','Image Save Name', 'Image Size']
 		CameraTransform = ['%s, %s, %s' %(50, -2.355, -.449), '%s, %s, %s' %(50, 2.355, -.449)]
 		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.1,0.1,0,0.1,0.1,0.1,0.1),
-					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(1,0.1,0.4,1,0.1,0.4,0.1,0.4)]
+					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(1,0.1,0.4,1,0.1,0.4,0.1,0.4),
+					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi,0.0,0.0,np.pi,0.0,0.0,0.0,0.0),
+					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi/2,0.0,0.0,np.pi/2,0.0,0.0,0.0,0.0)]
+					 # 3 finger pinch
+					 # equidistant
+					 # hook
+					 # 2 finger pinch:    
 		handT = list((np.zeros((4,4)), np.zeros((4,4))))
 		handT[0] = np.array([[  0,				1,					0,	0],
 	   						[  -1,				0,					0,	-3.00000000e-02],
@@ -399,7 +411,8 @@ class Tester(object): # this is just meant to test different parts of the class
 if __name__ == '__main__':
 	T = Tester()
 	# T.Test6()
-	T.Test5()
+	# T.Test5()
+	T.Test7()
 	# T.Test10()
 	# T.Test8()
 	
