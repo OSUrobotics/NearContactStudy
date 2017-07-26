@@ -1,4 +1,0 @@
-finger_1_med
-finger_2_prox
-finger_2_med
-finger_2_dist

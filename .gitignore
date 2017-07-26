@@ -1,6 +1,8 @@
 *.pyc
+*.pyc~
 /ShapeGenerator/Shapes/*
 /ShapeImageGenerator/GeneratedImages/*
 /ShapeImageGenerator/GeneratedImagesReduced/*
 /ShapeImageGenerator/GeneratedImagesCropped/*
 *.py~
+*.m~

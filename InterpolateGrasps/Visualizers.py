@@ -1,7 +1,7 @@
 from openravepy import *
 from Colors import ColorsDict, bcolors
 import numpy as np
-import sys, os, pdb, copy, subprocess
+import sys, os, pdb, copy, subprocess, time
 from Colors import ColorsDict, bcolors
 from stlwriter import Binary_STL_Writer
 
@@ -16,6 +16,12 @@ elif platform.node() == 'Desktop': #personal desktop Linux
 	import retract_finger
 else:
 	base_path = os.path.dirname(os.path.realpath(__file__))
+
+
+# classdir = base_path +'/../OpenRAVETrainingVideo/'
+# sys.path.insert(0, classdir) # path to helper classes
+# from PreShapeChooser import ChooserGUI
+
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -77,9 +83,8 @@ class Vis(object): #General Class for visualization
 		self.axes = misc.DrawAxes(self.env, [1,0,0,0,0,0,0])
 
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
-		Viewer = self.env.GetViewer()
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
-			Im = Viewer.GetCameraImage(640,480,  Viewer.GetCameraTransform(),[640,640,320,240])
+			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
 			plt.imshow(Im)
 		except: #this is more robust, but requires that particular window to be selected
 			if not delay:
@@ -300,10 +305,6 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 
 	def loadObject(self, objtype, h, w, e, a = None): # load object based on features -- for near contact study
 		self.objCheck()
-		self.objType = objtype
-		self.h = int(h)
-		self.w = int(w)
-		self.e = int(e)
 
 		if a is not None:
 			self.a = int(a)
@@ -319,6 +320,16 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 
 		else:
 			self.objFN = self.stl_path + '%s_h%s_w%s_e%s.stl' %(objtype, int(h), int(w), int(e))
+		self.loadObjectFN(self.objFN)
+		self.objType = objtype
+		self.h = int(h)
+		self.w = int(w)
+		self.e = int(e)
+
+	def loadObjectFN(self, FN): # load an object from file name
+		self.objCheck()
+		self.objFN = FN
+		self.h, self.w, self.e, self.a = self.getFeaturesFromFN(FN)
 		if os.path.isfile(self.objFN):
 			self.obj = self.env.ReadKinBodyXMLFile(self.objFN)
 			self.env.Add(self.obj,True)
@@ -327,6 +338,35 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 			print("STL File Does not Exist! Parameters may be wrong.")
 			print('Filename: %s' %self.objFN)
 			return False
+
+
+	def getFeaturesFromFN(self, FN):
+		FN_processed = FN.split('/')[-1].strip('.stl') #removing path and extension
+		h = FN_processed.split('_')[1].strip('h')
+		h = self.decimalCheck(h)
+		w = FN_processed.split('_')[2].strip('w')
+		w = self.decimalCheck(w)
+		e = FN_processed.split('_')[3].strip('e')
+		e = self.decimalCheck(e)
+		if 'a' in FN_processed:
+			a = FN_processed.split('_')[4].strip('a')
+			a = self.decimalCheck(a)
+		else:
+			a = None
+
+		return h, w, e, a
+
+
+
+	def decimalCheck(self, val_str): # check a parameter for D and convert to decimal
+		#this is all necessary to try and keep file names readable
+		if 'D' in val_str:
+			val = float(val_str.replace('D', ''))/10
+		else:
+			val = float(val_str)
+		return val
+
+
 
 # Kadon Engle - last edited 07/06/17
 class AddGroundPlane(object): #General class for adding a ground plane into the environment.
@@ -454,6 +494,7 @@ class HandVis(GenVis):
 		self.TClass = Transforms(self.obj)
 
 	def setJointAngles(self, JA): # set hand joint angles
+		#adjust some values so that we get behavior more similar to the actual barett hand
 		self.obj.SetDOFValues(JA)
 		''' Index in Joint Angle array: joint that it affects  |   value limit
 		0: unknown
@@ -559,6 +600,21 @@ class HandVis(GenVis):
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
+
+	# Kadon Engle - last edited 07/14/17
+	def getContactPoints(self): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
+		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
+		report = CollisionReport()
+		positions = []
+		for link in self.obj.GetLinks():
+			collision = self.env.CheckCollision(link,report=report)
+			# if collision == True:
+			# 	print link
+			if len(report.contacts) > 0:
+				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
+				positions += [c.pos for c in report.contacts]
+		return positions
+
 
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):

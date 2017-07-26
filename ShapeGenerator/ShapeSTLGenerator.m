@@ -22,11 +22,18 @@ function ShapeSTLGenerator(shape_type, resolution, filename, height, width, exte
         disp('Creating Cone');
     elseif  strcmpi(shape_type, 'cone') && isnan(alpha)
         disp('Need alpha to create cone');
-    elseif strcmpi(shape_type, 'handle')
+    elseif strcmpi(shape_type, 'handle') && ~isnan(alpha)
     	Handle(height, width, extent, alpha, resolution, filename)
         disp('Creating Handle')
     elseif  strcmpi(shape_type, 'handle') && isnan(alpha)
         disp('Need alpha to create handle');
+    elseif  strcmpi(shape_type, 'vase') && ~isnan(alpha)
+        Vase(height, width, extent, alpha, resolution, filename);
+        disp('Creating Vase');
+    elseif  strcmpi(shape_type, 'vase') && isnan(alpha)
+        disp('Need alpha to create vase');
+    elseif  strcmpi(shape_type, 'cone') && isnan(alpha)
+        disp('Need alpha to create cone');
     else
         disp('Invalid shape type')
     end
@@ -132,66 +139,36 @@ function Cone(height, width, extent, alpha, resolution, filename)
    
 end
 
-function Handle(height, width, extent, wr, resolution, filename)
-    % This needs to be fixed!
-%     r = ones(1,resolution) * wr;
-    r = ones(1,resolution);
-    y = linspace(0,1,resolution);
-    theta_handle = linspace(0,2*pi,resolution);
-    theta_height = linspace(0,pi, resolution); % vertical shape is half circle
-    % make handle shape
-    X = zeros(length(r), length(theta_handle));
-    Z = zeros(length(r), length(theta_handle));
-    Y = repmat(y',1,length(theta_handle));
-    for i1 = 1:length(r)
-        for i2 = 1:length(theta_handle)
-            X(i1,i2) = cos(theta_handle(i2)) + width/wr * sin(theta_height(i1));
-            Z(i1,i2) = sin(theta_handle(i2));
-        end
+function Handle(height, width, extent, curve_factor, resolution, filename)
+    % cylinder with offset slices
+    resolution_dir = resolution;
+    [X,Z,Y] = cylinder(ones(resolution_dir,1), resolution_dir);
+    X_scale = X * width;
+    Y_scale = Y * height;
+    Z_scale = Z * extent/2;
+
+    theta_height = linspace(0, pi, resolution_dir);
+    X_offset = X_scale;
+    curve_factor = 10;
+    for ix = 1:size(X,1)
+        X_offset(ix,:) = X_scale(ix, :) + curve_factor*sin(theta_height(ix));
     end
-    %add top and bottom
-    [x_end, y_end, z_end] = ellipsoid(0,0,0,1, 0, 1, resolution-1);
-    X_surf = [x_end; X; x_end];
-    y_top = y_end + 1;
-    Y_surf = [y_end; Y; y_top];
-    Z_surf = [z_end; Z; z_end];
-%     figure(1)
-%     surf(X_surf,Z_surf,Y_surf)
-%     xlabel('x'); ylabel('z'); zlabel('y');
-%     
-    %scale to size
-    Z_scale = Z_surf * extent/2;
-%     X_scale = (X_surf - (max(X_surf) - min(X_surf))/2) * r(1);
-    X_scale = X_surf * wr + (width - wr);
-    Y_scale = (Y_surf-0.5) * height;
-%     
-%     figure(2)
-%     title('Z Scale')
-%     surf(X_surf,Z_scale,Y_surf)
-%     xlabel('x'); ylabel('z'); zlabel('y');
-%     
-%     figure(3)
-%     title('Y Scale')
-%     surf(X_surf,Z_surf,Y_scale)
-%     xlabel('x'); ylabel('z'); zlabel('y');
-%     
-%     figure(4)
-%     title('X Scale')
-%     surf(X_scale,Z_surf,Y_surf)
-%     xlabel('x'); ylabel('z'); zlabel('y');
-%     
-%     % show model
-%     figure(5)
-%     surf(X_scale,Z_scale,Y_scale)
-%     xlabel('x'); ylabel('z'); zlabel('y');
+
+    surf(X_offset, Z_scale, Y_scale)
+    xlabel('x'); ylabel('z'); zlabel('y');axis('equal')
     %save file
-    fvc = surf2patch(X_scale,Y_scale,Z_scale,'triangles');
+    fvc = surf2patch(X_offset, Z_scale, Y_scale,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
 end
 
 function Vase(height, width, extent, d, resolution, filename) %makes a vase like cup
     % cylinder with a path for the outer dimension
-    [X, Z, Y] = cylinder(sin(linspace(0,pi,resolution)));
+    if width < d
+        disp("STL Not Created: Unknown performance.  Width is less than maximum diameter change")
+        return
+    end
+    cylinder_path = 1 - (width - d)/width * sin(linspace(0,pi,resolution));
+    [X, Z, Y] = cylinder(cylinder_path, resolution);
     
     %Scale
     X = X * (width/2);

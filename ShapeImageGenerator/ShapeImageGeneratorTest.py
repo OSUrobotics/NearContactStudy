@@ -7,6 +7,7 @@ sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 import numpy as np 
 import time
+import matplotlib.pyplot as plt
 import subprocess
 
 
@@ -46,6 +47,12 @@ class ShapeImageGenerator(object):
 	def loadObject(self, objtype, h, w, e, a = None): # loads stl object into scene
 		# only centroid that hasn't been dealt with is the handle.
 		# all centroids shoudl be in the center of the object
+		self.Obj.features['type'] = objtype
+		self.Obj.features['h'] = h
+		self.Obj.features['w'] = w
+		self.Obj.features['e'] = e
+		self.Obj.features['a'] = a
+
 		result = self.Obj.loadObject(objtype, h, w, e, a)
 		return result
 
@@ -117,6 +124,7 @@ class ShapeImageGenerator(object):
 	def createImageFromParameters(self, params): # creates image from a single set of parameters
 		objLoadSuccess = self.loadObjectFromParameters(params)
 		if objLoadSuccess:
+			self.addGroundPlane(y_height = self.Obj.h/2.0/100)
 			self.Obj.changeColor('yellowI')
 			self.Hand.changeColor('purpleI')
 			cam_params = params['Camera Transform']
@@ -350,7 +358,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		with open(fn, 'wb') as file:
 			writer = csv.DictWriter(file, headers)
 			writer.writeheader()
-			for i,l in enumerate(L):
+			for l in L:
 				writer.writerow(l)
 		print("Successfully wrote to CSV file")
 
@@ -402,11 +410,6 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadHandFromParameters(params)
 		self.SIG.loadObjectFromParameters(params)
 		pdb.set_trace()
-
-
-
-
-
 
 if __name__ == '__main__':
 	T = Tester()
