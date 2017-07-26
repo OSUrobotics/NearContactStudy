@@ -74,9 +74,14 @@ class ChooserGUI(wx.Frame):
 		else:
 			self.getDimension(name[underscore+1:])
 	def findAllShapeSizeOptions(self):
+<<<<<<< HEAD
 		self.sizeOptions = {}
 		self.shapeList = {}
 		for image in self.imageFiles:
+=======
+		imageFiles = os.listdir("/home/reu3/Documents/NearContactStudy/ShapeGenerator/Shapes")
+		for image in imageFiles:
+>>>>>>> master
 			self.parseImageFileName(image)
 		for dimension in self.sizeOptions:
 			self.sizeOptions[dimension] = [str(value) for value in sorted(self.sizeOptions[dimension])]
@@ -218,6 +223,7 @@ class ChooserGUI(wx.Frame):
 		offPnl.SetSizer(offSizer)
 		self.sizer.Add(offPnl, 0, wx.EXPAND)
 
+	
 
 	"--------------------------------------------------------------------------"
 	def setFingerSliders(self):

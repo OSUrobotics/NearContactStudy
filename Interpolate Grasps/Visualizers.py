@@ -405,15 +405,29 @@ class HandVis(GenVis):
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
 	
+	def getContact(self, body=None):
+		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
+		report = CollisionReport()
+		contact = {}
+		for link in self.obj.GetLinks():
+			if body == None:
+				collision = self.env.CheckCollision(link, report=report)
+			else:
+				collision = self.env.CheckCollision(link, body, report=report)
+			if len(report.contacts) > 0:
+				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
+				contact[link.GetName()] = report.contacts
+		return contact
 	# Kadon Engle - last edited 07/14/17
-	def getContactPoints(self): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
+	def getContactPoints(self, body=None): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
 		report = CollisionReport()
 		positions = []
 		for link in self.obj.GetLinks():
-			collision = self.env.CheckCollision(link,report=report)
-			# if collision == True:
-			# 	print link
+			if body == None:
+				collision = self.env.CheckCollision(link.GetName(), len(report.contacts))
+			else:
+				collision = self.env.CheckCollision(link, body,report=report)
 			if len(report.contacts) > 0:
 				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
 				positions += [c.pos for c in report.contacts]
