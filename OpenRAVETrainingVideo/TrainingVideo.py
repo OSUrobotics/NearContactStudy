@@ -50,11 +50,12 @@ class TrainingVideo(object):
 				if len(self.Hand.getContactPoints()) > 0:
 					self.Hand.setJointAngles(Angles[n-1])
 					return Angles[n-1]
+				pdb.set_trace()
 				self.recordFrame()
 			return Angles[n-1]
 
 		except:
-			print "Invalid Joint Angle"
+			print "ERROR: Could Possibly Be An Invalid Joint Angle"
 
 	# Kadon Engle - last edited 07/14/17
 	def handRecord(self, x, y, z): # Records frames as hand moves in x, y, and/or z direction
@@ -107,22 +108,42 @@ class TrainingVideo(object):
 	def VLCPlay(self, fn):
 		subprocess.call(["vlc", fn])
 
+	def Image1(self): # Takes a single image and saves it
+		self.Obj.loadObject('cylinder',24,6,6,None)
+		self.Obj.changeColor('purpleI', 0.5)
+		self.Hand.changeColor('mustard')
+		self.GP.createGroundPlane(0.175)
+		self.start_offset = -0.2
+		self.Hand.localTranslation(np.array([0, 0, self.start_offset]))
+		rot = matrixFromAxisAngle([0, 0, np.pi/2])
+		self.Hand.localRotation(rot) # rotate hand to put stationary finger on one side of object
+		self.T_start = self.Hand.obj.GetTransform() # get starting transform so everything can be done relative to this
+		oHand = np.array([0, 0, 0.0, 0.0, 0.837, 0.0, 0.0, 0.837, 0.0, 0.837]) # position fingers such that hand can move in x, y, and z without hitting object
+		cHand = np.array([0, 0, 0.0, 2.44, 0.0, 0.0, 2.44, 0.0, 2.44, 0.0]) # position fingers such that the hand will be closed around the object without hititng it
+		self.Hand.setJointAngles(oHand)
+		self.vis.setCamera(60, -2.25, -0.75)
+
+		self.recordFrame()
+		pdb.set_trace()
+
 	def Video1(self): 
 		# setup
-		self.Obj.loadObject('cube',36,18,3,None)  # TODO: Object with larger extent!
+		self.Obj.loadObject('cylinder',24,6,6,None)  # TODO: Object with larger extent!
 		self.Obj.changeColor('purpleI')
 		self.Hand.changeColor('mustard')
 		self.GP.createGroundPlane(0.175)
-		extent_offset = -3.0/100 # offset by thickness of object
-		palm_offset = -0.075 #offset so palm is at 0,0,0
-		clearance_offset = -1.0/100 # offset to have clearance between palm and object
-		self.start_offset = extent_offset + palm_offset + clearance_offset
+		# extent_offset = -3.0/100 # offset by thickness of object
+		# palm_offset = -0.075 #offset so palm is at 0,0,0
+		# clearance_offset = -1.0/100 # offset to have clearance between palm and object
+		# self.start_offset = extent_offset + palm_offset + clearance_offset
+		self.start_offset = -0.2
 		self.Hand.localTranslation(np.array([0, 0, self.start_offset]))
-		rot = matrixFromAxisAngle([0,0, np.pi/2])
+		# rot = matrixFromAxisAngle([0,0, np.pi/2])
+		rot = matrixFromAxisAngle([0,0, np.pi])
 		self.Hand.localRotation(rot) # rotate hand to put stationary finger on one side of object
 		self.T_start = self.Hand.obj.GetTransform() # get starting transform so everything can be done relative to this
-		oHand = np.array([0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]) # position fingers such that hand can move in x, y, and z without hitting object
-		cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4]) # position fingers such that the hand will be closed around the object without hititng it
+		oHand = np.array([0, 0, 0.0, 0.0, 0.837, 0.0, 0.0, 0.837, 0.0, 0.837]) # position fingers such that hand can move in x, y, and z without hitting object
+		cHand = np.array([0, 0, 0.0, 2.44, 0.0, 0.0, 2.44, 0.0, 2.44, 0.0]) # position fingers such that the hand will be closed around the object without hititng it
 		self.Hand.setJointAngles(oHand)
 		dist_range_min = -0.1
 		dist_range_max = 0.1
@@ -130,52 +151,33 @@ class TrainingVideo(object):
 		# Different arbitrary camera angles for needed viewpoints
 		# self.vis.setCamera(60,3*np.pi/4,-np.pi/4-0.1)
 		# self.vis.setCamera(60, np.pi, -np.pi/2) # top view
-		# self.vis.setCamera(60, -2.25, -np.pi/2.10)
+		# self.vis.setCamera(60, -2.25, -np.pi/2.20)
 		self.vis.setCamera(60, -2.25, -0.75) # Numbers are completely arbitrary, gives a good view of object and hand.
 
 		
 
-		# self.handRecord(0,0,-0.15)
-		# cHand = self.fingerRecord(oHand, cHand)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0,0,-0.115)
-		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
-		# cHand = self.fingerRecord(oHand, cHand)
-		# self.fingerRecord(cHand, oHand)
-		# pdb.set_trace()
 
-
-
-
-		# Moves the hand and closes the fingers in a suitable manner for this video
-		# self.handRecord(0, 0, -0.15)
-		# cHand = self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0, -0.13, -0.15)
-		# self.handRecord(0, -0.13, -0.115)
-		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
-		# cHand = self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0, -0.13, -0.15)
-		# self.handRecord(0, 0.1, -0.15)
-		# self.handRecord(0, 0.1, -0.115)
-		# cHand = np.array([0, 0, 0.0, 1.3, 0.4, 0.0, 1.3, 0.4, 1.3, 0.4])
-		# cHand = self.fingerRecord(oHand, cHand)
-		# self.stationaryRecord(5)
-		# self.fingerRecord(cHand, oHand)
-		# self.handRecord(0, 0.1, -0.15)
-		# self.handRecord(0, 0, -0.15)
-		# self.handRecord(-0.05, 0, -0.15)
-		# self.handRecord(-0.05, 0, -0.115)
-		# self.stationaryRecord(5)
-		# self.handRecord(-0.05, 0, -0.15)
-		# self.handRecord(0.05, 0, -0.15)
-		# self.handRecord(0.05, 0, -0.115)
-		# self.stationaryRecord(5)
-		# self.handRecord(0.05, 0, -0.15)
-		# self.handRecord(0, 0, -0.15)
+		# Moves Hand in a way appropriate for this Training Video.
+		self.handRecord(0, -0.06, -0.2)
+		self.stationaryRecord(2)
+		self.handRecord(0, 0.06, -0.2)
+		self.stationaryRecord(2)
+		self.handRecord(0, 0, -0.2)
+		self.stationaryRecord(2)
+		self.handRecord(-0.05, 0, -0.2)
+		self.stationaryRecord(2)
+		self.handRecord(0.05, 0, -0.2)
+		self.stationaryRecord(2)
+		self.handRecord(0, 0, -0.2)
+		self.handRecord(0, 0, -0.17)
+		cHand = self.fingerRecord(oHand, cHand)
+		self.stationaryRecord(5)
+		self.fingerRecord(cHand, oHand)
+		cHand = np.array([0, 0, 0.0, 1.3, 0.0, 0.0, 1.3, 0.0, 1.3, 0.0])
+		self.handRecord(0, 0, -0.125)
+		cHand = self.fingerRecord(oHand, cHand)
+		self.stationaryRecord(5)
+		self.fingerRecord(cHand, oHand)
 
 
 
@@ -183,9 +185,11 @@ class TrainingVideo(object):
 
 
 if __name__ == '__main__':
+	# TV = TrainingVideo()
+	# TV.Video1()
+	# TV.createVideo('Video1.avi')
+	# TV.removeImages()
+	# TV.VLCPlay('Video1.avi')
 	TV = TrainingVideo()
-	TV.Video1()
-	TV.createVideo('Video1.avi')
-	TV.removeImages()
-	TV.VLCPlay('Video1.avi')
+	TV.Image1()
 	pdb.set_trace()

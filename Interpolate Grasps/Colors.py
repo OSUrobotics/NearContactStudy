@@ -16,12 +16,12 @@ class ColorsDict(object): # General class for holding colors
 	colors['blueII'] = np.array([141, 146, 178]).astype('float') / 255
 	colors['greenII'] = np.array([113, 199, 136]).astype('float') / 255
 	colors['teal'] = np.array([0, 255, 255]).astype('float') / 255
-	colors['mustard'] = np.array([255 , 196, 2]).astype('float') / 255
+	colors['mustard'] = np.array([255 , 196, 2]).astype('float') / 255 # Hand Color
 	colors['fucia'] = np.array([255, 2, 120]).astype('float') / 255
 	colors['yellowII'] = np.array([255, 237, 171]).astype('float') / 255
 	colors['pinkII'] = np.array([255, 125, 186]).astype('float') / 255
 	colors['magenta'] = np.array([204, 0, 97]).astype('float') / 255
-	colors['purpleI'] = np.array([138, 0, 204]).astype('float') / 255
+	colors['purpleI'] = np.array([138, 0, 204]).astype('float') / 255 # Obj Color
 
 class bcolors():
 	def __init__(self):
