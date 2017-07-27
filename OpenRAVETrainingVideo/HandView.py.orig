@@ -110,6 +110,7 @@ class HandView(object):
 		self.setIgnoreContact(True)
 
 	def setObject(self, newObj):
+		#newObj = {"shape":, "h":, "w":, "e":, "a":}
 		if newObj["shape"] == 'cone':
 			self.Obj.loadObject(newObj["shape"],int(newObj["h"]),int(newObj["w"]),int(newObj["e"]),int(newObj["a"]))
 		else:
@@ -201,11 +202,19 @@ class HandView(object):
 		if finger == 1:
 			return (self.grasp[3]-self.medJointAngles["min"])/(self.medJointAngles["max"]-self.medJointAngles["min"])
 		elif finger == 2:
+<<<<<<< HEAD
 			return (self.grasp[6]-self.medJointAngles["min"])/(self.medJointAngles["max"]-self.medJointAngles["min"])
 		elif finger == 3:
 			return (self.grasp[8]-self.medJointAngles["min"])/(self.medJointAngles["max"]-self.medJointAngles["min"])
 
 	def showGrasp (self):
 		self.Hand.setJointAngles(self.grasp)
-
-	
+=======
+			self.grasp[6] = 2.44*newValue/100
+			self.grasp[7] = .837*newValue/100
+		elif finger ==3:
+			self.grasp[8] = 2.44*newValue/100
+			self.grasp[9] = .837*newValue/100
+		self.showGrasp()
+		return self.grasp
+>>>>>>> master

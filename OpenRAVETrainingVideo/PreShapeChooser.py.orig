@@ -74,9 +74,14 @@ class ChooserGUI(wx.Frame):
 		else:
 			self.getDimension(name[underscore+1:])
 	def findAllShapeSizeOptions(self):
+<<<<<<< HEAD
+		imageFiles = os.listdir("/home/reu4/NearContactStudy/ShapeGenerator/Shapes")
+		for image in imageFiles:
+=======
 		self.sizeOptions = {}
 		self.shapeList = {}
 		for image in self.imageFiles:
+>>>>>>> e9c0e42ad5eecf7b29d308cee98f6180554bfbe2
 			self.parseImageFileName(image)
 		for dimension in self.sizeOptions:
 			self.sizeOptions[dimension] = [str(value) for value in sorted(self.sizeOptions[dimension])]
