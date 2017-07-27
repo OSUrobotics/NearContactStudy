@@ -16,7 +16,7 @@ from openravepy import matrixFromPose, poseTransformPoints, poseMult, transformL
 class TableImageGenerator(object):
 	def __init__(self):
 		self.SIG = ShapeImageGenerator()
-		self.SIG.Hand.changeColor('blueI')
+		self.SIG.Hand.changeColor('yellowI')
 		self.ImageFolder = 'GraspTypesImages'
 		self.HandList = list()
 		self.HandList.append(self.SIG.Hand)
@@ -30,7 +30,7 @@ class TableImageGenerator(object):
 		self.HandList.append(HandVis(self.SIG.vis))
 		self.HandList[-1].loadHand()
 		self.HandList[-1].show()
-		self.HandList[-1].changeColor('blueI')
+		self.HandList[-1].changeColor('yellowI')
 
 	def removeHand(self, ind = -1): # remove last hand in list
 		self.SIG.vis.env.Remove(self.HandList[ind].obj)
@@ -83,11 +83,13 @@ class TableImageGenerator(object):
 
 		variationDist = 0.1
 		filename = os.path.join(self.ImageFolder,'ExtentDisplacement')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.positionVariation(self.HandList[0], self.HandList[1], HandT_close, variationDist, 'x', transparency = True)
+		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		self.SIG.vis.takeImage(filename)
+		
 
 	def showExtentRotation(self):
 		self.loadAdditionalHand()
@@ -105,12 +107,12 @@ class TableImageGenerator(object):
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		variationDist = np.pi/6
 		filename = os.path.join(self.ImageFolder,'ExtentRotation')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.rotationVariation(self.HandList[0], self.HandList[1], HandT_close, variationDist, 'z', transparency = False)
 		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.takeImage(filename)
-		self.removeHand()
+		
 
 	def showWidthDisplacement(self):
 		self.loadAdditionalHand()
@@ -127,12 +129,13 @@ class TableImageGenerator(object):
 
 		variationDist = -0.1
 		filename = os.path.join(self.ImageFolder,'WidthDisplacement')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.positionVariation(self.HandList[0], self.HandList[1], HandT_close, variationDist, 'z', transparency = True)
 		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		self.SIG.vis.takeImage(filename)
+		
 
 	def showWidthRotation(self):
 		self.loadAdditionalHand()
@@ -149,14 +152,13 @@ class TableImageGenerator(object):
 
 		variationDist = np.pi/6
 		filename = os.path.join(self.ImageFolder,'WidthRotation')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.rotationVariation(self.HandList[0], self.HandList[1], HandT_close, variationDist, 'y', transparency = False)
 		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		self.SIG.vis.takeImage(filename)
-		self.removeHand()
-
+		
 
 	def showHeightDisplacement(self):
 		self.loadAdditionalHand()
@@ -173,12 +175,13 @@ class TableImageGenerator(object):
 
 		variationDist = -0.1
 		filename = os.path.join(self.ImageFolder,'HeightVariation')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.positionVariation(self.HandList[0], self.HandList[1], HandT_close, variationDist, 'y', transparency = True)
 		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		self.SIG.vis.takeImage(filename)
+		
 
 	def showHeightRotation(self):
 		self.loadAdditionalHand()
@@ -195,13 +198,13 @@ class TableImageGenerator(object):
 
 		rotationDist = np.pi/6
 		filename = os.path.join(self.ImageFolder,'HeightRotation')
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
 		self.rotationVariation(self.HandList[0], self.HandList[1], HandT_close, rotationDist, 'x', transparency = True)
 		self.HandList[0].changeColor('pinkI')
 		self.SIG.vis.viewer.SetCamera(cameraT)
 		self.SIG.vis.takeImage(filename)
-		self.removeHand()
+		
 
 	def equidistantPregrasp(self):
 		self.HandList[0].setJointAngles(self.equidistant)
@@ -213,8 +216,9 @@ class TableImageGenerator(object):
 					       [ 0.        ,  0.        ,  0.        ,  1.        ]])
 		filename = os.path.join(self.ImageFolder,'equidistantPregrasp')
 		self.SIG.vis.viewer.SetCamera(cameraT)
-		self.HandList[0].changeColor(color = 'blueI')
+		self.HandList[0].changeColor(color = 'yellowI')
 		self.SIG.vis.takeImage(filename)
+		
 
 	def threeFingerPinchPregrasp(self):
 		self.HandList[0].setJointAngles(self.threeFingerPinch)
@@ -227,8 +231,9 @@ class TableImageGenerator(object):
 					       [ 0.        ,  0.        ,  0.        ,  1.        ]])
 		filename = os.path.join(self.ImageFolder,'ThreeFingerPinchPregrasp')
 		self.SIG.vis.viewer.SetCamera(cameraT)
-		self.HandList[0].changeColor(color = 'blueI')
+		self.HandList[0].changeColor(color = 'yellowI')
 		self.SIG.vis.takeImage(filename)
+		
 
 	def hookPregrasp(self):
 		self.HandList[0].setJointAngles(self.hook)
@@ -241,8 +246,9 @@ class TableImageGenerator(object):
 					       [ 0.        ,  0.        ,  0.        ,  1.        ]])
 		filename = os.path.join(self.ImageFolder,'HookPregrasp')
 		self.SIG.vis.viewer.SetCamera(cameraT)
-		self.HandList[0].changeColor(color = 'blueI')
+		self.HandList[0].changeColor(color = 'yellowI')
 		self.SIG.vis.takeImage(filename)
+		
 
 	def twoFingerPinchPregrasp(self):
 		self.HandList[0].setJointAngles(self.twoFingerPinch)
@@ -254,7 +260,7 @@ class TableImageGenerator(object):
 					       [ 0.        ,  0.        ,  0.        ,  1.        ]])
 		filename = os.path.join(self.ImageFolder,'TwoFingerPinchPregrasp')
 		self.SIG.vis.viewer.SetCamera(cameraT)
-		self.HandList[0].changeColor(color = 'blueI')
+		self.HandList[0].changeColor(color = 'yellowI')
 		unused_finger_alpha = 0.5
 		# set unused finger to more transparent
 		t_line_draw = list()
@@ -294,6 +300,7 @@ class TableImageGenerator(object):
 				
 		# pdb.set_trace()
 		self.SIG.vis.takeImage(filename)
+		
 
 		# to make a wireframe
 		#tmesh = geos.GetCollisionMesh()
@@ -302,7 +309,7 @@ class TableImageGenerator(object):
 
 	def palmDistanceMetric(self):
 		self.SIG.loadObject('cube', 9, 6, 3)
-		self.SIG.Obj.changeColor('greenI')
+		self.SIG.Obj.changeColor('purpleI')
 		HandT = np.array([[ 0.08,  1.  , -0.03,  0.  ],
 					       [ 1.  , -0.08, -0.  , -0.  ],
 					       [-0.  , -0.03, -1.  ,  0.21],
@@ -315,12 +322,13 @@ class TableImageGenerator(object):
 		filename = os.path.join(self.ImageFolder,'PalmDistanceMetric')
 
 		self.HandList[0].obj.SetTransform(HandT)
-		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		self.SIG.groundPlane.createGroundPlane(self.SIG.obj.h/2/100.0)
 		self.SIG.vis.viewer.SetCamera(transformLookat([0,0,0],[0, -.6,0], [1,0,0]) ) # move point to between palm and face of object
-		self.HandList[0].changeColor(color = 'blueI')
+		self.HandList[0].changeColor(color = 'yellowI')
 		# self.SIG.vis.viewer.SetCamera(np.round(cameraT,4))
 
 		self.SIG.vis.takeImage(filename)
+		
 		pdb.set_trace()
 
 	def TestRotation(self):
@@ -334,8 +342,77 @@ class TableImageGenerator(object):
 		self.SIG.vis.drawPoints(self.HandList[0].getPalmPoint())
 		self.HandList[0].rotZ(np.pi)
 
+	def objectOrientations(self): # show the different way an object can be oriented relative to ground plane
+		self.removeHand()
+		self.SIG.obj.loadObject('cylinder', 9, 6, 3)
+		self.SIG.obj.changeColor('purpleI')
 
+		objT_base = np.eye(4)
+		camT = np.array([[-0.6543736 ,  0.42170426, -0.6276629 ,  0.26217875],
+						[ 0.01079645,  0.83517956,  0.54987138, -0.2296852 ],
+						[ 0.75609433,  0.35304478, -0.55107237,  0.23018694],
+						[ 0.        ,  0.        ,  0.        ,  1.        ]])
+		self.SIG.obj.obj.SetTransform(objT_base)
+		self.SIG.vis.viewer.SetCamera(camT)
+		self.SIG.groundPlane.createGroundPlane(self.Obj.h/2/100.0)
+		save_name = os.path.join(self.ImageFolder,'ObjectOrientationBase')
+		self.SIG.vis.takeImage(save_name)
 
+		objT_side1 = np.array([[ 1.,  0.,  0.,  0.],
+					       [ 0.,  0., -1.,  0.],
+					       [ 0.,  1.,  0.,  0.],
+					       [ 0.,  0.,  0.,  1.]])
+		self.SIG.obj.obj.SetTransform(objT_side1)
+		self.SIG.groundPlane.createGroundPlane(self.SIG.obj.e/2.0/100.0)
+		save_name = os.path.join(self.ImageFolder,'ObjectOrientationSide1')
+		self.SIG.vis.takeImage(save_name)
+
+		objT_side2 = np.array([[ 0.,  1.,  0.,  0.],
+						       [-1.,  0., -0.,  0.],
+						       [-0.,  0.,  1.,  0.],
+						       [ 0.,  0.,  0.,  1.]])
+		self.SIG.obj.obj.SetTransform(objT_side2)
+		self.SIG.groundPlane.createGroundPlane(self.Obj.w/2/100.0)
+		save_name = os.path.join(self.ImageFolder,'ObjectOrientationSide2')
+		self.SIG.vis.takeImage(save_name)
+
+	def objectImages(self): #images of the objects for showing how objects are defined
+		self.removeHand()
+		cameraT = np.array([[ 0.61082426, -0.29731531,  0.73382377, -0.15447424],
+					       [-0.03596405,  0.91544358,  0.40083617, -0.08188852],
+					       [-0.79094899, -0.27123173,  0.54848249, -0.11150595],
+					       [ 0.        ,  0.        ,  0.        ,  1.        ]])
+		self.SIG.vis.viewer.SetCamera(cameraT)
+		# Prism
+		self.SIG.loadObject('cube', 9, 6, 3)
+		self.SIG.Obj.changeColor('purpleI')
+		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		filename = os.path.join(self.ImageFolder,'Prism')
+		self.SIG.vis.takeImage(filename)
+		# Cone
+		self.SIG.loadObject('cone', 9, 6, 3, 30)
+		self.SIG.Obj.changeColor('purpleI')
+		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		filename = os.path.join(self.ImageFolder,'Cone')
+		self.SIG.vis.takeImage(filename)
+		# Cylinder
+		self.SIG.loadObject('cylinder', 9, 6, 3)
+		self.SIG.Obj.changeColor('purpleI')
+		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		filename = os.path.join(self.ImageFolder,'cylinder')
+		self.SIG.vis.takeImage(filename)
+		# Ellipsode
+		self.SIG.loadObject('ellipse', 9, 6, 3)
+		self.SIG.Obj.changeColor('purpleI')
+		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		filename = os.path.join(self.ImageFolder,'ellipse')
+		self.SIG.vis.takeImage(filename)
+		# Vase
+		self.SIG.loadObject('vase', 9, 6, 3, 3)
+		self.SIG.Obj.changeColor('purpleI')
+		self.SIG.groundPlane.createGroundPlane(self.SIG.Obj.h/2/100.0)
+		filename = os.path.join(self.ImageFolder,'vase')
+		self.SIG.vis.takeImage(filename)
 
 
 if __name__ == '__main__':
@@ -343,15 +420,16 @@ if __name__ == '__main__':
 	# TIG.showExtentDisplacement()
 	# TIG.showWidthDisplacement()
 	# TIG.showHeightDisplacement()
-	TIG.showExtentRotation()
-	TIG.showWidthRotation()
-	TIG.showHeightRotation()
-
+	# TIG.showExtentRotation() # --> fix hand positioning
+	# TIG.showWidthRotation()  # --> make transparent
+	# TIG.showHeightRotation() # --> not clear. fix camera angle?
+	# TIG.objectOrientations()
 	# TIG.equidistantPregrasp()
 	# TIG.threeFingerPinchPregrasp()
 	# TIG.hookPregrasp()
 	# TIG.twoFingerPinchPregrasp()
 	# TIG.palmDistanceMetric()
+	TIG.objectImages()
 
 	# TIG.TestRotation()
-	pdb.set_trace()
+	# pdb.set_trace()

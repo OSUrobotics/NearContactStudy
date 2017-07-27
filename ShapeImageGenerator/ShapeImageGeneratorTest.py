@@ -124,9 +124,9 @@ class ShapeImageGenerator(object):
 	def createImageFromParameters(self, params): # creates image from a single set of parameters
 		objLoadSuccess = self.loadObjectFromParameters(params)
 		if objLoadSuccess:
-			self.addGroundPlane(y_height = self.Obj.h/2.0/100)
-			self.Obj.changeColor('yellowI')
-			self.Hand.changeColor('purpleI')
+			self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
+			self.Obj.changeColor('purpleI')
+			self.Hand.changeColor('yellowI')
 			cam_params = params['Camera Transform']
 			self.vis.setCamera(cam_params[0], cam_params[1], cam_params[2])
 			if params['Joint Angles'] is not '' and params['Hand Matrix'] is not '':
@@ -142,9 +142,9 @@ class ShapeImageGenerator(object):
 				self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
 			# this should definitely be taken care of when making the spreadsheet
 			pts = self.Hand.getContactPoints()
-			while len(pts) > 0:
-				self.Hand.moveY(-0.001)
-				pts = self.Hand.getContactPoints()
+			# while len(pts) > 0:
+			# 	self.Hand.moveY(-0.001)
+			# 	pts = self.Hand.getContactPoints()
 				# pdb.set_trace()
 			self.vis.takeImage(params['Image Save Name'], delay = True)
 
@@ -162,6 +162,10 @@ class ShapeImageGenerator(object):
 		self.Hand.show()
 		self.Hand.setJointAngles(params['Joint Angles'])
 		self.Hand.obj.SetTransform(params['Hand Matrix'])
+
+	def loadSceneFromParameters(self, params):
+		self.loadObjectFromParameters(params)
+		self.loadHandFromParameters(params)
 
 	def getParameterFromList(self, list_indx): return self.params_list[list_indx] #get parameters from a location in the list
 
@@ -278,8 +282,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		# self.SIG.createImagesFromParametersList(shapes = ['cylinder'])
 		# self.SIG.createImagesFromParametersList(shapes = ['cone'])
 		# self.SIG.createImagesFromParametersList(shapes = ['handle'])
-		self.SIG.createImagesFromParametersList(shapes = ['vase'])
-		# self.SIG.createImagesFromParametersList()
+		# self.SIG.createImagesFromParametersList(shapes = ['vase'])
+		self.SIG.createImagesFromParametersList()
 		print("Image Generation Complete!")
 
 	def Test6(self): # Description: Create CSV file for making images
@@ -296,57 +300,110 @@ class Tester(object): # this is just meant to test different parts of the class
 					 # 3 finger pinch
 					 # equidistant
 					 # hook
-					 # 2 finger pinch:    
-		handT = list((np.zeros((4,4)), np.zeros((4,4))))
-		handT[0] = np.array([[  0,				1,					0,	0],
-	   						[  -1,				0,					0,	-3.00000000e-02],
-	   						[   0,				0,					1,	-9.50000000e-02],
-	   						[   0,				0,					0,	1]])
+					 # 2 finger pinch:
+		preshape_names =    ['3fingerpinch', 'equidistant', 'hook', '2fingerpinch']
+		
+		handT_top = list((np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4))))
+		handT_side = list((np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4))))
+		handTs = [handT_side, handT_top]
+		handT_names = ['top', 'side']
 
 		ModelMatrix = list()
 		ModelMatrix.append(np.eye(4))
 		ModelMatrix.append(np.array([[ 0, -1,  0,  0], [ 1,  0,  0,  0], [ 0,  0,  1,  0], [ 0,  0,  0,  1]])) # rotated 90 degrees around e
+
+		
 		for model in self.SIG.STLFileList:
 			for ip, preshape in enumerate(preshapes):
-				for ic, cameraT in enumerate(CameraTransform):
-					for im, modelT in enumerate(ModelMatrix):
-						model_type = model.split('/')[-1].strip('.stl')
-						if im == 1 and 'cylinder' not in model_type: # skip second model matrix orientation for all objects except cylinder
-							continue
-						else: # only if it is a cylinder, do the second pass
-							D = dict.fromkeys(headers)
-							D['Joint Angles'] = preshape
-							D['Model'] = model_type
-							h =  float(D['Model'].split('_')[1].strip('h'))/100.0# position hand above height away from object centroid
-							w =  float(D['Model'].split('_')[2].strip('w'))/100.0# position hand width away from object centroid
-							e =  float(D['Model'].split('_')[3].strip('e'))/100.0# position hand object extent away from origin (palm)
-							if w >12: pdb.set_trace()
-							clearance = 0.01
-							# i think the limit should be applied for each grasp?
-							h_limit = -(0.12) # this is specific to this grasp!
-							h_offset = -(h/2 + clearance)
-							if h_offset > h_limit:
-								h_offset = h_limit + h/2
-							h_offset -= 0.075 # origin of hand is the base of the hand
-							handT[0][2,3] = -.01 + -e/2.0 - clearance - 0.075
-							handT[1] = np.array([[ 1.   , -0.   ,  0.   ,  0   ],
-												[ 0.   ,  0.   ,  1.   , h_offset],
-												[-0.   , -1.   ,  0.   ,  0],
-												[ 0.   ,  0.   ,  0.   ,  1.   ]])
-							D['Hand Matrix'] = copy.deepcopy(handT[ip])
-							D['Model Matrix'] = ModelMatrix[im]
-							D['Camera Transform'] = cameraT
-							if im == 0: #normal save name
-								ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'], ip, ic)
-							elif im == 1: #sidways cylinder save name
-								ImageSaveName = '%s/%s_grasp%s_cam%s' %('GeneratedImages/Grasps', D['Model'].replace('cylinder', 'cylinderRot'), ip, ic)
-							D['Image Save Name'] = ImageSaveName
-							D['Image Size'] = '' # need to do something for this step -- image size
+				for it, handT in enumerate(handTs):
+					for ic, cameraT in enumerate(CameraTransform):
+						for im, modelT in enumerate(ModelMatrix):
+							model_type = model.split('/')[-1].strip('.stl')
+							if im == 1 and 'cylinder' not in model_type: # skip second model matrix orientation for all objects except cylinder
+								continue
+							else: # only if it is a cylinder, do the second pass
+								D = dict.fromkeys(headers)
+								D['Joint Angles'] = preshape
+								D['Model'] = model_type
+								h =  float(D['Model'].split('_')[1].strip('h'))/100.0# position hand above height away from object centroid
+								w =  float(D['Model'].split('_')[2].strip('w'))/100.0# position hand width away from object centroid
+								e =  float(D['Model'].split('_')[3].strip('e'))/100.0# position hand object extent away from origin (palm)
+								if 'a' in D['Model']:
+									if 'D' not in D['Model'].split('_')[4].strip('a'):
+										a = float(D['Model'].split('_')[4].strip('a'))
+									else:
+										a = -1
+								else:
+									a = None
+								clearance = 0.01
+								# i think the limit should be applied for each grasp?
+								h_limit = np.array([-0.08, -0.04, 0.06, -0.025]) # this is specific for each grasp!
+								h_offset = -(h/2 + clearance)
+								if h_offset > h_limit[ip]:
+									h_offset = h_limit[ip] + h/2
+								h_offset -= 0.075 # origin of hand is the base of the hand
 
-							# if len(L) >= 9:
-							# 	pdb.set_trace()
-							L.append(D)
-		for model in self.SIG.STLFileList:
+
+								################ SIDE ##########################
+								# 3 finger pinch
+								handT_side[0] = np.array([[ 0,	-1,	0,	0],
+								   						[   1,	0,	0,	-0.02],
+								   						[   0,	0,	1,	-.01 + -e/2.0 - clearance - 0.075],
+								   						[   0,	0,	0,	1]])
+								# equidistant
+								handT_side[1] = np.array([[ -1,	0,	0,	0],
+								   						[   0,	-1,	0,	-0.056],
+								   						[   0,	0,	1,	-.01 + -e/2.0 - clearance - 0.075],
+								   						[   0,	0,	0,	1]])
+								# hook
+								handT_side[2] = np.array([[ 0,	1,	0,	0],
+								   						[   -1,	0,	0,	-0.02],
+								   						[   0,	0,	1,	-.01 + -e/2.0 - clearance - 0.075],
+								   						[   0,	0,	0,	1]])
+								# 2 finger pinch
+								handT_side[3] = np.array([[ -1,	0,	0,	0],
+								   						[   0,	-1,	0,	-.016],
+								   						[   0,	0,	1,	-.01 + -e/2.0 - clearance - 0.075],
+								   						[   0,	0,	0,	1]])
+								
+								################ TOP ##########################
+								# 3 finger pinch
+								handT_top[0] = np.array([[  0,	1,	0,	0],
+								   						[   0,	0,	1,	h_offset],
+								   						[   1,	0,	0,	0],
+								   						[   0,	0,	0,	1]])
+								# equidistant
+								handT_top[1] = np.array([[ 1.  ,  0.   ,  0.   ,  0   ],
+													[ 0.   ,  0.   ,  1.   , h_offset],
+													[ 0.   , -1.   ,  0.   ,  0],
+													[ 0.   ,  0.   ,  0.   ,  1.   ]])
+								# hook
+								handT_top[2] = np.array([[ -1.  ,  0.   ,  0.   ,  0   ],
+													[ 0.   ,  0.   ,  1.   , h_offset],
+													[ 0.   ,  1.   ,  0.   ,  0],
+													[ 0.   ,  0.   ,  0.   ,  1.   ]])
+								# 2 finger pinch
+								handT_top[3] = np.array([[ -1.  ,  0.   ,  0.   ,  0   ],
+													[ 0.   ,  0.   ,  1.   , h_offset],
+													[ 0.   ,  1.   ,  0.   ,  0],
+													[ 0.   ,  0.   ,  0.   ,  1.   ]])
+
+								D['Hand Matrix'] = copy.deepcopy(handT[ip])
+								D['Model Matrix'] = ModelMatrix[im]
+								D['Camera Transform'] = cameraT
+								if im == 0: #normal save name
+									ImageSaveName = '%s/%s_%s_%s_cam%s' %('GeneratedImages/Grasps', D['Model'], preshape_names[ip], handT_names[it], ic)
+								elif im == 1: #sidways cylinder save name
+									ImageSaveName = '%s/%s_%s_%s_cam%s' %('GeneratedImages/Grasps', D['Model'].replace('cylinder', 'cylinderRot'), preshape_names[ip], handT_names[it], ic)
+								D['Image Save Name'] = ImageSaveName
+								D['Image Size'] = '' # need to do something for this step -- image size
+
+								if h == 6/100.0 and w == 6/100.0 and e == 6/100.0: #only capturing the "medium" object with grasps
+									if a is None or a == 30 or a == 3:
+										L.append(D)
+
+
+		for model in self.SIG.STLFileList: #capturing images of all objects
 			D = dict.fromkeys(headers)
 			D['Camera Transform'] = CameraTransform[0]
 			D['Model'] = model.split('/')[-1].strip('.stl')
@@ -367,8 +424,8 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		# self.SIG.createImageFromParameters(self.SIG.params_list[8])
-		self.SIG.loadObject('cylinder', 9, 6, 3)
+		self.SIG.createImageFromParameters(self.SIG.params_list[14])
+		# self.SIG.loadObject('cylinder', 9, 6, 3)
 		pdb.set_trace()
 
 	def Test8(self): # Description: Adding Ground plane with object
@@ -413,9 +470,9 @@ class Tester(object): # this is just meant to test different parts of the class
 
 if __name__ == '__main__':
 	T = Tester()
-	# T.Test6()
-	# T.Test5()
-	T.Test7()
+	T.Test6()
+	T.Test5()
+	# T.Test7()
 	# T.Test10()
 	# T.Test8()
 	

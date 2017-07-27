@@ -49,7 +49,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 				print("Image has been cropped already")
 				return im1
 			# crop_box = (30,20,600,420)
-			crop_box = (150, 0, 490, 310)
+			crop_box = (150, 0, 490, 350)
 			im1_cropped = im1.crop(crop_box)
 		except:
 			print("File may be damaged.  Unable to crop file: %s" %(im1.filename))
@@ -203,7 +203,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
-	SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
+	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
 	SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced', size = (285, 200))
 	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
