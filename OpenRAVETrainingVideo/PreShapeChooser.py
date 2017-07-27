@@ -59,7 +59,7 @@ class ChooserGUI(wx.Frame):
 				self.sizeOptions[dimension].append(int(value))
 			underscore = name.find("_", underscore+1)
 	def findAllShapeSizeOptions(self):
-		imageFiles = os.listdir("/home/reu3/Documents/NearContactStudy/ShapeGenerator/Shapes")
+		imageFiles = os.listdir("/home/reu4/NearContactStudy/ShapeGenerator/Shapes")
 		for image in imageFiles:
 			self.parseImageFileName(image)
 		for dimension in self.sizeOptions:
