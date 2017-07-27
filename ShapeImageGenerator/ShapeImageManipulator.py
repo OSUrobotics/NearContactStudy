@@ -1,4 +1,4 @@
-import subprocess, os, pdb, copy
+import subprocess, os, pdb, re
 import paramiko
 from  PIL import Image
 import matplotlib.pyplot as plt
@@ -38,8 +38,37 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		im2_reduced_border.paste(im2_reduced, (border_size,0))
 
 		im_out.paste(im2_reduced_border, box = (w-w_out-border_size, 0))
-		self.previewImage(im_out)
-		pdb.set_trace()
+		return im_out
+
+	def combineMultipleImages(self, dir_name_in, dir_name_out): # combine multiple images from a directory
+		#look through all the files in the directory
+		#find matching second camera angle
+		# combine images
+		# save image
+
+		for files in os.walk(dir_name_in):
+			for im_path in files[2]:
+				if os.path.splitext(im_path)[1] == '.png':
+					if 'cam' in im_path or 'camera' in im_path: #check that camera angles are being considered
+						# other camera angles will have similar file names
+						if 'cam1' in im_path:
+							cur_cam = 'cam1'
+							next_cam = 'cam0'
+						elif 'cam0' in im_path:
+							cur_cam = 'cam0'
+							next_cam = 'cam1'
+						else:
+							print('i have no idea: %s' %im_path)
+							continue
+						next_camera_angle_name = re.sub(cur_cam,next_cam,im_path) #replace 1 with 2 for camera angle
+						im_out = self.combineImagesTopRight(os.path.join(files[0], im_path), os.path.join(files[0], next_camera_angle_name))
+						# self.previewImage(im_out)
+						#remove those two files from the list
+						files[2].remove(im_path)
+						files[2].remove(next_camera_angle_name)
+						save_name = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), re.sub('_cam\d', '', im_path)) #remove camera angle identifier for save name
+						self.saveImage(im_out, save_name)
+
 
 	def cropOpenRAVEBoarder(self,image1): # crops image.  image1 is a PIL.Image object
 		im1 = self.imageTypeCheck(image1)
@@ -49,7 +78,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 				print("Image has been cropped already")
 				return im1
 			# crop_box = (30,20,600,420)
-			crop_box = (150, 0, 490, 350)
+			crop_box = (130, 0, 510, 350)
 			im1_cropped = im1.crop(crop_box)
 		except:
 			print("File may be damaged.  Unable to crop file: %s" %(im1.filename))
@@ -138,6 +167,8 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 	def saveImage(self, image1, fn): #save an image
 		im1 = self.imageTypeCheck(image1)
+		if not os.path.isdir(os.path.split(fn)[0]): #make a directory if it doesn't exist
+			os.makedirs(os.path.split(fn)[0])
 		im1.save(fn)
 
 	def closeImage(self,image1):
@@ -203,9 +234,24 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
+
+	# crop images down to size
+	SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
+	# combine images
+	SIM.combineMultipleImages('GeneratedImagesCropped', 'GeneratedImagesCombined')
+	# reduce image size
+
+
+
+
+
+
+
+
+
 	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
-	SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced', size = (285, 200))
-	SIM.uploadMultipleImages('GeneratedImagesReduced/')
+	# SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced', size = (285, 200))
+	# SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
 	# SIM.combineImagesTopRight('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png', 'GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam1.png', percent_image2 = 30)
 	# SIM.cropToHand('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png')

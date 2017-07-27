@@ -76,7 +76,7 @@ function Ellipse(height, width, extent, resolution, filename)
     xc = 0;
     yc = 0;
     zc = 0;
-    xr = width;
+    xr = width/2;
     yr = height/2;
     zr = extent/2;
     n = resolution;
@@ -108,8 +108,8 @@ function Cone(height, width, extent, alpha, resolution, filename)
     % unit cone with specified alpha
     % top and bottom are switched (based on matlab command) so orients
     % upward in openrave.  Could fix it there, but seemed easier here
-    r_top = 0.5;
-    r_bottom = 0.5 - sind(alpha);
+    r_top = 0.75;
+    r_bottom = 0.75 - sind(alpha);
     % check that alpha is between 0 and 90
     if ~((0 <= alpha) && (alpha <= 90))
         disp('STL Not Created: Angle Not in Range')

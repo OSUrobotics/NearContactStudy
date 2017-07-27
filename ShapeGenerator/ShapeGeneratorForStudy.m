@@ -1,16 +1,15 @@
 % % % Generate Shapes for Study
-base_dir = 'Shapes'
+base_dir = 'Shapes';
 % base_dir = '/Volumes/UBUNTU 14_0/Shapes';
 shapes = {'cube', 'ellipse', 'cylinder', 'cone', 'vase' };
 resolution = [10, 100, 25, 25, 25]; %certain resolutions do not produce an image
 % dimensions in cm
-% width  = [1,3:3:12];
-width  = [1,3:3:12,18];
-height = [1,3:3:12,18,24,30];
-extent = [1,3:3:12,18,24,30];
+width  = 1:8:33;
+height = 1:8:33;
+extent = 1:8:33;
 alpha = 10:10:30; % degrees
 min_d = width/2;
-for is = 5 %1:size(shapes,2)
+for is = 4
 % for is = 1:size(shapes, 2)
     for ih = 1:size(height,2)
         for iw = 1:size(width,2)

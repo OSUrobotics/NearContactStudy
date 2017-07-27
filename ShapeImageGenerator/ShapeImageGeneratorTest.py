@@ -125,6 +125,7 @@ class ShapeImageGenerator(object):
 		objLoadSuccess = self.loadObjectFromParameters(params)
 		if objLoadSuccess:
 			self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
+			# self.vis.changeBackgroundColor(self.groundPlane.groundPlane.GetLinks()[0].GetGeometries()[0].GetAmbientColor())
 			self.Obj.changeColor('purpleI')
 			self.Hand.changeColor('yellowI')
 			cam_params = params['Camera Transform']
@@ -142,9 +143,9 @@ class ShapeImageGenerator(object):
 				self.groundPlane.createGroundPlane(y_height = self.Obj.h/2.0/100)
 			# this should definitely be taken care of when making the spreadsheet
 			pts = self.Hand.getContactPoints()
-			# while len(pts) > 0:
-			# 	self.Hand.moveY(-0.001)
-			# 	pts = self.Hand.getContactPoints()
+			while len(pts) > 0:
+				self.Hand.moveY(-0.001)
+				pts = self.Hand.getContactPoints()
 				# pdb.set_trace()
 			self.vis.takeImage(params['Image Save Name'], delay = True)
 
@@ -292,9 +293,9 @@ class Tester(object): # this is just meant to test different parts of the class
 		# create list of dictionaries
 		L = list()
 		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform','Image Save Name', 'Image Size']
-		CameraTransform = ['%s, %s, %s' %(50, -2.355, -.449), '%s, %s, %s' %(50, 2.355, -.449)]
-		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.1,0.1,0,0.1,0.1,0.1,0.1),
-					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(1,0.1,0.4,1,0.1,0.4,0.1,0.4),
+		CameraTransform = ['%s, %s, %s' %(60, -2.355, -.449), '%s, %s, %s' %(60, -2.355, -np.pi/2.2)]
+		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.0,0.0,0,0.0,0.0,0.0,0.0),
+					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi/3,0.0,0.0,np.pi/3,0.0,0.0,0.0,0.0),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi,0.0,0.0,np.pi,0.0,0.0,0.0,0.0),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi/2,0.0,0.0,np.pi/2,0.0,0.0,0.0,0.0)]
 					 # 3 finger pinch
@@ -306,7 +307,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		handT_top = list((np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4))))
 		handT_side = list((np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4)), np.zeros((4,4))))
 		handTs = [handT_side, handT_top]
-		handT_names = ['top', 'side']
+		handT_names = ['side', 'top']
 
 		ModelMatrix = list()
 		ModelMatrix.append(np.eye(4))
@@ -398,18 +399,18 @@ class Tester(object): # this is just meant to test different parts of the class
 								D['Image Save Name'] = ImageSaveName
 								D['Image Size'] = '' # need to do something for this step -- image size
 
-								if h == 6/100.0 and w == 6/100.0 and e == 6/100.0: #only capturing the "medium" object with grasps
-									if a is None or a == 30 or a == 3:
+								if h == 17/100.0 and w == 17/100.0 and e == 17/100.0: #only capturing the "medium" object with grasps
+									if a is None or a == 30 or a == 8.5/100:
 										L.append(D)
 
 
-		for model in self.SIG.STLFileList: #capturing images of all objects
-			D = dict.fromkeys(headers)
-			D['Camera Transform'] = CameraTransform[0]
-			D['Model'] = model.split('/')[-1].strip('.stl')
-			D['Model Matrix'] = np.eye(4)
-			D['Image Save Name'] = '%s/%s_nohand' %('GeneratedImages/ObjectsOnly', D['Model'])
-			L.append(D)
+		# for model in self.SIG.STLFileList: #capturing images of all objects
+		# 	D = dict.fromkeys(headers)
+		# 	D['Camera Transform'] = CameraTransform[0]
+		# 	D['Model'] = model.split('/')[-1].strip('.stl')
+		# 	D['Model Matrix'] = np.eye(4)
+		# 	D['Image Save Name'] = '%s/%s_nohand' %('GeneratedImages/ObjectsOnly', D['Model'])
+		# 	L.append(D)
 
 
 		with open(fn, 'wb') as file:
@@ -424,7 +425,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		self.SIG.loadSTLFileList()
 		fn = curdir + '/ImageGeneratorParameters.csv'
 		self.SIG.readParameterFile(fn)
-		self.SIG.createImageFromParameters(self.SIG.params_list[14])
+		self.SIG.createImageFromParameters(self.SIG.params_list[81])
 		# self.SIG.loadObject('cylinder', 9, 6, 3)
 		pdb.set_trace()
 

@@ -61,6 +61,13 @@ class Vis(object): #General Class for visualization
 		# matplotlib.pyplot.imshow(img)
 
 
+	def changeBackgroundColor(self, color):
+		#values should be between 0 and 1.  values are scaled up to a point, and then outside of that I don't know what happens
+		if len(color) != 3:
+			print('Invalid Color Array.  Must have only 3 elements')
+			return
+		self.viewer.SetBkgndColor(color)
+
 	def close(self): # Close Env
 		self.env.Destroy()
 		self.viewer.quitmainloop()
@@ -83,6 +90,9 @@ class Vis(object): #General Class for visualization
 		self.axes = misc.DrawAxes(self.env, [1,0,0,0,0,0,0])
 
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
+		if not os.path.isdir(os.path.split(fname)[0]): #make a directory if it doesn't exist
+			os.makedirs(os.path.split(fname)[0])
+
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
 			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
 			plt.imshow(Im)
@@ -374,14 +384,15 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 			self.vis = V
 			self.groundPlane = None
 
-		def createGroundPlane(self, y_height, x = 3, y = 0, z = 3): #Removes any existing ground plane (if any), then creates a ground plane.
+		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
 			with self.vis.env:
 				self.removeGroundPlane()
 				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
 				self.groundPlane.SetName('groundPlane')
 				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
 				self.vis.env.AddKinBody(self.groundPlane)
-				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([0,0,0])
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetAmbientColor([3,3,3])
 
 		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
 			for i in self.vis.env.GetBodies():
@@ -494,7 +505,10 @@ class HandVis(GenVis):
 		self.TClass = Transforms(self.obj)
 
 	def setJointAngles(self, JA): # set hand joint angles
-		#adjust some values so that we get behavior more similar to the actual barett hand
+		#adjust fingertip values so we get behavior more similar to the actual hand
+		JA[4] += -0.7853981
+		JA[7] += -0.7853981
+		JA[9] += -0.7853981
 		self.obj.SetDOFValues(JA)
 		''' Index in Joint Angle array: joint that it affects  |   value limit
 		0: unknown
