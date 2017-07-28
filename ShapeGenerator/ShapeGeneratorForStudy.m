@@ -1,17 +1,16 @@
 % % % Generate Shapes for Study
-
 base_dir = 'Shapes';
-shapes = {'cube', 'ellipse', 'cylinder','cone', 'handle'};
-resolution = [10, 100, 50,50,100]; %certain resolutions do not produce an image
+% base_dir = '/Volumes/UBUNTU 14_0/Shapes';
+shapes = {'cube', 'ellipse', 'cylinder', 'cone', 'vase' };
+resolution = [10, 100, 25, 25, 25]; %certain resolutions do not produce an image
 % dimensions in cm
-width  = 3:3:9;
-widthr = 0.3:0.3:0.9; % for handle only
-height = 3:3:9;
-extent = 3:3:9;
-extentr = 0.3:0.3:0.9; % for handle only
-r = (1:1:3)/10; % radius of handle
+width  = 1:8:33;
+height = 1:8:33;
+extent = 1:8:33;
 alpha = 10:10:30; % degrees
-for is = 4 %1:size(shapes,2)
+min_d = width/2;
+for is = 4
+% for is = 1:size(shapes, 2)
     for ih = 1:size(height,2)
         for iw = 1:size(width,2)
             for ie = 1:size(extent,2)
@@ -20,12 +19,11 @@ for is = 4 %1:size(shapes,2)
                         filename = sprintf('%s/%s_h%d_w%d_e%d_a%d', base_dir, shapes{is}, height(ih), width(iw), extent(ie),alpha(ia));
                         ShapeSTLGenerator(shapes(is), resolution(is), filename, height(ih)/100, width(iw)/100, extent(ie)/100, alpha(ia))
                     end
-                if strcmpi(shapes{is}, 'handle')
-                    for ir = 1:size(r, 2)
-                        filename = sprintf('%s/%s_h%d_w%d_e%d_a%d', base_dir, shapes{is}, height(ih), widthr(iw), extentr(ie),r(ir));
-                        ShapeSTLGenerator(shapes(is), resolution(is), filename, height(ih)/100, widthr(iw)/100, extentr(ie)/100, r(ir)/100)
+                elseif strcmpi(shapes{is}, 'vase')
+                    for id = 1:size(min_d, 2)
+                        filename = MakeShapeFileName('%s/%s_h%d_w%d_e%d_a%d', {base_dir, shapes{is}, height(ih), width(iw), extent(ie),min_d(id)});
+                        ShapeSTLGenerator(shapes(is), resolution(is), filename, height(ih)/100, width(iw)/100, extent(ie)/100, min_d(id)/100)
                     end
-                end
                 else
                     filename = sprintf('%s/%s_h%d_w%d_e%d', base_dir, shapes{is}, height(ih), width(iw), extent(ie));
                     ShapeSTLGenerator(shapes(is), resolution(is), filename, height(ih)/100, width(iw)/100, extent(ie)/100)
@@ -35,8 +33,35 @@ for is = 4 %1:size(shapes,2)
     end
 end
 
+%%
+shapes = {'handle'};
+widthr = width/2; % for handle only
+heightr = height * 3;
+extentr = extent/10; % for handle only
+r = ([1,3:3:12])/2; % radius of handle
+for is = 1
+    if strcmpi(shapes{is}, 'handle')
+        for ih = 1:size(heightr, 2)
+            for iw = 1:size(width, 2)
+                for ie = 1:size(extent,2)
+                     for ir = 1:size(r, 2)
+                         % save filename is different because of decimal
+                         % places
+                         filename = sprintf('%s/%s_h%d_w%0.1f_e%0.1f_a%0.1f', base_dir, shapes{is}, heightr(ih), width(iw), extentr(ie), r(ir));
+                         filename = strrep(filename, '.','');
+                         try
+                             ShapeSTLGenerator(shapes(is), resolution(is), filename, heightr(ih)/100, width(iw)/100, extentr(ie)/100, r(ir)/100)
+                         catch
+                             disp(filename) %just keep going with loop
+                         end
+                     end
+                end
+            end
+        end
+    end
+end
 
-
+                         
 % width  = 3:3:9;
 % height = 3:3:9;
 % extent = 3:3:9;

@@ -3,3 +3,7 @@
 /ShapeImageGenerator/GeneratedImages/*
 /ShapeImageGenerator/GeneratedImagesReduced/*
 /ShapeImageGenerator/GeneratedImagesCropped/*
+*.pyc~
+*.goutputstream*
+*.~
+
