@@ -22,7 +22,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 			os.makedirs(dir_name)
 			print("New Directory Made")
 
-	def combineImagesTopRight(self, image1, image2, percent_image2 = 25): #combine images so that the second one is smaller and in top right corner
+	def combineImagesTopRight(self, image1, image2, percent_image2 = 35): #combine images so that the second one is smaller and in top right corner
 		im1 = self.imageTypeCheck(image1)
 		im2 = self.imageTypeCheck(image2)
 
@@ -47,27 +47,24 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		# save image
 
 		for files in os.walk(dir_name_in):
-			for im_path in files[2]:
+			files[2].sort()
+			while len(files[2]) > 0: # keep going until list is empty
+				im_path = files[2][0]
+				# print("Current Image: %s" %im_path)
 				if os.path.splitext(im_path)[1] == '.png':
-					if 'cam' in im_path or 'camera' in im_path: #check that camera angles are being considered
-						# other camera angles will have similar file names
-						if 'cam1' in im_path:
-							cur_cam = 'cam1'
-							next_cam = 'cam0'
-						elif 'cam0' in im_path:
-							cur_cam = 'cam0'
-							next_cam = 'cam1'
-						else:
-							print('i have no idea: %s' %im_path)
-							continue
-						next_camera_angle_name = re.sub(cur_cam,next_cam,im_path) #replace 1 with 2 for camera angle
+					if 'cam0' in im_path or 'camera' in im_path: #check that camera angles are being considered
+						next_camera_angle_name = re.sub('cam0','cam1',im_path) #replace 1 with 2 for camera angle
 						im_out = self.combineImagesTopRight(os.path.join(files[0], im_path), os.path.join(files[0], next_camera_angle_name))
-						# self.previewImage(im_out)
 						#remove those two files from the list
+						# print('Combined: %s, %s' %(im_path, next_camera_angle_name))
 						files[2].remove(im_path)
 						files[2].remove(next_camera_angle_name)
 						save_name = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), re.sub('_cam\d', '', im_path)) #remove camera angle identifier for save name
 						self.saveImage(im_out, save_name)
+					elif 'cam2' in im_path: #just keep going look for cam1
+						continue
+					else:
+						files[2].remove(im_path)
 
 
 	def cropOpenRAVEBoarder(self,image1): # crops image.  image1 is a PIL.Image object
@@ -75,7 +72,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		try:
 			cur_box = im1.getbbox()
 			if cur_box != (0,0,640,480): #should crop images down to desired size if they are larger
-				print("Image has been cropped already")
+				print("Image has been cropped already: %s" %im1.filename)
 				return im1
 			# crop_box = (30,20,600,420)
 			crop_box = (130, 0, 510, 350)
@@ -236,12 +233,14 @@ if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
 
 	# crop images down to size
-	SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
+	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
 	# combine images
 	SIM.combineMultipleImages('GeneratedImagesCropped', 'GeneratedImagesCombined')
 	# reduce image size
-
-
+	SIM.reduceSizeAllImages('GeneratedImagesCropped/ObjectsOnly', 'GeneratedImagesReduced/ObjectsOnly', size = (285, 200))
+	SIM.reduceSizeAllImages('GeneratedImagesCombined/Grasps', 'GeneratedImagesReduced/Grasps', size = (285, 200))
+	#upload Images
+	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
 
 
@@ -251,7 +250,7 @@ if __name__ == '__main__':
 
 	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
 	# SIM.reduceSizeAllImages('GeneratedImagesCropped', 'GeneratedImagesReduced', size = (285, 200))
-	# SIM.uploadMultipleImages('GeneratedImagesReduced/')
+
 
 	# SIM.combineImagesTopRight('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png', 'GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam1.png', percent_image2 = 30)
 	# SIM.cropToHand('GeneratedImages/Grasps/cone_h3_w3_e3_a10_grasp0_cam0.png')

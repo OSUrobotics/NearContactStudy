@@ -4,24 +4,19 @@ import numpy as np
 import sys, os, pdb, copy, subprocess, time
 from Colors import ColorsDict, bcolors
 from stlwriter import Binary_STL_Writer
-
 import platform
 print "\n\n" + platform.node() + "\n\n"
 if platform.node()[0:3] == 'reu': #lab computer
-	base_path = os.path.expanduser('~/NearContactStudy/InterpolateGrasps')
+	base_path = os.path.dirname(os.path.realpath(__file__))
+elif platform.node() == 'Sonny': #lab computer
+	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
+	import retract_finger
 elif platform.node() == 'Desktop': #personal desktop Linux
 	base_path = os.path.dirname(os.path.realpath(__file__))
-	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
-	sys.path.append(retract_fingers_path)
+	retract_fingers_path = os.path.expanduser('~/NearContactStudy/Interpolate Grasps/')
 	import retract_finger
 else:
 	base_path = os.path.dirname(os.path.realpath(__file__))
-
-
-# classdir = base_path +'/../OpenRAVETrainingVideo/'
-# sys.path.insert(0, classdir) # path to helper classes
-# from PreShapeChooser import ChooserGUI
-
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -40,7 +35,6 @@ class Vis(object): #General Class for visualization
 		self.env = Environment()
 		self.env.SetViewer('qtcoin')
 		self.viewer = self.env.GetViewer()
-		
 		self.colors = dict()
 		self.colors = ColorsDict.colors
 		self.points = list()
@@ -104,7 +98,7 @@ class Vis(object): #General Class for visualization
 				time.sleep(1)
 
 	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
-		#Thsi can be re-written to be more efficient (unneeded operations)
+		#This can be re-written to be more efficient (unneeded operations)
 		cam_T_zero = np.eye(4)
 		cam_p_zero = poseFromMatrix(np.eye(4))
 		cam_p_dist = cam_p_zero;
@@ -312,9 +306,11 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 		self.stl_path = curdir +'/../ShapeGenerator/Shapes/'
 		self.features = dict()
 
-
 	def loadObject(self, objtype, h, w, e, a = None): # load object based on features -- for near contact study
 		self.objCheck()
+		self.h = int(h)
+		self.w = int(w)
+		self.e = int(w)
 
 		if a is not None:
 			self.a = int(a)
@@ -349,7 +345,6 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 			print('Filename: %s' %self.objFN)
 			return False
 
-
 	def getFeaturesFromFN(self, FN):
 		FN_processed = FN.split('/')[-1].strip('.stl') #removing path and extension
 		h = FN_processed.split('_')[1].strip('h')
@@ -366,8 +361,6 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 
 		return h, w, e, a
 
-
-
 	def decimalCheck(self, val_str): # check a parameter for D and convert to decimal
 		#this is all necessary to try and keep file names readable
 		if 'D' in val_str:
@@ -376,131 +369,16 @@ class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near co
 			val = float(val_str)
 		return val
 
-
-
-# Kadon Engle - last edited 07/06/17
-class AddGroundPlane(object): #General class for adding a ground plane into the environment.
-		def __init__(self, V):
-			self.vis = V
-			self.groundPlane = None
-
-		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
-			with self.vis.env:
-				self.removeGroundPlane()
-				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
-				self.groundPlane.SetName('groundPlane')
-				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
-				self.vis.env.AddKinBody(self.groundPlane)
-				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([0,0,0])
-				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetAmbientColor([3,3,3])
-
-		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
-			for i in self.vis.env.GetBodies():
-				if i.GetName() == 'groundPlane':
-					self.vis.env.Remove(i)
-
-# Ammar Kothari - last edited 07/10/17
-class ArmVis(GenVis): # general class for importing arm into an openrave scene
-	# it would be nice to reuse the functions from Hand here
-
-	# can't use changeColor -- links do not have geometries
-	def __init__(self, V):
-		super(ArmVis, self).__init__(V)
-		self.stl_path = base_path + "/models/robots/"
-
-	def loadArm(self): # load arm from file
-		self.robotFN = self.stl_path + 'barrett_wam.dae'
-		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
-		self.env.Add(self.obj, True)
-		self.obj.SetVisible(1)
-		# self.vis.DrawGlobalAxes()
-		# self.addObjectAxes()
-		self.localTranslation([0,0,-1]) #moves base to (0,0,0). centroid of model is off?
-		self.localRotation(np.array(([1, 0, 0],[0, 1, 0], [0, 0, 1]))) #make up Z
-		self.TClass = Transforms(self.obj)
-
-	def getJointAngles(self):
-		return self.obj.GetDOFValues()
-
-	def setJointAngles(self, jointAngles):
-		if len(jointAngles) != 17:
-			print('Input array should be 1x17')
-			return
-		self.obj.SetDOFValues(jointAngles)
-		'''
-		Index in Joint Angle array: joint that it affects  |   value limit
-		0 : J1						|-2.6 < l < 2.6
-		1 : J2						|-1.98< l < 1.98
-		2 : J3						|-2.8 < l < 2.8
-		3 : J4						|-0.9 < l < 3.14
-		4 : J5						|-4.55< l < 1.25
-		5 : J6						|-1.57< l < 1.57
-		6 : J7						|  -3 < l < 3
-		7 : Unknown
-		8 : Unknown
-		9 : Finger1-Rotation		|	0 < l < pi
-		10: Finger1-Base			|	0 < l < 2.44
-		11: Finger1-Tip				|	0 < l < 0.837
-		12: Finger2-Rotation		|	0 < l < pi
-		13: Finger2-Base			|	0 < l < 2.44
-		14: Finger2-Tip				|	0 < l < 0.837
-		15: Finger3-Base			|	0 < l < 2.44
-		16: Finger3-Tip				|	0 < l < 0.837
-		'''
-
-		# TODO: function that returns a 'name' for a given index -- helps with troubleshooting
-
-	#can all STL functions go into GenVis?
-	def getSTLFeatures(self): # gets the mesh of the arm from openrave
-		links = self.obj.GetLinks()
-		all_vertices = []
-		all_faces = []
-		ind = 0
-		# I don't know what is happening here
-		for link in links:
-			vertices = link.GetCollisionData().vertices
-			faces = link.GetCollisionData().indices
-			if ind == 0:
-				faces = np.add(faces,ind)
-			else:
-				faces = np.add(faces,ind+1)
-			try:
-				ind = faces[-1][-1]
-			except:
-				pass
-		
-			#print "link: ", link, "\nStarting index for this link: ", len(all_vertices)
-			link_pose = poseFromMatrix(link.GetTransform())
-			transform_vertices = poseTransformPoints(link_pose, vertices)
-			all_vertices.extend(transform_vertices.tolist())
-			all_faces.extend(faces.tolist())
-		self.all_faces = all_faces
-		self.all_vertices = all_vertices
-
-	def writeSTL(self, save_filename): # writes mesh created by getSTLFeatures to file
-		faces_points = []
-		for vec in self.all_faces:
-			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
-		
-		with open(save_filename,'wb') as fp:
-			writer = Binary_STL_Writer(fp)
-			writer.add_faces(faces_points)
-			writer.close()
-
-	def generateSTL(self, save_filename): # helper function to create STL from current scene
-		self.getSTLFeatures()
-		self.writeSTL(save_filename)
-
 class HandVis(GenVis):
 	def __init__(self, V):
 		super(HandVis, self).__init__(V)
 		self.stl_path = base_path + "/models/robots/"
-		print self.stl_path
 
 	def loadHand(self): # load hand from file
 		self.robotFN = self.stl_path + 'bhand.dae'
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
+		self.changeColor(color = self.colors['grey'])
 		self.obj.SetVisible(1)
 		self.TClass = Transforms(self.obj)
 
@@ -614,20 +492,153 @@ class HandVis(GenVis):
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
-
+	
+	def getContact(self, body=None):
+		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
+		report = CollisionReport()
+		contact = {}
+		for link in self.obj.GetLinks():
+			if body == None:
+				collision = self.env.CheckCollision(link, report=report)
+			else:
+				collision = self.env.CheckCollision(link, body, report=report)
+			if len(report.contacts) > 0:
+				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
+				contact[link.GetName()] = report.contacts
+		return contact
 	# Kadon Engle - last edited 07/14/17
-	def getContactPoints(self): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
+	def getContactPoints(self, body=None): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
 		report = CollisionReport()
 		positions = []
 		for link in self.obj.GetLinks():
-			collision = self.env.CheckCollision(link,report=report)
-			# if collision == True:
-			# 	print link
+			if body == None:
+				collision = self.env.CheckCollision(link.GetName(), len(report.contacts))
+			else:
+				collision = self.env.CheckCollision(link, body,report=report)
 			if len(report.contacts) > 0:
 				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
 				positions += [c.pos for c in report.contacts]
 		return positions
+
+
+# Kadon Engle - last edited 07/06/17
+class AddGroundPlane(object): #General class for adding a ground plane into the environment.
+		def __init__(self, V):
+			self.vis = V
+			self.groundPlane = None
+			self.colors = dict()
+			self.colors = ColorsDict.colors
+
+		def changeColor(self, color = None, alpha = None): # change color of object.  Sets all sub features to same color
+			# pdb.set_trace()
+			if type(color) is str: #loads from dictionary
+				color = self.colors[color]
+			for link in self.groundPlane.GetLinks():
+				for geos in link.GetGeometries():
+					geos.SetDiffuseColor(color)
+
+		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
+			with self.vis.env:
+				self.removeGroundPlane()
+				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
+				self.groundPlane.SetName('groundPlane')
+				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
+				self.vis.env.AddKinBody(self.groundPlane)
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
+
+		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
+			for i in self.vis.env.GetBodies():
+				if i.GetName() == 'groundPlane':
+					self.vis.env.Remove(i)
+
+# Ammar Kothari - last edited 07/10/17
+class ArmVis(GenVis): # general class for importing arm into an openrave scene
+	# it would be nice to reuse the functions from Hand here
+
+	# can't use changeColor -- links do not have geometries
+	def __init__(self, V):
+		super(ArmVis, self).__init__(V)
+		self.stl_path = base_path + "/models/robots/"
+
+	def loadArm(self): # load arm from file
+		self.robotFN = self.stl_path + 'barrett_wam.dae'
+		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
+		self.env.Add(self.obj, True)
+		self.obj.SetVisible(1)
+		self.TClass = Transforms(self.obj)
+
+	def getJointAngles(self):
+		return self.obj.GetDOFValues()
+
+	def setJointAngles(self, jointAngles):
+		if len(jointAngles) != 17:
+			print('Input array should be 1x17')
+			return
+		'''
+		Index in Joint Angle array: joint that it affects  |   value limit
+		0 : J1						|-2.6 < l < 2.6
+		1 : J2						|-1.98< l < 1.98
+		2 : J3						|-2.8 < l < 2.8
+		3 : J4						|-0.9 < l < 3.14
+		4 : J5						|-4.55< l < 1.25
+		5 : J6						|-1.57< l < 1.57
+		6 : J7						|  -3 < l < 3
+		7 : Unknown
+		8 : Unknown
+		10: Finger1-Rotation		|	0 < l < pi
+		11: Finger1-Base			|	0 < l < 2.44
+		12: Finger1-Tip				|	0 < l < 0.837
+		13: Finger2-Rotation		|	0 < l < pi
+		14: Finger2-Base			|	0 < l < 2.44
+		15: Finger2-Tip				|	0 < l < 0.837
+		16: Finger3-Base			|	0 < l < 2.44
+		17: Finger3-Tip				|	0 < l < 0.837
+		'''
+		self.obj.SetDOFValues(jointAngles)
+
+	#can all STL functions go into GenVis?
+	def getSTLFeatures(self):
+		links = self.obj.GetLinks()
+		all_vertices = []
+		all_faces = []
+		ind = 0
+		# I don't know what is happening here
+		for link in links:
+			vertices = link.GetCollisionData().vertices
+			faces = link.GetCollisionData().indices
+			if ind == 0:
+				faces = np.add(faces,ind)
+			else:
+				faces = np.add(faces,ind+1)
+			try:
+				ind = faces[-1][-1]
+			except:
+				pass
+		
+			#print "link: ", link, "\nStarting index for this link: ", len(all_vertices)
+			link_pose = poseFromMatrix(link.GetTransform())
+			transform_vertices = poseTransformPoints(link_pose, vertices)
+			all_vertices.extend(transform_vertices.tolist())
+			all_faces.extend(faces.tolist())
+		self.all_faces = all_faces
+		self.all_vertices = all_vertices
+
+	def writeSTL(self, save_filename):
+		faces_points = []
+		for vec in self.all_faces:
+			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
+		
+		pdb.set_trace()
+		with open(save_filename,'wb') as fp:
+			writer = Binary_STL_Writer(fp)
+			writer.add_faces(faces_points)
+			writer.close()
+
+	def generateSTL(self, save_filename):
+		self.getSTLFeatures()
+		self.writeSTL(save_filename)
+
 
 
 class Transforms(object): #class for holding all transform operations -- this may be useless!
@@ -660,3 +671,27 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		T = self.R2T(R)
 		T = self.AddTranslation(Tl, T)
 		return T
+
+		
+		
+if __name__ == '__main__': #For testing classes (put code below and run in terminal)
+	V = Vis()
+	H = HandVis(V)
+	O = ObjectGenericVis(V)
+	H.loadHand()
+	O.loadObject('cube', 3, 3, 3)
+	# G = AddGroundPlane(V)
+	# G.createGroundPlane(0)
+	# Gr = AddGroundPlane(V)
+	# Gr.createGroundPlane(0)
+
+	#A = ArmVis(V)
+	#A.loadArm()
+	#A.generateSTL('test1.stl')
+	# for i in range(10):
+	# 	JA = np.zeros(17)
+	# 	JA[0:7] = np.random.rand(7) * 2 - 1
+	# 	A.setJointAngles(JA)
+	# 	raw_input('Continue?')
+	pdb.set_trace()
+

@@ -293,7 +293,7 @@ class Tester(object): # this is just meant to test different parts of the class
 		# create list of dictionaries
 		L = list()
 		headers = ['Joint Angles', 'Hand Matrix', 'Model', 'Model Matrix', 'Camera Transform','Image Save Name', 'Image Size']
-		CameraTransform = ['%s, %s, %s' %(60, -2.355, -.449), '%s, %s, %s' %(60, -2.355, -np.pi/2.2)]
+		CameraTransform = ['%s, %s, %s' %(80, -2.355, -.449), '%s, %s, %s' %(80, -2.355, -np.pi/2.2)]
 		preshapes = ['0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(0,0.0,0.0,0,0.0,0.0,0.0,0.0),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi/3,0.0,0.0,np.pi/3,0.0,0.0,0.0,0.0),
 					 '0,0,%s,%s,%s,%s,%s,%s,%s,%s' %(np.pi,0.0,0.0,np.pi,0.0,0.0,0.0,0.0),
