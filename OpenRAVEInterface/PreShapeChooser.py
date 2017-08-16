@@ -5,7 +5,7 @@ import math
 from openravepy import *
 import numpy as np
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../Interpolate Grasps/'
+classdir = curdir +'/../InterpolateGrasps/'
 sys.path.insert(0, classdir)
 from Colors import ColorsDict, bcolors
 
@@ -13,7 +13,7 @@ from Colors import ColorsDict, bcolors
 This creates a GUI with which to affect an OpenRAVE Simulation
 This runs a HandView class (as the simulation) so HandView.py must be in the same folder
 All shape models must be in ../ShapeGenerator/Shapes/
-Visualizers.py and Colors.py must be in ../Interpolate Grasps/
+Visualizers.py and Colors.py must be in ../InterpolateGrasps/
 """
 
 class ChooserGUI(wx.Frame):
@@ -35,7 +35,7 @@ class ChooserGUI(wx.Frame):
 		self.wristAngle = {'X':0, 'Y':0, 'Z':0}
 		self.objAngle = {'X':0, 'Y':0, 'Z':0}
 		self.translation = {'X':100, 'Y':100, 'Z':100}
-		self.handColor = 'mustard'
+		self.handColor = 'yellowI'
 		self.objColor = 'purpleI'
 		self.handPnlBackground = self.setColor(self.handColor)
 		self.objPnlBackground = self.setColor(self.objColor)

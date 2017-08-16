@@ -4,14 +4,14 @@ import math
 
 from openravepy import *
 curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/../Interpolate Grasps/'
+classdir = curdir +'/../InterpolateGrasps/'
 sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, GenVis, HandVis, ObjectGenericVis, AddGroundPlane
 
 """
 This sets up the simulation view that is paired with the PreShapeChooser GUI
 Run starting from PreShapeChooser.py so this should be in the same folder as PreShapeChooser.py
-Visualizers should be in the folder ../Interpolate Grasps/
+Visualizers should be in the folder ../InterpolateGrasps/
 """
 class HandView(object):
 	def __init__(self, handColor, objColor, grasps):
