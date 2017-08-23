@@ -59,16 +59,18 @@ function Cube(height, width, extent, resolution, filename)
 %to save file to
 %Output: none
 %saves STL to file
-  
-    V_val = 0.9;
-    X_span = linspace(-width/2,width/2,resolution);
-    Y_span = linspace(-height/2,height/2,resolution);
-    Z_span = linspace(-extent/2,extent/2,resolution);
-    V = V_val * ones(length(X_span), length(X_span), length(Y_span))/10;
+    V_val = true;
+    X_span = linspace(-1,1,resolution);
+    Y_span = linspace(-1,1,resolution);
+    Z_span = linspace(-1,1,resolution);
+    V = V_val * zeros(resolution, resolution, resolution);
     V(1,:,:) = V_val; V(end,:,:) = V_val;
     V(:,1,:) = V_val; V(:,end,:) = V_val;
     V(:,:,1) = V_val; V(:,:,end) = V_val;
     fv = isosurface(X_span, Y_span, Z_span, V);
+    fv.vertices(:,1) = fv.vertices(:,1) / max(fv.vertices(:,1)) * width/2;
+    fv.vertices(:,2) = fv.vertices(:,2) / max(fv.vertices(:,2)) * height/2;
+    fv.vertices(:,3) = fv.vertices(:,3) / max(fv.vertices(:,3)) * extent/2;
     stlwrite(filename, fv, 'mode', 'ascii')
 end
 
@@ -103,40 +105,27 @@ function Cylinder(height, width, extent, resolution, filename)
 
 end
 
-function Cone(height, width, extent, alpha, resolution, filename)
-%something weird here wtih top, bottom, and -1 multiplaction at end
-    % unit cone with specified alpha
-    % top and bottom are switched (based on matlab command) so orients
-    % upward in openrave.  Could fix it there, but seemed easier here
-    r_top = 0.75;
-    r_bottom = 0.75 - sind(alpha);
-    % check that alpha is between 0 and 90
-    if ~((0 <= alpha) && (alpha <= 90))
-        disp('STL Not Created: Angle Not in Range')
-        return
-    end
-    % check to make sure it doesn't become an hour glass
-%     r_test_top = min(width, extent);
-%     r_test_bottom = r_test_top - sind(alpha)
-    if ((r_top - r_bottom) * tand(alpha) >= 1) || r_bottom < 0
-        disp('STL Not Created: Not a Cone')
-        return
-    end 
-    [X, Y, Z] = cylinder([r_top, r_bottom], resolution);
-    %add top and bottom;
-    [x_top, y_top, z_top] = ellipsoid(0,0,1,r_bottom, r_bottom, 0, resolution);
-    [x_bot, y_bot, z_bot] = ellipsoid(0,0,0,r_top, r_top, 0, resolution);
-    X_surf = [x_bot;X;x_top];
-    Z_surf = [z_bot;Z;z_top];
-    Y_surf = [y_bot;Y;y_top];
-    %scale
-    X_scale = X_surf * width;
-    Y_scale = (Z_surf - 0.5) * height;
-    Z_scale = Y_surf * extent;
-    %save file
-    fvc = surf2patch(X_scale,-1 * Y_scale,Z_scale,'triangles');
+function Cone(height, width, extent, p_cutoff, resolution, filename)
+    % p_cutoff is the percent amount of the top of the cone that is chopped off
+    t = linspace(0,2*pi, resolution);
+    X_lower = width/2 * sin(t);
+    Z_lower = extent/2 * cos(t);
+    Y_lower = -height/2*ones(1, resolution);
+    height_complete = height / (1 - p_cutoff);
+    w_gamma = atan2(width/2, height_complete);
+    e_gamma = atan2(extent/2, height_complete);
+    w_upper = 2*(width/2 - height*tan(w_gamma));
+    e_upper = 2*(extent/2 - height*tan(e_gamma));
+    X_upper = w_upper/2 * sin(t);
+    Z_upper = e_upper/2 * cos(t);
+    Y_upper = height/2*ones(1, resolution);
+    [x_bottom, z_bottom, y_bottom] = ellipsoid(0,0,-height/2,width/2, extent/2, 0, resolution-1);
+    [x_top, z_top, y_top] = ellipsoid(0,0,height/2,w_upper/2, e_upper/2, 0, resolution-1);
+    X = [x_bottom; X_lower; X_upper; x_top];
+    Z = [z_bottom; Z_lower; Z_upper; z_top];
+    Y = [y_bottom; Y_lower; Y_upper; y_top];
+    fvc = surf2patch(X,-1*Y,Z,'triangles');
     stlwrite(filename, fvc, 'mode', 'ascii')
-   
 end
 
 function Handle(height, width, extent, curve_factor, resolution, filename)

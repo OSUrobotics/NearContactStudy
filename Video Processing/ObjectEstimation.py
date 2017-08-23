@@ -9,19 +9,23 @@ sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, ArmVis
 from cv_bridge import CvBridge, CvBridgeError
 import struct, ctypes
-import pcl.registration, pcl
+# import pcl.registration, pcl
 
 class BagReader(object):
 	# Do general bag operations
-	def __init__(self, fn, start_time = 0, duration = None):
+	def __init__(self):
+		i = 1
+		
+
+	def loadBagFile(self, fn, start_time = 0, duration = None): #load a bag file
 		self.bagFileNameCheck(fn)
 		self.bag = self.loadBag()
 		self.bag_gen = self.bag.read_messages() # generator of each time step in bag file
-		self.all_data = list() # list of dicts for each frame by time?
-		self.frame_exists_count = 0
 		topic, msg, t = self.readNextMsg()
 		self.start_time = copy.deepcopy(t)
 		self.start_time.secs += start_time # change start time of reading
+		self.all_data = list() # list of dicts for each frame by time?
+		self.frame_exists_count = 0
 		self.end_time = None
 		self.frame_count = 0
 
@@ -30,6 +34,13 @@ class BagReader(object):
 			self.end_time.secs += duration
 
 		self.bag_gen = self.bag.read_messages(start_time = self.start_time, end_time = self.end_time)
+
+		# check to see if hand is connected (broadcasting hand messages)
+		topics = self.bag.get_type_and_topic_info()[1].keys()
+		if '/bhand/joint_states' in topics:
+			self.hand_attached_flag = True
+		else:
+			self.hand_attached_flag = False
 
 	def createEnv(self): # create scene and arm to it
 		self.vis = Vis()
@@ -72,10 +83,39 @@ class BagReader(object):
 			print("There was an error")
 			pdb.set_trace()
 
+	def readBag(self, showPose = False): #cycles through all time steps, running other functions as necessary
+		for topic, msg, t in self.bag_gen:
+			self.parseData() #adds message to all_data with topic as key
+			if showPose:
+				self.showPoses()
+
+	def topicsInKeys(self, topics, keys): #checks if all the topics are in the keys
+		for t in topics:
+			if t not in keys: # if a topic is not in the keys, return False
+				return False
+		return True # return sucess if all topics in keys
+
+	def showPoses(self): #shows position of robot in openRave
+		# topics_to_check = ['/wam/joint_states', '/bhand/joint_states']
+		# if self.topicsInKeys(topics_to_check, self.all_data[-1].keys()):
+			# if the necessary data is in the last entry of list to show a pose
+		# deal with cases where Open Hand is attached
+		if self.hand_attached_flag and self.topicsInKeys(['/bhand/joint_states'], self.all_data[-1].keys()):
+			handArray = self.all_data[-1]['/bhand/joint_states']
+		else:
+			handArray = np.zeros(10)
+		JA = self.robotStateToArray(self.all_data[-1]['/wam/joint_states'], handArray)
+		self.setJA(JA)
+		print('Pose at time: %s' %self.all_data[-1]['time'])
+		time.sleep(0.01)
+
+	def showPointCloud(self): #shows point cloud in openRave
+		topics_to_check = ['/camera1/depth/points', '/camera1/rgb/image_raw/compressed', '/camera2/depth/points', '/camera2/rgb/image_raw/compressed']
+
+
 	def AllPoses(self, save_poses = False, dir_name = None, align_pc = False): #read a message, display pose, and write to file
 		print('Showing All Poses from Robot in openRAVE')
 		save_time_interval = 0.1 # amount of time between saved stls
-
 		# some directory checking for file creation
 		if save_poses:
 			if dir_name is not None:
@@ -95,32 +135,24 @@ class BagReader(object):
 		last_save_time = 0
 		for topic, msg, t in self.bag_gen:
 			self.parseData(topic,msg,t) #adds message to all_data with topic as key
-
-			if '/wam/joint_states' in self.all_data[-1].keys() and '/bhand/joint_states' in self.all_data[-1].keys():
-				# pdb.set_trace()
+			audio_filename = '%s/%s.mp3' %(dir_name, os.path.split(dir_name)[-1])
+			self.extractAudio(audio_filename, topic, msg)
+			hand_check = '/bhand/joint_states' in self.all_data[-1].keys() or not self.hand_attached_flag #checks if hand message is there when necessary
+			if '/wam/joint_states' in self.all_data[-1].keys() and hand_check:
 				# if the necessary data is in the last entry of list to show a pose
-				JA = self.robotStateToArray(self.all_data[-1]['/wam/joint_states'], self.all_data[-1]['/bhand/joint_states'])
-				# pdb.set_trace()
-				self.setJA(JA)
-				print('Pose at time: %s' %self.all_data[-1]['time'])
-				time.sleep(0.01)
+				self.showPoses()
 				if save_poses:
 					if '/camera1/depth/points' in self.all_data[-1].keys() \
 					and '/camera1/rgb/image_raw/compressed' in self.all_data[-1].keys() \
 					and '/camera2/depth/points' in self.all_data[-1].keys() \
 					and '/camera2/rgb/image_raw/compressed' in self.all_data[-1].keys() \
 					and abs(self.all_data[-1]['time'] - last_save_time) > save_time_interval:
-					# if '/kinect2/hd/points' in self.all_data[-1].keys() and '/camera/depth/points' in self.all_data[-1].keys():
 						
 						camera1_pts = self.pc2ToXYZRGB(self.all_data[-1]['/camera1/depth/points'])
 						camera2_pts = self.pc2ToXYZRGB(self.all_data[-1]['/camera2/depth/points'])
-						# camera1_pts = self.pc2ToXYZ(self.all_data[-1]['/camera1/depth/points'])
-						# camera2_pts = self.pc2ToXYZ(self.all_data[-1]['/camera2/depth/points'])
-						self.showPointCloud(camera1_pts)
-						self.showPointCloud(camera2_pts)
-						# pdb.set_trace()
+						# self.showPointCloud(camera1_pts)
+						# self.showPointCloud(camera2_pts)
 						
-						# saving image from camera -- should check this at the if statement...
 						try:
 							cv_image1 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera1/rgb/image_raw/compressed'], "bgr8")
 							cv_image2 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera2/rgb/image_raw/compressed'], "bgr8")
@@ -129,7 +161,6 @@ class BagReader(object):
 						
 						# save point clouds
 						camera_pts = [camera1_pts, camera2_pts]
-						# camera_pts = [camera1_pts]
 						camera_filename = ['%s/frame%s_pc%s.csv' %(dir_name,self.frame_count,ci) for ci in range(len(camera_pts))]
 						for i in range(len(camera_pts)): # won't work with only one camera
 							with open(camera_filename[i], 'wb') as f:
@@ -198,7 +229,7 @@ class BagReader(object):
 					self.all_data.pop(idx)
 					print('List Entry Popped')
 
-	def writeAllPosesToFile(self, dir_name, save_poses = False): self.AllPoses(dir_name = dir_name, save_poses = save_poses) # saves all poses in a bag file
+	def writeAllPosesToFile(self, dir_name, save_poses = True): self.AllPoses(dir_name = dir_name, save_poses = save_poses) # saves all poses in a bag file
 
 	def viewAlignAllposes(self): self.AllPoses(align_pc = True) #view point clouds aligned to arm
 
@@ -359,25 +390,67 @@ class BagReader(object):
 		else:
 			print("Input array has incorrect dimension")
 
+	def extractAudio(self, save_fn, topic, msg): #extract audio from bag file
+		if topic == '/audio/audio':
+			with open(save_fn, 'ab') as f:
+				f.write("".join(msg.data))
+
+	def extractAudioOnly(self, save_fn):
+		for topic, msg, t in self.bag_gen:
+			self.extractAudio(save_fn, topic, msg)
+
+	def saveSetofBagFiles(self, bag_dir): # extract information from a set of bag files
+		for root, dirs, filenames in os.walk(bag_dir):
+			for fname in filenames:
+				if os.path.splitext(fname)[1] == '.bag': #only want bag files -- check for .orig.bag?
+					print(fname)
+					B.loadBagFile(os.path.join(root,fname))
+					B.writeAllPosesToFile(dir_name = os.path.splitext(os.path.join(root,fname))[0])
+
+	def splitBag(self, bag_fn, max_size = 14.5): #splits bag size down if larger than a specific size
+		#https://github.com/zhangzichao/bag_ops/blob/master/scripts/crop_bag.py
+		self.loadBagFile(bag_fn)
+		size_gb = self.bag.size / (1.0e9)
+		if size_gb > max_size:
+			split_into_pieces = int(size_gb // max_size + 1)  # number of section
+			# delta_time = (self.bag.get_end_time() - self.bag.get_start_time())/split_into_pieces
+			bag_times = np.linspace(self.bag.get_start_time(), self.bag.get_end_time(), split_into_pieces + 1)
+			for i in range(split_into_pieces):
+				new = os.path.split(self.bag.filename)[1].split('_')
+				new.insert(1, '_%s_' %i)
+				outbag_fn = os.path.split(self.bag.filename)[0] + '/%s' %(''.join(new))
+				outbag = rosbag.Bag(outbag_fn, mode = 'w', compression = 'lz4')
+				for topic, msg, t in self.bag_gen:
+					if t.to_time() > bag_times[i] and t.to_time() < bag_times[i+1]: #check if it is within range
+						outbag.write(topic, msg, t) #writing to new bag file
+					elif t.to_time() < bag_times[i]: #just keep going if you haven't gotten to the start time
+						continue
+					elif t.to_time() > bag_times[i+1]: #gone past the last time stamp, so move on to next bag
+						outbag.close()
+						print('Bag File Written: %s' %outbag_fn)
+						break
+			self.bag.close()
+			os.rename(bag_fn, bag_fn.replace('.bag', '.gab_old'))
+		else:
+			self.bag.close()
+			print("File Below Limit. Not doing anything: %s" %self.bag.filename)
+
+	def splitBags(self, bag_dir): # splits all bag files in a folder as necessary
+		for root, dirs, filenames in os.walk(bag_dir):
+			for fname in filenames:
+				if os.path.splitext(fname)[1] == '.bag': #only want bag files -- check for .orig.bag?
+					self.splitBag(os.path.join(root,fname))
 
 if __name__ == '__main__':
-	# B = BagReader('DataCollectionTest/DataCollectionTest2', 20, 10)
-	# B = BagReader('DataCollectionTest/DataCollectionTest_realsenseOnly', 20, 30)
-	# B = BagReader('DataCollectionTest/DataCollectionTest_2cam', 10, 30)
-	B = BagReader('DataCollectionTest/DataCollectionTest2_2cam')
-
-	
-	# topic, msg, t = B.readNextMsg()
-	# B.parseAllData()
+	B = BagReader()
 	B.createEnv()
-	# for idx, frame in enumerate(B.all_data):
-	# 	pdb.set_trace()
-	# 	B.createSTL(frame['/wam/joint_states'], frame['/bhand/joint_states'], "frame%s" %idx)
-	# B.viewAllPoses()
-	# B.writeAllPosesToFile('test1')
-	# B.writeAllPosesToFile('test3_2RealSense', save_poses = True)
-	# B.writeAllPosesToFile('test4_2RealSense', save_poses = True)
-	B.viewAlignAllposes()
+	# B.saveSetofBagFiles('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7')
+	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_1_2017-08-18-14-40-43.bag')
+	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_1_2017-08-18-14-40-43')
+	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43.bag')
+	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43')
+	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43.bag')
+	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43')
+	
 
-	pdb.set_trace()
 	B.closeBag()

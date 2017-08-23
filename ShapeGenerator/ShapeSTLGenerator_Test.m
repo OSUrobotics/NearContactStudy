@@ -48,6 +48,9 @@ xlabel('x'); ylabel('y'); zlabel('z');
 stlwrite('test.stl',X,Y,Z,'mode','ascii') 
 %%
 
+
+%%
+
 % %-Surface Values
 % X_span = [];
 % Y_span = [];
@@ -326,3 +329,41 @@ fvc = surf2patch(X_scale, Y_scale, Z_scale,'triangles');
 stlwrite(filename, fvc, 'mode', 'ascii')
 %% Vase Test
 ShapeSTLGenerator('vase', 25, 'vase1', 1, 3, 2, 1);
+
+%% Cone New
+height = 0.1;
+width = 0.03;
+extent = 0.02;
+p_cutoff = 0.25;
+resolution = 25;
+save_name = 'new_cone_test.stl';
+t = linspace(0,2*pi, resolution);
+X_lower = width/2 * sin(t);
+Z_lower = extent/2 * cos(t);
+Y_lower = -height/2*ones(1, resolution);
+plot(X_lower,Z_lower); xlabel('x'); ylabel('z'); axis equal
+rectangle('Position', [-width/2, -extent/2, width, extent])
+height_complete = height / (1 - p_cutoff);
+w_gamma = atan2(width/2, height_complete);
+e_gamma = atan2(extent/2, height_complete);
+w_upper = 2*(width/2 - height*tan(w_gamma));
+e_upper = 2*(extent/2 - height*tan(e_gamma));
+X_upper = w_upper/2 * sin(t);
+Z_upper = e_upper/2 * cos(t);
+Y_upper = height/2*ones(1, resolution);
+hold on
+plot(X_upper, Z_upper);
+rectangle('Position', [-w_upper/2, -e_upper/2, w_upper, e_upper])
+hold off
+[x_bottom, z_bottom, y_bottom] = ellipsoid(0,0,-height/2,width/2, extent/2, 0, resolution-1);
+[x_top, z_top, y_top] = ellipsoid(0,0,height/2,w_upper/2, e_upper/2, 0, resolution-1);
+% surf(x_bottom, y_bottom, z_bottom); hold on; surf(x_top, y_top, z_top); hold off
+
+X = [x_bottom; X_lower; X_upper; x_top];
+Z = [z_bottom; Z_lower; Z_upper; z_top];
+Y = [y_bottom; Y_lower; Y_upper; y_top];
+surf(X, Z, Y); axis equal
+xlabel('x'); ylabel('z'); zlabel('y');
+
+%%
+ShapeSTLGenerator('cone', 25, 'new_cone_test.stl', 1, 3, 2, 0.25);

@@ -33,8 +33,6 @@ Significantly more commenting is necessary to make this usable
 class Vis(object): #General Class for visualization
 	def __init__(self):
 		self.env = Environment()
-		self.env.SetViewer('qtcoin')
-		self.viewer = self.env.GetViewer()
 		self.colors = dict()
 		self.colors = ColorsDict.colors
 		self.points = list()
@@ -43,7 +41,10 @@ class Vis(object): #General Class for visualization
    										[-0.10644389, -0.78428209, -0.6112048 ,  0.29396212],
        									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
        									[ 0.        ,  0.        ,  0.        ,  1.        ]])
+		self.env.SetViewer('qtcoin')
+		self.viewer = self.env.GetViewer()
 		self.viewer.SetCamera(self.cameraTransform)
+		self.cameraFocusPoint = [0,0,0]
 		# pdb.set_trace()
 		# sensor = RaveCreateSensor(self.env, 'offscreen_render_camera')
 		# sensor.SendCommand('setintrinsic 529 525 328 267 0.01 10')
@@ -86,7 +87,7 @@ class Vis(object): #General Class for visualization
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
 		if not os.path.isdir(os.path.split(fname)[0]): #make a directory if it doesn't exist
 			os.makedirs(os.path.split(fname)[0])
-
+		self.env.UpdatePublishedBodies()
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
 			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
 			plt.imshow(Im)
@@ -96,6 +97,12 @@ class Vis(object): #General Class for visualization
 			else:
 				subprocess.call(["gnome-screenshot", "-w", "-B", "--file="+fname, '--delay=1'])
 				time.sleep(1)
+
+	def setCameraFocusPoint(self, pt): # sent the center point that the camera rotates around with setCamera
+		if len(pt) == 3:
+			self.cameraFocusPoint = np.array(pt)
+		else:
+			print('Invalid Input')
 
 	def setCamera(self, dist, az, el): # Description: Sets camera location pointed at center at a distance, azimuth, and elevation
 		#This can be re-written to be more efficient (unneeded operations)
@@ -110,6 +117,8 @@ class Vis(object): #General Class for visualization
 		rot_AA_az = [0, az, 0]
 		rot_mat_az = matrixFromAxisAngle(rot_AA_az)
 		rot_new = np.dot(rot_mat_az, rot_el)
+		# pdb.set_trace()
+		# rot_new[0:3, 3] = trasnformPoints(rot_new, self.cameraFocusPoint)
 		self.viewer.SetCamera(rot_new)
 		# pdb.set_trace()
 
@@ -213,6 +222,7 @@ class GenVis(object): # General class for objects in visualization
 		#TODO: add a check to cycle through and verify colors are correct.  sometimes color change doesn't seem to work
 		for link in self.obj.GetLinks():
 			for geos in link.GetGeometries():
+				geos.SetAmbientColor(color)
 				geos.SetDiffuseColor(color)
 				geos.SetTransparency(alpha)
 
@@ -256,6 +266,9 @@ class GenVis(object): # General class for objects in visualization
 	def rotY(self, y_rot): self.localRotation(matrixFromAxisAngle([0, y_rot, 0])) # rot in y direction
 
 	def rotZ(self, z_rot): self.localRotation(matrixFromAxisAngle([0, 0, z_rot])) # rot in z direction
+
+	def remove(self):
+		self.vis.env.Remove(self.obj) # remove object from scene
 
 class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
@@ -506,6 +519,7 @@ class HandVis(GenVis):
 				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
 				contact[link.GetName()] = report.contacts
 		return contact
+
 	# Kadon Engle - last edited 07/14/17
 	def getContactPoints(self, body=None): # Gets the contact points for the links of the fingers if they are in contact with something in the environment
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
@@ -538,14 +552,15 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 				for geos in link.GetGeometries():
 					geos.SetDiffuseColor(color)
 
-		def createGroundPlane(self, y_height, x = 10, y = 0, z = 10): #Removes any existing ground plane (if any), then creates a ground plane.
+		def createGroundPlane(self, y_height, x = 0.5, y = 0, z = 0.5): #Removes any existing ground plane (if any), then creates a ground plane.
 			with self.vis.env:
 				self.removeGroundPlane()
 				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
 				self.groundPlane.SetName('groundPlane')
 				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
 				self.vis.env.AddKinBody(self.groundPlane)
-				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([1,1,1])
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([0,0,0])
+				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetAmbientColor([3,3,3])
 
 		def removeGroundPlane(self): #Cycles through Bodies in the environment. If 'groundPlane' exists, remove it.
 			for i in self.vis.env.GetBodies():
@@ -564,6 +579,8 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 	def loadArm(self): # load arm from file
 		self.robotFN = self.stl_path + 'barrett_wam.dae'
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
+		# self.robotFN = '/home/ammar/Documents/SourceSoftware/openrave/src/robots/barrettwam.robot.xml'
+		self.obj = self.vis.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
 		self.TClass = Transforms(self.obj)
@@ -628,8 +645,7 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		faces_points = []
 		for vec in self.all_faces:
 			faces_points.append([self.all_vertices[vec[0]],self.all_vertices[vec[1]],self.all_vertices[vec[2]]])
-		
-		pdb.set_trace()
+
 		with open(save_filename,'wb') as fp:
 			writer = Binary_STL_Writer(fp)
 			writer.add_faces(faces_points)

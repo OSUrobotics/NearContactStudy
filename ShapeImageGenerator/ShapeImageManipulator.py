@@ -1,11 +1,14 @@
-import subprocess, os, pdb, re
+import subprocess, os, pdb, re, copy, sys
 import paramiko
-from  PIL import Image
+from  PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 import numpy as np
+from multiprocessing import Process, Pool
+# sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)))
+from ShapeImageGeneratorTest import ShapeImageGenerator
 
-#Editted: Ammar Kothari -- Last Update: 7/13/17
+#Editted: Ammar Kothari -- Last Update: 8/8/17
 class ShapeImageManipulator: #manipulate images that have been produced (most likely with ShapeImageGenerator)
 	def __init__(self):
 		self.i = 1
@@ -61,7 +64,7 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 						files[2].remove(next_camera_angle_name)
 						save_name = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), re.sub('_cam\d', '', im_path)) #remove camera angle identifier for save name
 						self.saveImage(im_out, save_name)
-					elif 'cam2' in im_path: #just keep going look for cam1
+					elif 'cam1' in im_path: #just keep going look for cam1
 						continue
 					else:
 						files[2].remove(im_path)
@@ -82,9 +85,47 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 			return False
 		return im1_cropped
 
-	def cropToHand(self, image1): #crop images so only hand and object remain
+	def boundingPixels(self, bbox): #returns a list of pixels along the edge of the bounding box
+		pixel_loc = list()
+		y = bbox[1]
+		for x in xrange(bbox[0], bbox[2] - 1, 1):
+			pixel_loc.append([x, y])
+		for y in xrange(bbox[1], bbox[3] - 1, 1):
+			pixel_loc.append([x, y])
+
+		for x in xrange(bbox[2] - 1, bbox[0], -1):
+			pixel_loc.append([x, y])
+		for y in xrange(bbox[3] - 1, bbox[1], -1):
+			pixel_loc.append([x, y])
+		pixel_loc = np.array(pixel_loc).astype(int)
+		return pixel_loc
+
+	def bboxToHand(self, im1, crop = False): #crop images so only hand and object remain
 		# this depends on the choice of hand color and object color.
 		# potentially do some smart sampling, but it is unclear
+
+
+		image_orig = self.imageTypeCheck(im1)
+		print("Current File: %s" %image_orig.filename)
+		image_orig.convert("RGB") # occasionally will get RGBA values if not converted
+		bbox = image_orig.getbbox()
+		pixel_loc = self.boundingPixels(bbox)
+
+		#linear search at middle
+		## build line
+		# midline = bbox[2:] / 2
+		# mid_pixel_loc = list()
+		# for x in xrange(midline[0]):
+		# 	mid_pixel_loc.append([x, midline[1]])
+		# for y in xrange(midline[1]):
+		# 	mid_pixel_loc.append([midline[0], y])
+		# mid_pixel_loc = np.array(mid_pixel_loc).astype(int)
+		search_box = copy.deepcopy(bbox)
+		search_pixel = self.boundingPixels([search_box[2] / 2 - 10, search_box[3] / 2 - 10, search_box[2] / 2 + 10, search_box[3] / 2 + 10])
+		search_result = self.checkOverCrop(image_orig, search_box)
+		pdb.set_trace()
+
+
 
 		ground_plane_color = np.array([137, 132, 132])
 		obj_color = np.array([238, 183, 4])
@@ -228,6 +269,113 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 	# 	sftp.close()
 	# 	ssh.close()
 
+	def checkOverCropAll(self, dir_name_in): #checks for colors at the border of each image to see if the image was cropped too much
+		for files in os.walk(dir_name_in):
+			for im_path in files[2]:
+				if os.path.splitext(im_path)[1] == '.png':
+					self.checkOverCrop(os.path.join(files[0], im_path))
+					
+	def checkOverCrop(self, im1, bbox = None): # checks for colors at the border of each image to see if hand or object has been cropped
+		# could implement a luminescence check as a better/alternate scheme
+		# manually set these ranges based on examining images
+		hand_color_range = np.array(([255, 205, 50], [134, 103, 0]))
+		obj_color_range = np.array(([120, 0, 178], [150, 0, 230]))
+		image_orig = self.imageTypeCheck(im1)
+		print("Current File: %s" %image_orig.filename)
+		image_orig.convert("RGB") # occasionally will get RGBA values if not converted
+		if bbox == None: #check the box if given one, otherwise use image size
+			bbox = image_orig.getbbox()
+		pixel_loc = self.boundingPixels(bbox)
+		# pdb.set_trace()
+		for pt in pixel_loc:
+			try:
+				pixel_color = image_orig.getpixel((pt[0], pt[1]))
+			except:
+				print("Failure: %s,%s" %(pt[0], pt[1]))
+			color_range = np.vstack((hand_color_range, obj_color_range))
+			diff_color = color_range - pixel_color
+			if ((diff_color[0] > 0).all() and (diff_color[1] < 0).all()) or \
+				((diff_color[2] > 0).all() and (diff_color[3] < 0).all()):
+				print("Overcropping: %s" %image_orig.filename)
+				draw = ImageDraw.Draw(image_orig)
+				r = 10
+				draw.ellipse((pt[0] - r, pt[1] - r, pt[0] + r, pt[1] + r), fill = (255, 0,0))
+				image_orig.show()
+				return False
+		return True #success is getting through all the pixels
+
+	def meanSquaredError(self, im1, im2): #check how similar two images are
+		# the 'Mean Squared Error' between the two images is the
+		# sum of the squared difference between the two images;
+		# NOTE: the two images must have the same dimension
+		im1 = np.array(self.imageTypeCheck(im1))
+		im2 = np.array(self.imageTypeCheck(im2))
+		try:
+			err = np.sum((im1.astype("float") - im2.astype("float")) ** 2)
+			err /= float(im1.shape[0] * im1.shape[1])
+			
+			# return the MSE, the lower the error, the more "similar"
+			# the two images are
+			return err
+		except:
+			print('Images not the same size')
+			return 100000
+
+	def viewImagesSideBySide(self, image_list): # view multiple images in a row
+		images = map(Image.open, image_list)
+		widths, heights = zip(*(i.size for i in images))  # extract sizes from images
+		total_width = sum(widths) # comparison total width
+		max_height = max(heights) # comparison total height
+		new_im = Image.new('RGB', (total_width, max_height))
+		x_offset = 0
+		for im in images:
+		  new_im.paste(im, (x_offset,0))
+		  x_offset += im.size[0]
+
+		# new_im.save('test.jpg')
+		new_im.show()
+
+	def checkForDuplicateImages(self, dir_name_in, retake = False): #check all files against each other for similarity
+		# pool = Pool(processes = 3)
+		self.SIG = ShapeImageGenerator()
+		self.SIG.readParameterFile('HandCenteredImageGeneratorParameters.csv')
+		for files in os.walk(dir_name_in):
+			# pick the first image
+			for im_path1 in files[2]:
+				if os.path.splitext(im_path1)[1] == '.png':
+					im1 = self.imageTypeCheck(os.path.join(files[0], im_path1))
+					# pick the second image
+					for im_path2 in files[2]:
+						if os.path.splitext(im_path2)[1] == '.png' and im_path1 != im_path2:
+							im2 = self.imageTypeCheck(os.path.join(files[0], im_path2))
+							sim_err = self.meanSquaredError(im1, im2)
+							if sim_err == 0:
+								# pdb.set_trace()
+								print('Similarity Error: %s, files:%s, %s' %(sim_err, im_path1, im_path2))
+								if retake:
+									# pdb.set_trace()
+									image_params2 = im_path2.split('_')
+									a = None
+									if len(image_params2) == 10:
+										a = int(image_params2.pop(4).strip('a'))
+									shape = image_params2.pop(0)
+									h = int(image_params2.pop(0).strip('h'))
+									w = int(image_params2.pop(0).strip('w'))
+									e = int(image_params2.pop(0).strip('e'))
+									obj_or = image_params2.pop(0)
+									grasp_type = image_params2.pop(0)
+									grasp_app = image_params2.pop(0)
+									grasp_or = image_params2.pop(0)
+									cam = image_params2.pop(0).strip('cam').strip('.png')
+									if a is not None:
+										param = self.SIG.getParameterFromFeatures(shape, h, w, e, obj_or, grasp_type, grasp_app, grasp_or, cam, a = a)
+									else:
+										param = self.SIG.getParameterFromFeatures(shape, h, w, e, obj_or, grasp_type, grasp_app, grasp_or, cam)
+									# pdb.set_trace()
+									self.SIG.createImageFromParameters(param)
+									# self.viewImagesSideBySide([os.path.join(files[0], im_path1), os.path.join(files[0], im_path2)])
+									# raw_input('Hit enter to continue')
+
 
 if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
@@ -235,14 +383,22 @@ if __name__ == '__main__':
 	# crop images down to size
 	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
 	# combine images
-	SIM.combineMultipleImages('GeneratedImagesCropped', 'GeneratedImagesCombined')
-	# reduce image size
-	SIM.reduceSizeAllImages('GeneratedImagesCropped/ObjectsOnly', 'GeneratedImagesReduced/ObjectsOnly', size = (285, 200))
-	SIM.reduceSizeAllImages('GeneratedImagesCombined/Grasps', 'GeneratedImagesReduced/Grasps', size = (285, 200))
-	#upload Images
-	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
+	# SIM.combineMultipleImages('GeneratedImagesCropped', 'GeneratedImagesCombined')
+	# # reduce image size
+	# SIM.reduceSizeAllImages('GeneratedImagesCropped/ObjectsOnly', 'GeneratedImagesReduced/ObjectsOnly', size = (285, 200))
+	# SIM.reduceSizeAllImages('GeneratedImagesCombined/Grasps', 'GeneratedImagesReduced/Grasps', size = (285, 200))
+	# #upload Images
+	# SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
+	# SIM.checkOverCrop('test_cone_h25_w9_e9_cam1')
+	# SIM.checkOverCrop('test_cone_h9_w9_e25_cam2')
+	# SIM.checkOverCrop('test_cone_h9_w9_e25_cam2')
+	# SIM.checkOverCropAll('GeneratedImagesCropped')
+	# SIM.bboxToHand('test_cone_h9_w9_e25_cam2')
+
+	SIM.checkForDuplicateImages('GeneratedImages', retake = True)
+	# SIM.meanSquaredError('test_cone_h9_w9_e25_cam2','test_cone_h33_w9_e9_cam1' )
 
 
 
