@@ -1,5 +1,5 @@
 import cv2
-import os, pdb, copy, time, sys, csv, shutil
+import os, pdb, copy, time, sys, csv, shutil, subprocess
 import numpy as np
 import rosbag
 import sensor_msgs.point_cloud2
@@ -43,14 +43,14 @@ class BagReader(object):
 			self.hand_attached_flag = False
 
 	def createEnv(self): # create scene and arm to it
-		self.vis = Vis()
+		self.vis = Vis(viewer = False)
 		self.arm = ArmVis(self.vis)
 		self.arm.loadArm()
-		self.cameraT = np.array([[-0.21123264, -0.25296545,  0.94413413, -2.66172409],
-	   [-0.96114868,  0.22935609, -0.15358708,  0.70581472],
-	   [-0.17769068, -0.93989588, -0.2915849 ,  1.37028074],
-	   [ 0.        ,  0.        ,  0.        ,  1.        ]])
-		self.vis.viewer.SetCamera(self.cameraT)
+		# self.cameraT = np.array([[-0.21123264, -0.25296545,  0.94413413, -2.66172409],
+	 #   [-0.96114868,  0.22935609, -0.15358708,  0.70581472],
+	 #   [-0.17769068, -0.93989588, -0.2915849 ,  1.37028074],
+	 #   [ 0.        ,  0.        ,  0.        ,  1.        ]])
+		# self.vis.viewer.SetCamera(self.cameraT)
 
 	def setJA(self, JA): self.arm.setJointAngles(JA) # set joint angles of arm
 		
@@ -60,7 +60,7 @@ class BagReader(object):
 			b = rosbag.Bag(self.fn, "r")
 		except rosbag.bag.ROSBagUnindexedException:
 			print "unindexed bag... Trying to reindex."
-			os.system("rosbag reindex " + self.fn)
+			p = subprocess.Popen(['rosbag', 'reindex', self.fn])
 			try:
 				b = rosbag.Bag(self.fn, "r")
 			except:
@@ -113,8 +113,13 @@ class BagReader(object):
 		topics_to_check = ['/camera1/depth/points', '/camera1/rgb/image_raw/compressed', '/camera2/depth/points', '/camera2/rgb/image_raw/compressed']
 
 
+	def writeToLog(self, fn, text): #writes text line to log file
+		with open(fn, 'a') as f:
+			f.write(text + '\n')
+
 	def AllPoses(self, save_poses = False, dir_name = None, align_pc = False): #read a message, display pose, and write to file
 		print('Showing All Poses from Robot in openRAVE')
+		pdb.set_trace()
 		save_time_interval = 0.1 # amount of time between saved stls
 		# some directory checking for file creation
 		if save_poses:
@@ -131,6 +136,7 @@ class BagReader(object):
 		#read all messages
 		#if there is a timestamp with enough information, show the pose
 		# if there is a timestamp with enough information, save the pointcloud data from that timestep
+		log_fn = '%s/%s.txt' %(dir_name, os.path.split(dir_name)[-1])
 		bridge = CvBridge()
 		last_save_time = 0
 		for topic, msg, t in self.bag_gen:
@@ -176,6 +182,7 @@ class BagReader(object):
 						cv2.imwrite('%s/frame%s_camera%s.png' %(dir_name, self.frame_count, 1), cv_image1)
 						cv2.imwrite('%s/frame%s_camera%s.png' %(dir_name, self.frame_count, 2), cv_image2)
 
+						self.writeToLog(log_fn, 'Time Step %s Saved as Frame %s' %(self.all_data[-1]['time'], self.frame_count))
 						self.frame_count += 1
 						last_save_time = self.all_data[-1]['time']
 
@@ -443,14 +450,13 @@ class BagReader(object):
 
 if __name__ == '__main__':
 	B = BagReader()
-	B.createEnv()
+	# B.createEnv()
 	# B.saveSetofBagFiles('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7')
-	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_1_2017-08-18-14-40-43.bag')
-	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_1_2017-08-18-14-40-43')
-	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43.bag')
-	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43')
+	# B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43.bag')
+	# B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43')
+	
 	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43.bag')
 	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43')
-	
+
 
 	B.closeBag()

@@ -31,7 +31,7 @@ Significantly more commenting is necessary to make this usable
 '''
 
 class Vis(object): #General Class for visualization
-	def __init__(self):
+	def __init__(self, viewer = True):
 		self.env = Environment()
 		self.colors = dict()
 		self.colors = ColorsDict.colors
@@ -41,10 +41,11 @@ class Vis(object): #General Class for visualization
    										[-0.10644389, -0.78428209, -0.6112048 ,  0.29396212],
        									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
        									[ 0.        ,  0.        ,  0.        ,  1.        ]])
-		self.env.SetViewer('qtcoin')
-		self.viewer = self.env.GetViewer()
-		self.viewer.SetCamera(self.cameraTransform)
-		self.cameraFocusPoint = [0,0,0]
+		if viewer:
+			self.env.SetViewer('qtcoin')
+			self.viewer = self.env.GetViewer()
+			self.viewer.SetCamera(self.cameraTransform)
+			self.cameraFocusPoint = [0,0,0]
 		# pdb.set_trace()
 		# sensor = RaveCreateSensor(self.env, 'offscreen_render_camera')
 		# sensor.SendCommand('setintrinsic 529 525 328 267 0.01 10')
