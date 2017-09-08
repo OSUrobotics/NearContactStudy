@@ -1,0 +1,330 @@
+Shortest: hook_side: over the top: cube_h_: W,
+Shortest: 2fingerpinch_side: end to end: cube_h_: H,30
+Shortest: 2fingerpinch_top: end to end: cone_h_: W,40
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: W,
+Longest: 3fingerpinch_side: end to end: cylinder_w_: W,
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: W,30
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: H,
+Longest: 3fingerpinch_side: end to end: cylinder_w_: H,79
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: H,30
+Shortest: hook_side: over the top: cube_h_: E,
+Shortest: hook_side: over the top: cube_h_: H,
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: E,100
+Longest: 3fingerpinch_side: end to end: cylinder_w_: E,
+Longest: 2fingerpinch_side: around the sides: cone_h_: E,85
+Longest: hook_side: around the sides: ellipse_h_: E,
+Shortest: 3fingerpinch_side: end to end: cube_h_: W,
+Longest: 2fingerpinch_side: around the sides: cone_h_: H,65
+Longest: 2fingerpinch_side: around the sides: cone_h_: W,75
+Shortest: 2fingerpinch_top: end to end: cone_h_: H,
+Shortest: 3fingerpinch_side: end to end: cube_h_: H,
+Shortest: 3fingerpinch_side: end to end: cube_h_: E,10
+Shortest: 2fingerpinch_side: end to end: cone_e_: W,40
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: H",50
+Longest: 3fingerpinch_side: end to end: cone_e_: H,
+Longest: 3fingerpinch_side: end to end: cone_e_: E,
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: E",
+Longest: 3fingerpinch_side: end to end: cone_e_: W,55
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: W",
+Longest: equidistant_top: 3 around the sides: cone_e_: H,
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: E,
+"Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: W",
+Longest: hook_side: around the sides: cylinder_h_: W,
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: W,
+"Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: E",85
+Shortest: 2fingerpinch_side: end to end: cone_e_: H,40
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: H,75
+Longest: hook_side: around the sides: cylinder_h_: E,
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: E,
+Longest: hook_side: around the sides: cylinder_h_: H,
+"Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: H",
+Longest: equidistant_top: 3 down the sides: cone_h_: W,90
+Shortest: 2fingerpinch_side: end to end: cone_e_: E,40
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: H,
+Shortest: hook_side: over the top: ellipse_h_: E,
+Shortest: 2fingerpinch_side: around the sides: cone_h_: W,15
+Shortest: hook_side: over the top: ellipse_h_: H,
+Shortest: hook_side: over the top: ellipse_h_: W,
+Shortest: 2fingerpinch_side: around the sides: cone_h_: H,45
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: E,30
+Shortest: 2fingerpinch_side: around the sides: cone_h_: E,25
+Shortest: 2fingerpinch_side: around the sides: cylinder_h_: H,30
+Longest: 3fingerpinch_side: around the sides: cone_h_: E,
+Longest: 3fingerpinch_side: around the sides: cone_h_: H,
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: W,
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: H,
+Longest: 3fingerpinch_side: around the sides: cone_h_: W,50
+Shortest: hook_side: around the sides: cube_h_: E,
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: E,60
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: E",70
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: H",
+Shortest: 2fingerpinch_side: around the sides: cylinder_h_: W,25
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: W",
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: W,
+Longest: 3fingerpinch_top: around the sides: cylinder_e_: H,
+Longest: 3fingerpinch_top: around the sides: cylinder_e_: E,
+Shortest: 2fingerpinch_side: around the sides: cylinder_h_: E,10
+Longest: 3fingerpinch_top: around the sides: cylinder_e_: W,30
+Shortest: hook_side: over the top: cylinder_h_: H,
+Shortest: hook_side: over the top: cylinder_h_: E,
+Shortest: hook_side: over the top: cylinder_h_: W,
+Longest: 3fingerpinch_top: opposite sides: cube_h_: W,
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: W,
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: W,
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: E",30
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: E,30
+Longest: 3fingerpinch_top: opposite sides: cube_h_: E,
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: H,
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: H,
+Longest: 3fingerpinch_top: opposite sides: cube_h_: H,
+Longest: 3fingerpinch_side: around the sides: cylinder_h_: E,70
+Longest: equidistant_top: 3 around the sides: cone_e_: W,95
+Longest: hook_side: over the top: cylinder_h_: W,
+Shortest: 2fingerpinch_top: end to end: cylinder_w_: W,
+Longest: 3fingerpinch_side: around the sides: cylinder_h_: W,
+Longest: hook_side: over the top: cylinder_h_: H,
+Longest: hook_side: over the top: cylinder_h_: E,
+Shortest: 2fingerpinch_top: end to end: cylinder_w_: E,
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: W,
+Shortest: 2fingerpinch_top: end to end: cylinder_h_: W,
+Shortest: 2fingerpinch_top: end to end: cylinder_h_: H,
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: W",40
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: H,
+"Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: W",
+"Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: E",
+"Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: H",70
+Shortest: hook_side: around the sides: cube_h_: H,
+Longest: equidistant_top: 3 around the sides: cone_e_: E,
+Longest: hook_side: over the top: cylinder_e_: E,
+Longest: hook_side: over the top: cylinder_e_: H,
+Longest: hook_side: over the top: cylinder_e_: W,
+Shortest: equidistant_top: 3 around the sides: cube_h_: E,35
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: E",
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: H",
+Longest: 2fingerpinch_side: end to end: cylinder_w_: W,55
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: H",30
+Longest: 2fingerpinch_side: end to end: cylinder_w_: H,60
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: W",
+Shortest: hook_side: around the sides: cube_h_: W,
+Longest: 2fingerpinch_side: end to end: cylinder_w_: E,65
+Longest: 2fingerpinch_side: end to end: cube_h_: W,55
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: W,
+Longest: 2fingerpinch_side: end to end: cube_h_: E,60
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: E,
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: H,
+Longest: 2fingerpinch_side: end to end: cube_h_: H,65
+Longest: 2fingerpinch_top: end to end: cone_h_: W,65
+Longest: 2fingerpinch_top: end to end: cone_h_: H,
+Longest: 2fingerpinch_top: end to end: cone_h_: E,
+Shortest: hook_side: over the top: cylinder_e_: H,
+Longest: equidistant_top: 3 around the sides: cylinder_e_: H,65
+"Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: H",
+Longest: equidistant_top: 3 around the sides: cylinder_e_: E,
+"Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: W",
+Longest: equidistant_top: 3 around the sides: cylinder_e_: W,
+Longest: equidistant_top: 3 down the sides: cylinder_h_: W,
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: E,
+Longest: equidistant_top: 3 down the sides: cylinder_h_: E,70
+Longest: equidistant_top: 3 down the sides: cylinder_h_: H,
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: W",
+Shortest: 3fingerpinch_side: end to end: cone_e_: W,10
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: W",
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: E",
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: H",
+"Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: E",
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: E",
+Longest: hook_side: around the sides: ellipse_h_: H,
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: W",50
+"Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: E",
+"Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: H",40
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: H",30
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: E",55
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: H",10
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: E",45
+"Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: W",
+Shortest: hook_side: around the sides: ellipse_h_: W,
+"Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: E",
+"Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: H",
+"Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: E",55
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: H,
+Longest: 2fingerpinch_top: 2 around the sides: cone_e_: H,70
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: E,70
+Shortest: equidistant_top: 3 down the sides: cone_h_: W,40
+Shortest: equidistant_top: 3 down the sides: cone_h_: H,
+Longest: 2fingerpinch_top: 2 around the sides: cone_e_: W,70
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: W,85
+Shortest: equidistant_top: 3 down the sides: cone_h_: E,
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: H",
+Shortest: hook_side: around the sides: cylinder_e_: W,
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: E",
+Shortest: hook_side: around the sides: cylinder_e_: E,
+Shortest: hook_side: around the sides: cylinder_e_: H,
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: W",
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: W",70
+Longest: equidistant_top: 3 down the sides: cone_h_: E,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: E",75
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: H",60
+Longest: 2fingerpinch_top: end to end: cylinder_w_: W,
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: H,100
+Shortest: 3fingerpinch_side: around the sides: ellipse_h_: W,
+Longest: 2fingerpinch_top: end to end: cylinder_w_: E,
+Shortest: 3fingerpinch_side: around the sides: ellipse_h_: E,
+Shortest: 3fingerpinch_side: around the sides: ellipse_h_: H,50
+Longest: 2fingerpinch_top: end to end: cylinder_w_: H,
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: H,40
+Shortest: 3fingerpinch_top: around the sides: cone_e_: W,
+Shortest: 3fingerpinch_top: around the sides: cone_e_: H,
+Longest: equidistant_top: 3 down the sides: ellipse_h_: E,
+Shortest: 3fingerpinch_top: around the sides: cone_e_: E,31
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: W,30
+"Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: H",
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: W,
+Longest: hook_side: around the sides: cube_h_: H,
+Longest: hook_side: around the sides: cube_h_: E,
+Longest: 2fingerpinch_side: around the sides: cylinder_h_: E,60
+Longest: hook_side: around the sides: cube_h_: W,
+"Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: H",
+Longest: equidistant_top: 3 down the sides: cone_h_: H,
+"Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: W",
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: W,50
+Shortest: hook_side: around the sides: cylinder_h_: H,
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: E,50
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: E,0
+Shortest: hook_side: around the sides: cylinder_h_: W,
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: H,
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: E,
+Shortest: equidistant_top: 3 around the sides: cone_e_: H,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: W",70
+Shortest: equidistant_top: 3 around the sides: cone_e_: E,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: H",65
+Shortest: equidistant_top: 3 around the sides: cone_e_: W,50
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: H",
+Longest: hook_side: around the sides: cylinder_e_: H,
+Longest: hook_side: around the sides: cylinder_e_: E,
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: E",
+Longest: hook_side: around the sides: cylinder_e_: W,
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: H",90
+Shortest: 2fingerpinch_side: around the sides: ellipse_h_: E,25
+"Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: W",
+Shortest: hook_side: over the top: cylinder_e_: W,
+Shortest: 3fingerpinch_side: around the sides: cone_h_: W,0
+Shortest: 3fingerpinch_top: around the sides: cube_h_: E,
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: E",
+Longest: 3fingerpinch_side: around the sides: cylinder_h_: H,
+Longest: equidistant_top: 3 around the sides: cube_h_: W,
+Shortest: 3fingerpinch_top: around the sides: cube_h_: H,51
+Shortest: hook_side: over the top: cylinder_e_: E,
+Shortest: 3fingerpinch_side: around the sides: cone_h_: E,
+Shortest: 3fingerpinch_top: around the sides: cube_h_: W,
+Longest: equidistant_top: 3 around the sides: cube_h_: H,
+Longest: equidistant_top: 3 around the sides: cube_h_: E,75
+Shortest: 3fingerpinch_side: around the sides: cone_h_: H,
+Longest: 2fingerpinch_top: end to end: cube_h_: W,
+Shortest: 2fingerpinch_top: end to end: cylinder_w_: H,
+Longest: 2fingerpinch_top: end to end: cube_h_: E,
+Longest: 2fingerpinch_top: end to end: cube_h_: H,75
+Longest: 2fingerpinch_top: 2 around the sides: cone_e_: E,
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: W",60
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: W,
+Longest: 2fingerpinch_top: end to end: cylinder_h_: W,
+Shortest: 2fingerpinch_side: end to end: cube_h_: W,20
+Longest: equidistant_top: 3 down the sides: ellipse_h_: W,
+Longest: 2fingerpinch_side: around the sides: cylinder_h_: W,60
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: E",20
+Shortest: 2fingerpinch_side: around the sides: ellipse_h_: W,35
+Longest: equidistant_top: 3 down the sides: ellipse_h_: H,85
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: E,
+Longest: 2fingerpinch_top: end to end: cylinder_h_: H,
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: H,30
+Longest: 2fingerpinch_top: end to end: cylinder_h_: E,75
+"Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: W",40
+"Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: H",30
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: E",65
+Longest: 3fingerpinch_top: opposite sides: cone_h_: W,50
+Longest: 3fingerpinch_top: opposite sides: cone_h_: H,0
+Longest: 3fingerpinch_top: opposite sides: cone_h_: E,
+Shortest: 2fingerpinch_side: end to end: cylinder_w_: W,25
+Shortest: 2fingerpinch_side: around the sides: ellipse_h_: H,35
+"Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: W",
+Shortest: 2fingerpinch_side: end to end: cylinder_w_: E,15
+Shortest: 2fingerpinch_side: end to end: cube_h_: E,20
+"Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: E",
+Shortest: 2fingerpinch_side: end to end: cylinder_w_: H,35
+Longest: 3fingerpinch_side: around the sides: ellipse_h_: W,
+Longest: 3fingerpinch_top: around the sides: cube_h_: W,
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: W,
+Longest: hook_side: around the sides: ellipse_h_: W,
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: H,35
+Longest: 3fingerpinch_top: around the sides: cube_h_: E,
+Longest: 3fingerpinch_side: around the sides: ellipse_h_: E,
+Longest: 3fingerpinch_top: around the sides: cube_h_: H,90
+Longest: 3fingerpinch_side: around the sides: ellipse_h_: H,90
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: E,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: W",65
+Longest: hook_side: over the top: ellipse_h_: H,
+Shortest: hook_side: around the sides: ellipse_h_: H,
+Longest: hook_side: over the top: ellipse_h_: E,
+Shortest: 3fingerpinch_side: around the sides: cylinder_h_: W,
+Shortest: 3fingerpinch_side: around the sides: cylinder_h_: H,
+Longest: hook_side: over the top: ellipse_h_: W,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: H",75
+Shortest: 3fingerpinch_side: around the sides: cylinder_h_: E,31
+Longest: hook_side: around the sides: cone_h_: W,
+"Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: W",
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: H,50
+Longest: 2fingerpinch_side: around the sides: cylinder_h_: H,65
+Longest: hook_side: around the sides: cone_h_: E,
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: W,
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: E,50
+Longest: hook_side: around the sides: cone_h_: H,
+Shortest: 2fingerpinch_top: end to end: cone_h_: E,
+Longest: 3fingerpinch_side: end to end: cube_h_: W,
+Longest: 3fingerpinch_side: end to end: cube_h_: E,40
+Longest: 3fingerpinch_side: end to end: cube_h_: H,
+Shortest: hook_side: around the sides: cone_h_: E,
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: W,30
+Shortest: hook_side: around the sides: cone_h_: H,
+Shortest: 2fingerpinch_top: end to end: cylinder_h_: E,40
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: E,30
+Shortest: hook_side: around the sides: cone_h_: W,
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: H,
+"Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: H",75
+Shortest: hook_side: around the sides: ellipse_h_: E,
+Longest: 2fingerpinch_side: end to end: cone_e_: H,65
+Longest: hook_side: over the top: cube_h_: H,
+"Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: H",
+Shortest: equidistant_top: 3 around the sides: cube_h_: H,
+"Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: E",
+Longest: hook_side: over the top: cube_h_: E,
+Shortest: equidistant_top: 3 around the sides: cube_h_: W,
+"Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: W",
+Longest: hook_side: over the top: cube_h_: W,
+Longest: 2fingerpinch_side: end to end: cone_e_: E,75
+Shortest: 3fingerpinch_top: around the sides: cylinder_e_: E,
+Shortest: 3fingerpinch_top: around the sides: cylinder_e_: H,
+Shortest: 3fingerpinch_side: end to end: cone_e_: E,
+Shortest: 3fingerpinch_top: around the sides: cylinder_e_: W,30
+Shortest: 3fingerpinch_side: end to end: cone_e_: H,
+Shortest: 2fingerpinch_top: 2 around the sides: cone_e_: E,
+Longest: 3fingerpinch_top: around the sides: cone_e_: H,
+"Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: W",
+Longest: 3fingerpinch_top: around the sides: cone_e_: E,50
+Shortest: 2fingerpinch_top: 2 around the sides: cone_e_: H,45
+Shortest: 2fingerpinch_top: 2 around the sides: cone_e_: W,40
+"Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: E",
+Longest: 3fingerpinch_top: around the sides: cone_e_: W,
+"Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: E",70
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: W,
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: H,70
+Longest: 2fingerpinch_side: end to end: cone_e_: W,65
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: E,
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: H",
+"Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: W",55
+Shortest: hook_side: around the sides: cylinder_h_: E,
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: E,
+Longest: 2fingerpinch_side: around the sides: ellipse_h_: E,70
+Shortest: 2fingerpinch_top: end to end: cube_h_: W,
+Longest: 2fingerpinch_side: around the sides: ellipse_h_: H,75
+Shortest: 2fingerpinch_top: end to end: cube_h_: E,
+Longest: 2fingerpinch_side: around the sides: ellipse_h_: W,60
+Shortest: 2fingerpinch_top: end to end: cube_h_: H,30

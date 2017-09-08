@@ -1,6 +1,7 @@
 import os
 import math
 import csv
+import pdb
 
 class csvGenerator(object):
 	# This class creates a list of urls for all the pregrasp approache combinations with shapes
@@ -79,6 +80,176 @@ class csvGenerator(object):
 			result = result +preGraspApproach + "_" + graspRot + ".png"
 			yield result
 
+class csvGenerator2_1(csvGenerator): #class to build csv for follow up survey
+	def __init__(self):
+		super(csvGenerator2_1, self).__init__()
+		super(csvGenerator2_1, self).setDefaults()
+		self.setDefaults()
+
+	def setDefaults(self):
+		self.questions = (("equidistant_top", (("3 down the sides",(("cylinder_h_","up"), ("ellipse_h_","up"), ("cone_h_","up"))), 
+												("3 around the sides",(("cylinder_e_","angled"), ("cube_h_","angled"))),
+												("2 around the sides, 1 on the base",(("cylinder_e_","up"), ("cube_h_","up"))))),
+							("equidistant_side",(("3 around the sides, palm on flat",(("cylinder_e_","up"), ("cube_h_","down"), ("cone_e_","up"))), 
+												("3 around the sides, palm on round",(("ellipse_h_","up"), ("cylinder_h_","down"), ("cone_h_","90"))),
+												("2 pinch the sides, 1 on the top",(("cylinder_h_","up"), ("cone_h_","up"), ("cube_h_","up"))))),
+							("3fingerpinch_top",(("opposite sides",(("cylinder_h_","up"), ("cylinder_w_","up"), ("cube_h_","up"), ("ellipse_h_","up"))), 
+												("around the sides",(("cylinder_e_","up"), ("cone_e_","up"), ("cube_h_","angled"))))),
+							("3fingerpinch_side",(("around the sides",(("cylinder_h_","up"), ("ellipse_h_","up"), ("cone_h_","up"))), 
+												("end to end",(("cylinder_w_","up"), ("cone_e_","up"), ("cube_h_","up"))))), 
+							("hook_side",(("over the top",(("cylinder_h_","up"), ("cylinder_e_","up"), ("cube_h_","up"), ("ellipse_h_","up"))), 
+											("around the sides",(("cylinder_e_","90"), ("cube_h_","90"), ("cylinder_h_","90"), ("ellipse_h_","90"), ("cone_h_","90"))))),
+							("2fingerpinch_top",(("2 around the sides",(("ellipse_h_","up"), ("cone_e_","up"), ("cylinder_e_","up"), ("cube_h_","angled"))), 
+											("end to end",(("cylinder_w_","up"), ("cube_h_","up"), ("cone_h_","up"), ("cylinder_h_","up"))))),
+							("2fingerpinch_side",(("around the sides",(("cylinder_h_","up"), ("ellipse_h_","up"), ("cone_h_","up"))), 
+											("end to end",(("cylinder_w_","up"), ("cone_e_","up"), ("cube_h_","up"))))))
+		# removed follow:
+		# Cube h side hook up
+
+# Author: Ammar
+# Last Edit: 8/15/17
+class csvGenerator2(csvGenerator): # class to build csv for verification survey
+	def __init__(self):
+		super(csvGenerator2, self).__init__()
+		super(csvGenerator2, self).setDefaults()
+		self.setDefaults()
+
+	def setDefaults(self):
+		self.dimensionSizes = {'h':['17'], 'w':['17'], 'e':['17'], 'a':['10']}
+		self.questions = [\
+		#cube h
+		('cube', [17, 17, 17], 'h', '3fingerpinch', 'side', 'up'),\
+		('cube', [17, 17, 17], 'h', 'equidistant', 'side', 'up'),\
+		('cube', [17, 17, 17], 'h', 'equidistant', 'side', 'down'),\
+		('cube', [17, 17, 17], 'h', 'hook', 'side', 'up'),\
+		('cube', [17, 17, 17], 'h', 'hook', 'side', '90'),\
+		('cube', [17, 17, 17], 'h', '2fingerpinch', 'side', 'up'),\
+		('cube', [17, 17, 17], 'h', '3fingerpinch', 'top', 'up'),\
+		('cube', [17, 17, 17], 'h', '3fingerpinch', 'top', 'angled'),\
+		('cube', [17, 17, 17], 'h', 'equidistant', 'top', 'up'),\
+		('cube', [17, 17, 17], 'h', 'equidistant', 'top', 'angled'),\
+		('cube', [17, 17, 17], 'h', '2fingerpinch', 'top', 'up'),\
+		('cube', [17, 17, 17], 'h', '2fingerpinch', 'top', 'angled'),\
+		#cylinder h
+		('cylinder', [17, 17, 17], 'h', '3fingerpinch', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'h', 'equidistant', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'h', 'equidistant', 'side', 'down'),\
+		('cylinder', [17, 17, 17], 'h', 'hook', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'h', 'hook', 'side', '90'),\
+		('cylinder', [17, 17, 17], 'h', '2fingerpinch', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'h', '3fingerpinch', 'top', 'up'),\
+		('cylinder', [17, 17, 17], 'h', 'equidistant', 'top', 'up'),\
+		('cylinder', [17, 17, 17], 'h', '2fingerpinch', 'top', 'up'),\
+		#cylinder w/e
+		('cylinder', [17, 17, 17], 'e', 'equidistant', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'w', '3fingerpinch', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'e', 'hook', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'e', 'hook', 'side', '90'),\
+		('cylinder', [17, 17, 17], 'w', '2fingerpinch', 'side', 'up'),\
+		('cylinder', [17, 17, 17], 'e', 'equidistant', 'top', 'up'),\
+		('cylinder', [17, 17, 17], 'e', 'equidistant', 'top', 'angled'),\
+		('cylinder', [17, 17, 17], 'w', '3fingerpinch', 'top', 'up'),\
+		('cylinder', [17, 17, 17], 'e', '3fingerpinch', 'top', 'up'),\
+		('cylinder', [17, 17, 17], 'w', '2fingerpinch', 'top', 'up'),\
+		# ellipse h
+		('ellipse', [17, 17, 17], 'h', 'equidistant', 'side', 'up'),\
+		('ellipse', [17, 17, 17], 'h', '3fingerpinch', 'side', 'up'),\
+		('ellipse', [17, 17, 17], 'h', 'hook', 'side', 'up'),\
+		('ellipse', [17, 17, 17], 'h', 'hook', 'side', '90'),\
+		('ellipse', [17, 17, 17], 'h', '2fingerpinch', 'side', 'up'),\
+		('ellipse', [17, 17, 17], 'h', 'equidistant', 'top', 'up'),\
+		('ellipse', [17, 17, 17], 'h', '3fingerpinch', 'top', 'up'),\
+		('ellipse', [17, 17, 17], 'h', '2fingerpinch', 'top', 'up'),\
+		# cone h
+		('cone', [17, 17, 17, 10], 'h', 'equidistant', 'side', '90'),\
+		('cone', [17, 17, 17, 10], 'h', 'equidistant', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'h', '3fingerpinch', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'h', 'hook', 'side', '90'),\
+		('cone', [17, 17, 17, 10], 'h', '2fingerpinch', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'h', 'equidistant', 'top', 'up'),\
+		('cone', [17, 17, 17, 10], 'h', '3fingerpinch', 'top', 'up'),\
+		('cone', [17, 17, 17, 10], 'h', '2fingerpinch', 'top', 'up'),\
+		#cone w/e
+		('cone', [17, 17, 17, 10], 'e', 'equidistant', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'e', '3fingerpinch', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'e', '2fingerpinch', 'side', 'up'),\
+		('cone', [17, 17, 17, 10], 'e', 'equidistant', 'top', '90'),\
+		('cone', [17, 17, 17, 10], 'e', 'equidistant', 'top', 'up'),\
+		('cone', [17, 17, 17, 10], 'e', '3fingerpinch', 'top', 'up'),\
+		('cone', [17, 17, 17, 10], 'e', '2fingerpinch', 'top', 'up'),\
+
+		]
+
+	def getURL(self, shape, size, object_or, grasp, approach, hand_or): # get a url based on features
+		URL = self.baseURL + shape + '_'
+		URL += 'h%s_w%s_e%s_' %(size[0], size[1], size[2])
+		if shape == 'cone':
+			URL += 'a%s_' %size[3]
+		URL += object_or + '_'
+		URL += grasp + '_'
+		URL += approach + '_'
+		URL += hand_or + '.png'
+		return URL
+
+	def generatorQuestions(self): # generator for returning parameters for building URLs
+		for question in self.questions:
+			shape, size, object_or, grasp, approach, hand_or = question
+			yield shape, size, object_or, grasp, approach, hand_or
+		print("uhoh! should not get to this point in generator")
+		return
+
+	def createCSV(self, csvfilename): #writes questions to csv file
+		try:
+			os.remove(csvfilename)
+			print('Overwriting existing file')
+		except:
+			print('File does not exist')
+		Qgen = self.generatorQuestions()
+		for __ in self.questions: #just to keep going until questions run out
+			with open(csvfilename, 'a') as f:
+				self.csvwriter = csv.writer(f)
+				shape, size, object_or, grasp, approach, hand_or = Qgen.next()
+				URL = self.getURL(shape, size, object_or, grasp, approach, hand_or)
+				print(URL)
+				self.csvwriter.writerow([URL])
+
+	def createMappingCSV(self, csvfilename):
+	#this mapping is used to when analyzing data to know which values
+	# to replace from loop and merge
+		try:
+			os.remove(csvfilename)
+			print('Overwriting existing file')
+		except:
+			print('File does not exist')
+		Qgen = self.generatorQuestions()
+		count = 1
+		shape_prev = None
+		objector_prev = None
+		object_or_label = None
+		for __ in self.questions: #just to keep going until questions run out
+			with open(csvfilename, 'a') as f:
+				self.csvwriter = csv.writer(f)
+				shape, size, object_or, grasp, approach, hand_or = Qgen.next()
+				if object_or == 'w' or object_or == 'e': #deals with cases when on its side
+					object_or_label = 'w/e'
+				else:
+					object_or_label = 'h'
+				if shape_prev != shape or objector_prev != object_or_label:
+					count = 1
+				print('Shape: %s' %shape)
+				# pdb.set_trace()
+				shape_prev = shape
+				objector_prev = object_or_label
+				# record object orientation also
+				self.csvwriter.writerow(['${lm://Field/%s}' %count, '%s %s' %(shape, object_or_label), '%s %s %s %s' %(object_or, approach, grasp, hand_or) ])
+				count += 1
+
+
+
+
+
+
+
 class fileInterface(object):
 	#Class that handles reading and writing of qsf and csv Files
 
@@ -123,7 +294,7 @@ class qsfFiller(object):
 	def __init__(self, csvFile, qsfFile, finalFile=None):
 		self.setDefaults()
 		self.fileInterface = fileInterface(csvFile, qsfFile, finalFile)
-		self.fileInterface.generateCSV()
+		# self.fileInterface.generateCSV()
 
 	def setDefaults(self):
 		#These macros are constants based on the format of a .qsf file
@@ -154,6 +325,7 @@ class qsfFiller(object):
 		while self.thereAreMoreBlocksToBeFilled(keywordStartIndex):
 			currentIndex = self.fillInBlock(keywordStartIndex, currentIndex)
 			keywordStartIndex = self.fullFileText.find(self.keyword, currentIndex)
+			print('Index: %s' %keywordStartIndex)
 		return currentIndex
 
 	def thereAreMoreBlocksToBeFilled(self, keywordStartIndex):
@@ -184,6 +356,7 @@ class qsfFiller(object):
 		#gets the next URL from the csv and changes all '/' to '\/' so that the qualtrics can read it
 		csvURL = next(self.csvGenerator)[0];
 		csvURL = csvURL.replace("/", "\/");
+		print('CSV URL: %s' %csvURL)
 		return csvURL;
 	
 	def finishNewQSF(self,currentIndex):
@@ -194,8 +367,34 @@ class qsfFiller(object):
 
 if __name__ == "__main__":
 	curdir = os.path.dirname(os.path.realpath(__file__))
-	qsfFileName = curdir + "/Near_Contact_20.qsf"
-	outputQSF = curdir + "/NC20.qsf"
-	csvFileName = curdir + "/imageFiles.csv"
-	qF = qsfFiller(csvFileName, qsfFileName, outputQSF)
-	qF.fillIn()
+	# qsfFileName = curdir + "/Near_Contact_20.qsf"
+	# outputQSF = curdir + "/NC20.qsf"
+	# csvFileName = curdir + "/imageFiles.csv"
+	# qF = qsfFiller(csvFileName, qsfFileName, outputQSF)
+	# qF.fillIn()
+
+	#### Verification
+	# print(CG2.getURL('cube', [17, 17, 17], 'h', 'equidistant', 'side', 'up'))
+	# folder_dir = curdir + '/Near Contact 2.0 - Verification/'
+	csvFileName = folder_dir + 'imageFiles.csv'
+	CG2 = csvGenerator2()
+	CG2.createCSV(csvFileName)
+	mappingCSV = folder_dir + 'mapping.csv'
+	CG2.createMappingCSV(mappingCSV)
+	# qsfFileName = folder_dir + 'Near_Contact_20_-_Verification.qsf'
+	# outputQSF = qsfFileName.replace('.qsf', '_filled.qsf')
+	# qF = qsfFiller(csvFileName, qsfFileName, outputQSF)
+	# qF.fillIn()
+
+	### Follow up survey
+	# folder_dir = curdir + '/Near Contact 2.0 - Followup/'
+	# csvFileName = folder_dir + 'imageFiles.csv'
+	# CG2 = csvGenerator2_1()
+	# CG2.generateCSV(csvFileName)
+	# # mappingCSV = folder_dir + 'mapping.csv'
+	# # CG2.createMappingCSV(mappingCSV)
+	# qsfFileName = folder_dir + 'Near_Contact_20 - followup.qsf'
+	# outputQSF = qsfFileName.replace('.qsf', '_filled.qsf')
+	# qF = qsfFiller(csvFileName, qsfFileName, outputQSF)
+	# qF.fillIn()
+

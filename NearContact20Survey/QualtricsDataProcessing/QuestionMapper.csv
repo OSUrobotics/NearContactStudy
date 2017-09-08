@@ -1,0 +1,56 @@
+Grasp,Approach,Shape,Shape Orientation,Hand Orienation - Ammar,Hand Orientation - Vicky
+equidistant,top,cylinder,h,up,3 down the sides
+equidistant,top,ellipse,h,up,3 down the sides
+equidistant,top,cone,h,up,3 down the sides
+equidistant,top,cylinder,e,angled,3 around the sides
+equidistant,top,cone,e,90,3 around the sides
+equidistant,top,cube,h,angled,3 around the sides
+equidistant,top,cylinder,e,up,"2 around the sides, 1 on the base"
+equidistant,top,cone,e,up,"2 around the sides, 1 on the base"
+equidistant,top,cube,h,up,"2 around the sides, 1 on the base"
+equidistant,side,cylinder,e,up,"3 around the sides, palm on flat"
+equidistant,side,cube,h,down,"3 around the sides, palm on flat"
+equidistant,side,cone,e,up,"3 around the sides, palm on flat"
+equidistant,side,ellipse,h,up,"3 around the sides, palm on round"
+equidistant,side,cylinder,h,down,"3 around the sides, palm on round"
+equidistant,side,cone,h,90,"3 around the sides, palm on round"
+equidistant,side,cylinder,h,up,"2 pinch the sides, 1 on the top"
+equidistant,side,cone,h,up,"2 pinch the sides, 1 on the top"
+equidistant,side,cube,h,up,"2 pinch the sides, 1 on the top"
+3fingerpinch,top,cylinder,h,up,opposite sides
+3fingerpinch,top,cylinder,w,up,opposite sides
+3fingerpinch,top,cube,h,up,opposite sides
+3fingerpinch,top,ellipse,h,up,opposite sides
+3fingerpinch,top,cone,h,up,opposite sides
+3fingerpinch,top,cylinder,e,up,around the sides
+3fingerpinch,top,cone,e,up,around the sides
+3fingerpinch,top,cube,h,angled,around the sides
+3fingerpinch,side,cylinder,h,up,around the sides
+3fingerpinch,side,ellipse,h,up,around the sides
+3fingerpinch,side,cone,h,up,around the sides
+3fingerpinch,side,cylinder,w,up,end to end
+3fingerpinch,side,cone,e,up,end to end
+3fingerpinch,side,cube,h,up,end to end
+hook,side,cylinder,h,up,over the top
+hook,side,cylinder,e,up,over the top
+hook,side,cube,h,up,over the top
+hook,side,ellipse,h,up,over the top
+hook,side,cylinder,e,90,around the sides
+hook,side,cube,h,90,around the sides
+hook,side,cylinder,h,90,around the sides
+hook,side,ellipse,h,90,around the sides
+hook,side,cone,h,90,around the sides
+2fingerpinch,top,ellipse,h,up,2 around the sides
+2fingerpinch,top,cone,e,up,2 around the sides
+2fingerpinch,top,cylinder,e,up,2 around the sides
+2fingerpinch,top,cube,h,angled,2 around the sides
+2fingerpinch,top,cylinder,w,up,end to end
+2fingerpinch,top,cube,h,up,end to end
+2fingerpinch,top,cone,h,up,end to end
+2fingerpinch,top,cylinder,h,up,end to end
+2fingerpinch,side,cylinder,h,up,around the sides
+2fingerpinch,side,ellipse,h,up,around the sides
+2fingerpinch,side,cone,h,up,around the sides
+2fingerpinch,side,cylinder,w,up,end to end
+2fingerpinch,side,cone,e,up,end to end
+2fingerpinch,side,cube,h,up,end to end

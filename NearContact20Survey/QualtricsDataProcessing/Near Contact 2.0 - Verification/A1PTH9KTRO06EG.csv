@@ -1,0 +1,180 @@
+Cone w/e,Confidence,None,
+Cone w/e,Confidence,e side 2fingerpinch up,63
+Cone w/e,Confidence,e top 3fingerpinch up,
+Cone w/e,Confidence,e side 3fingerpinch up,83
+Cone w/e,Confidence,e top equidistant up,
+Cone w/e,Confidence,e side equidistant up,81
+Cone w/e,Confidence,e top 2fingerpinch up,
+Cone w/e,Confidence,e top equidistant 90,
+Cone w/e,Viable,None,
+Cone w/e,Viable,e side 2fingerpinch up,1
+Cone w/e,Viable,e top 3fingerpinch up,
+Cone w/e,Viable,e side 3fingerpinch up,1
+Cone w/e,Viable,e top equidistant up,
+Cone w/e,Viable,e side equidistant up,1
+Cone w/e,Viable,e top 2fingerpinch up,
+Cone w/e,Viable,e top equidistant 90,
+Cone w/e,Rank,None,
+Cone w/e,Rank,e side 2fingerpinch up,2
+Cone w/e,Rank,e top 3fingerpinch up,
+Cone w/e,Rank,e side 3fingerpinch up,3
+Cone w/e,Rank,e top equidistant up,
+Cone w/e,Rank,e side equidistant up,1
+Cone w/e,Rank,e top 2fingerpinch up,
+Cone w/e,Rank,e top equidistant 90,
+Cylinder w/e,Confidence,w side 3fingerpinch up,
+Cylinder w/e,Confidence,None,
+Cylinder w/e,Confidence,w top 3fingerpinch up,71
+Cylinder w/e,Confidence,w top 2fingerpinch up,
+Cylinder w/e,Confidence,w side 2fingerpinch up,
+Cylinder w/e,Confidence,e top 3fingerpinch up,70
+Cylinder w/e,Confidence,e side equidistant up,82
+Cylinder w/e,Confidence,e side hook 90,
+Cylinder w/e,Confidence,e top equidistant angled,
+Cylinder w/e,Confidence,e top equidistant up,
+Cylinder w/e,Confidence,e side hook up,
+Cylinder w/e,Viable,w side 3fingerpinch up,
+Cylinder w/e,Viable,None,
+Cylinder w/e,Viable,w top 3fingerpinch up,1
+Cylinder w/e,Viable,w top 2fingerpinch up,
+Cylinder w/e,Viable,w side 2fingerpinch up,
+Cylinder w/e,Viable,e top 3fingerpinch up,1
+Cylinder w/e,Viable,e side equidistant up,1
+Cylinder w/e,Viable,e side hook 90,
+Cylinder w/e,Viable,e top equidistant angled,
+Cylinder w/e,Viable,e top equidistant up,
+Cylinder w/e,Viable,e side hook up,
+Cylinder w/e,Rank,w side 3fingerpinch up,
+Cylinder w/e,Rank,None,
+Cylinder w/e,Rank,w top 3fingerpinch up,1
+Cylinder w/e,Rank,w top 2fingerpinch up,
+Cylinder w/e,Rank,w side 2fingerpinch up,
+Cylinder w/e,Rank,e top 3fingerpinch up,2
+Cylinder w/e,Rank,e side equidistant up,3
+Cylinder w/e,Rank,e side hook 90,
+Cylinder w/e,Rank,e top equidistant angled,
+Cylinder w/e,Rank,e top equidistant up,
+Cylinder w/e,Rank,e side hook up,
+Ellipse h,Confidence,h side 3fingerpinch up,22
+Ellipse h,Confidence,None,
+Ellipse h,Confidence,h top 3fingerpinch up,
+Ellipse h,Confidence,h side hook 90,
+Ellipse h,Confidence,h side equidistant up,71
+Ellipse h,Confidence,h top equidistant up,99
+Ellipse h,Confidence,h side hook up,
+Ellipse h,Confidence,h side 2fingerpinch up,49
+Ellipse h,Confidence,h top 2fingerpinch up,
+Ellipse h,Viable,h side 3fingerpinch up,1
+Ellipse h,Viable,None,
+Ellipse h,Viable,h top 3fingerpinch up,
+Ellipse h,Viable,h side hook 90,
+Ellipse h,Viable,h side equidistant up,1
+Ellipse h,Viable,h top equidistant up,1
+Ellipse h,Viable,h side hook up,
+Ellipse h,Viable,h side 2fingerpinch up,1
+Ellipse h,Viable,h top 2fingerpinch up,
+Ellipse h,Rank,h side 3fingerpinch up,4
+Ellipse h,Rank,None,
+Ellipse h,Rank,h top 3fingerpinch up,
+Ellipse h,Rank,h side hook 90,
+Ellipse h,Rank,h side equidistant up,2
+Ellipse h,Rank,h top equidistant up,1
+Ellipse h,Rank,h side hook up,
+Ellipse h,Rank,h side 2fingerpinch up,3
+Ellipse h,Rank,h top 2fingerpinch up,
+Cube h,Confidence,h side 3fingerpinch up,
+Cube h,Confidence,h top equidistant angled,93
+Cube h,Confidence,None,
+Cube h,Confidence,h top 3fingerpinch angled,
+Cube h,Confidence,h side equidistant up,82
+Cube h,Confidence,h side equidistant down,58
+Cube h,Confidence,h top equidistant up,95
+Cube h,Confidence,h top 2fingerpinch angled,
+Cube h,Confidence,h top 3fingerpinch up,48
+Cube h,Confidence,h side hook up,
+Cube h,Confidence,h side 2fingerpinch up,86
+Cube h,Confidence,h top 2fingerpinch up,
+Cube h,Confidence,h side hook 90,
+Cube h,Viable,h side 3fingerpinch up,
+Cube h,Viable,h top equidistant angled,1
+Cube h,Viable,None,
+Cube h,Viable,h top 3fingerpinch angled,
+Cube h,Viable,h side equidistant up,1
+Cube h,Viable,h side equidistant down,1
+Cube h,Viable,h top equidistant up,1
+Cube h,Viable,h top 2fingerpinch angled,
+Cube h,Viable,h top 3fingerpinch up,1
+Cube h,Viable,h side hook up,
+Cube h,Viable,h side 2fingerpinch up,1
+Cube h,Viable,h top 2fingerpinch up,
+Cube h,Viable,h side hook 90,
+Cube h,Rank,h side 3fingerpinch up,
+Cube h,Rank,h top equidistant angled,1
+Cube h,Rank,None,
+Cube h,Rank,h top 3fingerpinch angled,
+Cube h,Rank,h side equidistant up,4
+Cube h,Rank,h side equidistant down,5
+Cube h,Rank,h top equidistant up,2
+Cube h,Rank,h top 2fingerpinch angled,
+Cube h,Rank,h top 3fingerpinch up,3
+Cube h,Rank,h side hook up,
+Cube h,Rank,h side 2fingerpinch up,6
+Cube h,Rank,h top 2fingerpinch up,
+Cube h,Rank,h side hook 90,
+Cone h,Confidence,h side 3fingerpinch up,57
+Cone h,Confidence,None,
+Cone h,Confidence,h top 3fingerpinch up,
+Cone h,Confidence,h side equidistant 90,
+Cone h,Confidence,h side hook 90,
+Cone h,Confidence,h side equidistant up,68
+Cone h,Confidence,h top equidistant up,52
+Cone h,Confidence,h side 2fingerpinch up,51
+Cone h,Confidence,h top 2fingerpinch up,52
+Cone h,Viable,h side 3fingerpinch up,1
+Cone h,Viable,None,
+Cone h,Viable,h top 3fingerpinch up,
+Cone h,Viable,h side equidistant 90,
+Cone h,Viable,h side hook 90,
+Cone h,Viable,h side equidistant up,1
+Cone h,Viable,h top equidistant up,1
+Cone h,Viable,h side 2fingerpinch up,1
+Cone h,Viable,h top 2fingerpinch up,1
+Cone h,Rank,h side 3fingerpinch up,4
+Cone h,Rank,None,
+Cone h,Rank,h top 3fingerpinch up,
+Cone h,Rank,h side equidistant 90,
+Cone h,Rank,h side hook 90,
+Cone h,Rank,h side equidistant up,1
+Cone h,Rank,h top equidistant up,5
+Cone h,Rank,h side 2fingerpinch up,3
+Cone h,Rank,h top 2fingerpinch up,2
+Cylinder h,Confidence,h side 3fingerpinch up,
+Cylinder h,Confidence,None,
+Cylinder h,Confidence,h top 3fingerpinch up,76
+Cylinder h,Confidence,h side equidistant up,90
+Cylinder h,Confidence,h side equidistant down,
+Cylinder h,Confidence,h top equidistant up,87
+Cylinder h,Confidence,h side hook up,
+Cylinder h,Confidence,h side 2fingerpinch up,75
+Cylinder h,Confidence,h top 2fingerpinch up,81
+Cylinder h,Confidence,h side hook 90,
+Cylinder h,Viable,h side 3fingerpinch up,
+Cylinder h,Viable,None,
+Cylinder h,Viable,h top 3fingerpinch up,1
+Cylinder h,Viable,h side equidistant up,1
+Cylinder h,Viable,h side equidistant down,
+Cylinder h,Viable,h top equidistant up,1
+Cylinder h,Viable,h side hook up,
+Cylinder h,Viable,h side 2fingerpinch up,1
+Cylinder h,Viable,h top 2fingerpinch up,1
+Cylinder h,Viable,h side hook 90,
+Cylinder h,Rank,h side 3fingerpinch up,
+Cylinder h,Rank,None,
+Cylinder h,Rank,h top 3fingerpinch up,4
+Cylinder h,Rank,h side equidistant up,1
+Cylinder h,Rank,h side equidistant down,
+Cylinder h,Rank,h top equidistant up,2
+Cylinder h,Rank,h side hook up,
+Cylinder h,Rank,h side 2fingerpinch up,3
+Cylinder h,Rank,h top 2fingerpinch up,5
+Cylinder h,Rank,h side hook 90,

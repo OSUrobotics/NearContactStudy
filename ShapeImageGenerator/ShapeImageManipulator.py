@@ -389,7 +389,7 @@ if __name__ == '__main__':
 	# SIM.reduceSizeAllImages('GeneratedImagesCropped/ObjectsOnly', 'GeneratedImagesReduced/ObjectsOnly', size = (285, 200))
 	# SIM.reduceSizeAllImages('GeneratedImagesCombined/Grasps', 'GeneratedImagesReduced/Grasps', size = (285, 200))
 	# #upload Images
-	# SIM.uploadMultipleImages('GeneratedImagesReduced/')
+	SIM.uploadMultipleImages('GeneratedImagesReduced/')
 
 	# SIM.checkOverCrop('test_cone_h25_w9_e9_cam1')
 	# SIM.checkOverCrop('test_cone_h9_w9_e25_cam2')
@@ -397,7 +397,7 @@ if __name__ == '__main__':
 	# SIM.checkOverCropAll('GeneratedImagesCropped')
 	# SIM.bboxToHand('test_cone_h9_w9_e25_cam2')
 
-	SIM.checkForDuplicateImages('GeneratedImages', retake = True)
+	# SIM.checkForDuplicateImages('GeneratedImages', retake = True)
 	# SIM.meanSquaredError('test_cone_h9_w9_e25_cam2','test_cone_h33_w9_e9_cam1' )
 
 

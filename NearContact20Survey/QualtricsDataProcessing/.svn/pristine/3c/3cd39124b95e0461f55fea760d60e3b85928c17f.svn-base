@@ -1,0 +1,261 @@
+15
+14
+8
+7
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: H:		 Std Dv: 4.49691252108, Center: 26.7333333333cm
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: H:		 Std Dv: 3.68178700573, Center: 12.7333333333cm
+Longest: 3fingerpinch_side: end to end: cylinder_w_: W:		 Std Dv: 4.91807889323, Center: 19.1cm
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: W:		 Std Dv: 3.76662979333, Center: 0.425cm
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: W:		 Std Dv: 11.0453610172, Center: 23.4cm
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: W:		 Std Dv: 0.471404520791, Center: 0.0333333333333cm
+Shortest: hook_side: around the sides: cube_h_: H:		 Std Dv: 8.01560977094, Center: 2.0cm
+Longest: hook_side: around the sides: cube_h_: H:		 Std Dv: 3.89711431703, Center: 33.775cm
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: W:		 Std Dv: 7.7888809637, Center: 16.6cm
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: W:		 Std Dv: 4.54606056566, Center: 0.5cm
+Shortest: 3fingerpinch_top: around the sides: cube_h_: W:		 Std Dv: 7.01585505995, Center: 0.466666666667cm
+Longest: 3fingerpinch_top: around the sides: cube_h_: W:		 Std Dv: 5.58768487141, Center: 22.7333333333cm
+Longest: 3fingerpinch_side: end to end: cone_e_: E:		 Std Dv: 0.0, Center: 34.0cm
+Shortest: 3fingerpinch_side: end to end: cone_e_: E:		 Std Dv: 13.4246870437, Center: 0.6cm
+Shortest: hook_side: over the top: cylinder_h_: W:		 Std Dv: 0.0, Center: 0.0cm
+Longest: hook_side: over the top: cylinder_h_: W:		 Std Dv: 14.4875425414, Center: 21.4cm
+Shortest: 3fingerpinch_top: around the sides: cone_e_: W:		 Std Dv: 5.61248608016, Center: 0.6cm
+Longest: 3fingerpinch_top: around the sides: cone_e_: W:		 Std Dv: 9.17537465175, Center: 15.7cm
+Longest: 3fingerpinch_top: around the sides: cylinder_e_: H:		 Std Dv: 3.76662979333, Center: 33.625cm
+Shortest: 3fingerpinch_top: around the sides: cylinder_e_: H:		 Std Dv: 12.9807549857, Center: 11.4cm
+Longest: hook_side: around the sides: ellipse_h_: W:		 Std Dv: 7.16658914687, Center: 18.68cm
+Shortest: hook_side: around the sides: ellipse_h_: W:		 Std Dv: 9.74474217206, Center: 7.88cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: W:		 Std Dv: 7.12780159345, Center: 0.816666666667cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: W:		 Std Dv: 10.4029910229, Center: 17.6cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: W:		 Std Dv: 9.9679486355, Center: 3.72cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: W:		 Std Dv: 7.75628777187, Center: 22.28cm
+Shortest: 3fingerpinch_side: around the sides: ellipse_h_: W:		 Std Dv: 10.0717426496, Center: 0.0cm
+Longest: 3fingerpinch_side: around the sides: ellipse_h_: W:		 Std Dv: 7.68374908492, Center: 19.96cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: H:		 Std Dv: 10.8397416943, Center: 30.0cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: H:		 Std Dv: 6.94172168846, Center: 16.5cm
+Shortest: 3fingerpinch_top: around the sides: cone_e_: H:		 Std Dv: 9.97496867163, Center: 2.2cm
+Longest: 3fingerpinch_top: around the sides: cone_e_: H:		 Std Dv: 8.67107259801, Center: 33.225cm
+Longest: 3fingerpinch_top: around the sides: cylinder_e_: E:		 Std Dv: 18.6874883872, Center: 27.0cm
+Shortest: 3fingerpinch_top: around the sides: cylinder_e_: E:		 Std Dv: 0.37267799625, Center: 0.0166666666667cm
+Shortest: equidistant_top: 3 down the sides: cone_h_: E:		 Std Dv: 8.82269800005, Center: 0.86cm
+Longest: equidistant_top: 3 down the sides: cone_h_: E:		 Std Dv: 10.6018866246, Center: 26.6cm
+Longest: hook_side: around the sides: cylinder_h_: W:		 Std Dv: 8.74483974823, Center: 19.0666666667cm
+Shortest: hook_side: around the sides: cylinder_h_: W:		 Std Dv: 10.8997961245, Center: 3.0cm
+Longest: 3fingerpinch_side: around the sides: cylinder_h_: E:		 Std Dv: 11.7127067751, Center: 11.2cm
+Shortest: 3fingerpinch_side: around the sides: cylinder_h_: E:		 Std Dv: 7.94905654779, Center: 0.975cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: W:		 Std Dv: 12.3288280059, Center: 0.3cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: W:		 Std Dv: 7.38647412505, Center: 11.48cm
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: W:		 Std Dv: 10.8943792848, Center: 5.2cm
+Longest: equidistant_top: 3 around the sides: cylinder_e_: W:		 Std Dv: 9.23309265631, Center: 20.8cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: W:		 Std Dv: 12.5315601583, Center: 0.1cm
+Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: W:		 Std Dv: 7.73563184233, Center: 21.56cm
+Longest: equidistant_top: 3 around the sides: cone_e_: E:		 Std Dv: 10.6389614155, Center: 25.8cm
+Shortest: equidistant_top: 3 around the sides: cone_e_: E:		 Std Dv: 9.78199877326, Center: 7.9cm
+Longest: hook_side: over the top: cylinder_e_: W:		 Std Dv: 13.4014924542, Center: 20.6cm
+Shortest: hook_side: over the top: cylinder_e_: W:		 Std Dv: 7.19444229944, Center: 0.68cm
+Shortest: hook_side: around the sides: cube_h_: E:		 Std Dv: 4.65698400255, Center: 4.3cm
+Longest: hook_side: around the sides: cube_h_: E:		 Std Dv: 16.5, Center: 28.6cm
+Shortest: hook_side: over the top: ellipse_h_: W:		 Std Dv: 10.2583807202, Center: 0.1cm
+Longest: hook_side: over the top: ellipse_h_: W:		 Std Dv: 11.4318633652, Center: 17.8cm
+Longest: 2fingerpinch_top: 2 around the sides: cone_e_: W:		 Std Dv: 15.747519646, Center: 18.0cm
+Shortest: 2fingerpinch_top: 2 around the sides: cone_e_: W:		 Std Dv: 6.66614581299, Center: 0.375cm
+Longest: hook_side: around the sides: cone_h_: W:		 Std Dv: 18.208667045, Center: 23.0cm
+Shortest: hook_side: around the sides: cone_h_: W:		 Std Dv: 4.24264068712, Center: 0.3cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: W:		 Std Dv: 19.0591185525, Center: 24.0cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: W:		 Std Dv: 3.41869858279, Center: 0.325cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: W:		 Std Dv: 14.9728921722, Center: 6.4cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: W:		 Std Dv: 8.84236959191, Center: 23.5cm
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: W:		 Std Dv: 12.3883906228, Center: 0.25cm
+Longest: equidistant_top: 3 down the sides: cylinder_h_: W:		 Std Dv: 11.4406682012, Center: 33.4cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: E:		 Std Dv: 3.37036719068, Center: 0.2125cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: E:		 Std Dv: 20.576388291, Center: 21.4cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: E:		 Std Dv: 13.1600721883, Center: 33.65cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: E:		 Std Dv: 10.9401782435, Center: 2.0cm
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: H:		 Std Dv: 2.86138078556, Center: 33.775cm
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: H:		 Std Dv: 21.5406592285, Center: 8.2cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: W:		 Std Dv: 21.1601039695, Center: 17.4cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: W:		 Std Dv: 3.2572035552, Center: 0.2125cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: E:		 Std Dv: 9.02441133814, Center: 2.36cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: E:		 Std Dv: 15.7098695093, Center: 19.4cm
+Longest: equidistant_top: 3 down the sides: ellipse_h_: E:		 Std Dv: 16.1210697191, Center: 24.2cm
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: E:		 Std Dv: 8.72576007514, Center: 0.783333333333cm
+Longest: 2fingerpinch_top: end to end: cube_h_: E:		 Std Dv: 17.1277370076, Center: 33.1cm
+Shortest: 2fingerpinch_top: end to end: cube_h_: E:		 Std Dv: 8.00683301937, Center: 4.55cm
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: E:		 Std Dv: 15.5402702679, Center: 6.8cm
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: E:		 Std Dv: 9.70502447189, Center: 0.625cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: E:		 Std Dv: 13.4313067123, Center: 5.4cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: E:		 Std Dv: 11.9599331102, Center: 19.0cm
+Shortest: 2fingerpinch_top: end to end: cylinder_w_: E:		 Std Dv: 6.97614984549, Center: 0.8cm
+Longest: 2fingerpinch_top: end to end: cylinder_w_: E:		 Std Dv: 18.4571575999, Center: 21.0cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: E:		 Std Dv: 9.96242942259, Center: 2.8cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: E:		 Std Dv: 15.8350876221, Center: 14.2cm
+Longest: equidistant_top: 3 around the sides: cube_h_: H:		 Std Dv: 23.3826859022, Center: 31.0cm
+Shortest: equidistant_top: 3 around the sides: cube_h_: H:		 Std Dv: 2.59807621135, Center: 6.0cm
+Shortest: hook_side: over the top: cube_h_: W:		 Std Dv: 10.1972729198, Center: 1.2cm
+Longest: hook_side: over the top: cube_h_: W:		 Std Dv: 15.896147332, Center: 22.0cm
+Longest: equidistant_top: 3 down the sides: ellipse_h_: H:		 Std Dv: 18.8561808316, Center: 34.0cm
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: H:		 Std Dv: 7.4087035903, Center: 5.13333333333cm
+Shortest: hook_side: over the top: ellipse_h_: H:		 Std Dv: 4.40908153701, Center: 4.76cm
+Longest: hook_side: over the top: ellipse_h_: H:		 Std Dv: 22.1594223751, Center: 33.4cm
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: W:		 Std Dv: 0.471404520791, Center: 0.0333333333333cm
+Longest: 3fingerpinch_top: opposite sides: cone_h_: W:		 Std Dv: 27.0, Center: 7.8cm
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: H:		 Std Dv: 13.227244611, Center: 10.2cm
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: H:		 Std Dv: 14.5958898324, Center: 33.5cm
+Shortest: 3fingerpinch_side: end to end: cube_h_: H:		 Std Dv: 7.22772439984, Center: 6.36cm
+Longest: 3fingerpinch_side: end to end: cube_h_: H:		 Std Dv: 20.6145579628, Center: 27.4cm
+Shortest: hook_side: over the top: cube_h_: E:		 Std Dv: 12.7769323392, Center: 0.8cm
+Longest: hook_side: over the top: cube_h_: E:		 Std Dv: 15.3586747113, Center: 34.0cm
+Longest: equidistant_top: 3 down the sides: cone_h_: W:		 Std Dv: 14.1421356237, Center: 34.0cm
+Shortest: equidistant_top: 3 down the sides: cone_h_: W:		 Std Dv: 14.8548533034, Center: 9.4cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: H:		 Std Dv: 11.2555541845, Center: 1.4cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: H:		 Std Dv: 18.7533330371, Center: 4.4cm
+Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: E:		 Std Dv: 27.1337428307, Center: 33.5cm
+Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: E:		 Std Dv: 3.49857113691, Center: 0.24cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: H:		 Std Dv: 11.1208574034, Center: 8.6cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cylinder_e_: H:		 Std Dv: 19.6468827044, Center: 19.8cm
+Longest: hook_side: over the top: cylinder_e_: H:		 Std Dv: 16.1322658049, Center: 22.8cm
+Shortest: hook_side: over the top: cylinder_e_: H:		 Std Dv: 14.7287983217, Center: 3.0cm
+Longest: 3fingerpinch_side: around the sides: cylinder_h_: H:		 Std Dv: 26.0, Center: 34.0cm
+Shortest: 3fingerpinch_side: around the sides: cylinder_h_: H:		 Std Dv: 4.88262224629, Center: 4.44cm
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: H:		 Std Dv: 4.96655480858, Center: 5.0cm
+Longest: equidistant_top: 3 around the sides: cylinder_e_: H:		 Std Dv: 26.53718565, Center: 16.8cm
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: E:		 Std Dv: 14.0554457615, Center: 0.8cm
+Longest: equidistant_top: 3 down the sides: cylinder_h_: E:		 Std Dv: 17.6635217327, Center: 25.0cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: H:		 Std Dv: 19.6015872373, Center: 3.8cm
+Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: H:		 Std Dv: 12.2292908852, Center: 12.2cm
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: E:		 Std Dv: 31.1804782231, Center: 27.0cm
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: E:		 Std Dv: 0.816496580928, Center: 0.1cm
+Longest: 3fingerpinch_side: around the sides: cone_h_: E:		 Std Dv: 16.7260276216, Center: 29.8cm
+Shortest: 3fingerpinch_side: around the sides: cone_h_: E:		 Std Dv: 15.4919333848, Center: 1.0cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: H:		 Std Dv: 19.6020407101, Center: 28.2cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: H:		 Std Dv: 13.2119474551, Center: 3.6cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: E:		 Std Dv: 24.5899708553, Center: 13.0cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: E:		 Std Dv: 8.57645355351, Center: 1.26666666667cm
+Longest: 3fingerpinch_side: end to end: cylinder_w_: E:		 Std Dv: 25.7725090401, Center: 33.5cm
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: E:		 Std Dv: 7.93025150225, Center: 0.833333333333cm
+Shortest: 3fingerpinch_top: around the sides: cube_h_: E:		 Std Dv: 3.03108891325, Center: 0.175cm
+Longest: 3fingerpinch_top: around the sides: cube_h_: E:		 Std Dv: 30.7367857786, Center: 27.4cm
+Longest: 3fingerpinch_top: opposite sides: cube_h_: W:		 Std Dv: 24.4885177175, Center: 11.8cm
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: W:		 Std Dv: 9.95929214352, Center: 0.575cm
+Longest: hook_side: around the sides: ellipse_h_: E:		 Std Dv: 28.89059824, Center: 19.4cm
+Shortest: hook_side: around the sides: ellipse_h_: E:		 Std Dv: 5.79271573233, Center: 0.766666666667cm
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: E:		 Std Dv: 13.4233937587, Center: 0.0cm
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: E:		 Std Dv: 21.8059624874, Center: 27.8cm
+Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: H:		 Std Dv: 20.9758045138, Center: 24.6cm
+Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: H:		 Std Dv: 14.2866852349, Center: 7.6cm
+Longest: 2fingerpinch_top: 2 around the sides: cone_e_: H:		 Std Dv: 27.8017535418, Center: 18.4cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: E:		 Std Dv: 15.8981130956, Center: 2.2cm
+Longest: equidistant_top: 3 around the sides: cone_e_: W:		 Std Dv: 27.5781717225, Center: 11.2cm
+Shortest: equidistant_top: 3 around the sides: cone_e_: W:		 Std Dv: 8.15815883368, Center: 0.933333333333cm
+Longest: 3fingerpinch_side: end to end: cylinder_w_: H:		 Std Dv: 30.6412938514, Center: 34.0cm
+Shortest: 3fingerpinch_side: end to end: cylinder_w_: H:		 Std Dv: 5.35412613474, Center: 0.9cm
+Longest: 2fingerpinch_top: 2 around the sides: cylinder_e_: W:		 Std Dv: 12.0701077046, Center: 18.4cm
+Shortest: equidistant_top: 3 down the sides: cone_h_: H:		 Std Dv: 21.3016431291, Center: 6.6cm
+Longest: equidistant_top: 3 down the sides: cone_h_: H:		 Std Dv: 14.948987331, Center: 33.7cm
+Shortest: equidistant_top: 3 down the sides: cylinder_h_: H:		 Std Dv: 7.4311656032, Center: 0.733333333333cm
+Longest: equidistant_top: 3 down the sides: cylinder_h_: H:		 Std Dv: 29.0272860139, Center: 33.8cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: E:		 Std Dv: 7.4993333037, Center: 0.64cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: E:		 Std Dv: 29.0792021899, Center: 33.5cm
+Longest: hook_side: around the sides: cylinder_h_: E:		 Std Dv: 29.5916654933, Center: 13.4cm
+Longest: equidistant_top: 3 around the sides: cube_h_: W:		 Std Dv: 26.141155292, Center: 25.8cm
+Shortest: equidistant_top: 3 around the sides: cube_h_: W:		 Std Dv: 10.5375518979, Center: 0.0cm
+Shortest: hook_side: over the top: cube_h_: H:		 Std Dv: 10.1063786239, Center: 0.45cm
+Longest: hook_side: over the top: cube_h_: H:		 Std Dv: 27.0801280155, Center: 34.0cm
+Longest: 2fingerpinch_top: 2 around the sides: ellipse_h_: E:		 Std Dv: 26.0875449209, Center: 27.4cm
+Shortest: 2fingerpinch_top: 2 around the sides: ellipse_h_: E:		 Std Dv: 11.2534439173, Center: 0.0cm
+Shortest: equidistant_top: 3 around the sides: cube_h_: E:		 Std Dv: 9.59166304663, Center: 0.8cm
+Longest: equidistant_top: 3 around the sides: cube_h_: E:		 Std Dv: 27.8248490063, Center: 21.6cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: E:		 Std Dv: 14.7346318244, Center: 0.85cm
+Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: E:		 Std Dv: 22.898894624, Center: 33.6cm
+Shortest: hook_side: over the top: cylinder_h_: E:		 Std Dv: 14.6649658878, Center: 0.0cm
+Longest: hook_side: over the top: cylinder_h_: E:		 Std Dv: 23.1924317157, Center: 17.4cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: H:		 Std Dv: 9.60468635615, Center: 3.6cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: H:		 Std Dv: 28.5788383249, Center: 32.2cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_h_: H:		 Std Dv: 29.3204280323, Center: 19.0cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_h_: H:		 Std Dv: 9.09212113132, Center: 32.2cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: E:		 Std Dv: 11.0554159679, Center: 6.4cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: E:		 Std Dv: 27.7573814007, Center: 19.4cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: H:		 Std Dv: 14.5945195193, Center: 12.4cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: H:		 Std Dv: 24.415351216, Center: 29.8cm
+Longest: 3fingerpinch_side: end to end: cone_e_: H:		 Std Dv: 31.9168842464, Center: 23.2cm
+Longest: equidistant_top: 3 around the sides: cone_e_: H:		 Std Dv: 25.4411084664, Center: 27.4cm
+Shortest: equidistant_top: 3 around the sides: cone_e_: H:		 Std Dv: 14.8576579581, Center: 1.4cm
+Shortest: equidistant_top: 3 around the sides: cylinder_e_: E:		 Std Dv: 10.1666120217, Center: 0.0cm
+Longest: equidistant_top: 3 around the sides: cylinder_e_: E:		 Std Dv: 30.5509410657, Center: 29.0cm
+Shortest: 3fingerpinch_side: end to end: cube_h_: W:		 Std Dv: 27.6448910289, Center: 4.2cm
+Longest: hook_side: over the top: cylinder_e_: E:		 Std Dv: 30.0072907807, Center: 27.8cm
+Shortest: hook_side: over the top: cylinder_e_: E:		 Std Dv: 10.810151479, Center: 3.6cm
+Longest: hook_side: around the sides: ellipse_h_: H:		 Std Dv: 27.147743921, Center: 33.5cm
+Shortest: hook_side: around the sides: cube_h_: W:		 Std Dv: 12.9494208365, Center: 2.8cm
+Longest: hook_side: around the sides: cube_h_: W:		 Std Dv: 29.9196841561, Center: 18.8cm
+Shortest: 3fingerpinch_side: around the sides: ellipse_h_: H:		 Std Dv: 8.49836585599, Center: 0.833333333333cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: H:		 Std Dv: 10.5672449894, Center: 0.9cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: W:		 Std Dv: 25.2227575812, Center: 2.6cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: W:		 Std Dv: 20.548722588, Center: 24.8cm
+Shortest: hook_side: over the top: ellipse_h_: E:		 Std Dv: 11.8415464456, Center: 5.0cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: H:		 Std Dv: 15.5769059829, Center: 7.8cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cone_e_: H:		 Std Dv: 32.1147940987, Center: 18.6cm
+Longest: equidistant_top: 3 down the sides: ellipse_h_: W:		 Std Dv: 14.7918896697, Center: 20.2cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: W:		 Std Dv: 36.4943831295, Center: 1.8cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: W:		 Std Dv: 15.1162164578, Center: 14.4cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cone_e_: H:		 Std Dv: 28.1824413421, Center: 10.8cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cone_e_: H:		 Std Dv: 25.0736415385, Center: 33.65cm
+Longest: equidistant_side: 3 around the sides, palm on flat: cube_h_: W:		 Std Dv: 26.5, Center: 26.4cm
+Shortest: equidistant_side: 3 around the sides, palm on flat: cube_h_: W:		 Std Dv: 29.1699998095, Center: 15.8cm
+Longest: 3fingerpinch_top: opposite sides: cube_h_: E:		 Std Dv: 12.9614813968, Center: 0.6cm
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: E:		 Std Dv: 42.7551166529, Center: 0.2cm
+Shortest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: W:		 Std Dv: 25.7644242232, Center: 0.15cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cylinder_e_: W:		 Std Dv: 31.2691541299, Center: 15.4cm
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: H:		 Std Dv: 39.8269695056, Center: 2.8cm
+Longest: 3fingerpinch_top: opposite sides: cone_h_: H:		 Std Dv: 39.277856357, Center: 10.2cm
+Longest: hook_side: around the sides: cylinder_h_: H:		 Std Dv: 0.0, Center: 34.0cm
+Shortest: hook_side: around the sides: cylinder_h_: H:		 Std Dv: 5.0, Center: 14.6cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cone_h_: H:		 Std Dv: 5.0, Center: 8.2cm
+Longest: equidistant_side: 3 around the sides, palm on round: cone_h_: H:		 Std Dv: 4.5, Center: 19.6cm
+Shortest: 2fingerpinch_top: 2 around the sides: cube_h_: H:		 Std Dv: 9.5, Center: 1.6cm
+Longest: 2fingerpinch_top: 2 around the sides: cube_h_: H:		 Std Dv: 1.0, Center: 26.6cm
+Longest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: W:		 Std Dv: 7.0, Center: 21.0cm
+Longest: 3fingerpinch_top: opposite sides: cube_h_: H:		 Std Dv: 0.0, Center: 17.0cm
+Shortest: 3fingerpinch_top: opposite sides: cube_h_: H:		 Std Dv: 17.5, Center: 10.0cm
+Shortest: hook_side: around the sides: cylinder_e_: W:		 Std Dv: 9.5, Center: 0.95cm
+Longest: hook_side: around the sides: cylinder_e_: W:		 Std Dv: 8.5, Center: 29.6cm
+Shortest: hook_side: around the sides: cylinder_e_: E:		 Std Dv: 14.5, Center: 2.8cm
+Longest: hook_side: around the sides: cylinder_e_: E:		 Std Dv: 10.0, Center: 33.0cm
+Longest: 3fingerpinch_side: end to end: cone_e_: W:		 Std Dv: 15.5, Center: 15.2cm
+Shortest: 3fingerpinch_top: opposite sides: cone_h_: E:		 Std Dv: 0.0, Center: 0.0cm
+Longest: 3fingerpinch_top: opposite sides: cone_h_: E:		 Std Dv: 35.0, Center: 23.0cm
+Shortest: 3fingerpinch_top: opposite sides: cylinder_w_: E:		 Std Dv: 10.5, Center: 1.2cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: W:		 Std Dv: 0.0, Center: 1.8cm
+Longest: 3fingerpinch_side: around the sides: cone_h_: W:		 Std Dv: 0.0, Center: 21.8cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: H:		 Std Dv: 0.0, Center: 6.6cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cone_h_: W:		 Std Dv: 0.0, Center: 30.2cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cylinder_h_: H:		 Std Dv: 0.0, Center: 26.6cm
+Longest: hook_side: around the sides: cylinder_e_: H:		 Std Dv: 0.0, Center: 19.0cm
+Longest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: E:		 Std Dv: 0.0, Center: 33.7cm
+Shortest: 3fingerpinch_side: around the sides: cone_h_: W:		 Std Dv: 0.0, Center: 14.2cm
+Shortest: equidistant_side: 2 pinch the sides, 1 on the top: cube_h_: E:		 Std Dv: 0.0, Center: 3.4cm
+Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: E:		 Std Dv: nan, Center: nancm
+Shortest: 2fingerpinch_top: 2 around the sides: cone_e_: H:		 Std Dv: 7.57359722985, Center: 3.85cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: E:		 Std Dv: 19.7278356644, Center: 26.2cm
+Shortest: 2fingerpinch_top: 2 around the sides: cylinder_e_: W:		 Std Dv: 24.1379369458, Center: 0.3cm
+Shortest: hook_side: around the sides: cylinder_h_: E:		 Std Dv: 6.99404508612, Center: 3.2cm
+Longest: hook_side: around the sides: cone_h_: E:		 Std Dv: 22.8875512015, Center: 33.1cm
+Shortest: hook_side: around the sides: cone_h_: E:		 Std Dv: 17.0575496482, Center: 1.4cm
+Shortest: 3fingerpinch_side: end to end: cone_e_: H:		 Std Dv: 8.0553639824, Center: 2.33333333333cm
+Longest: hook_side: around the sides: cone_h_: H:		 Std Dv: 32.5269119346, Center: 34.0cm
+Shortest: hook_side: around the sides: cone_h_: H:		 Std Dv: 7.54247233266, Center: 0.533333333333cm
+Longest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: W:		 Std Dv: 27.3062749759, Center: 15.0cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: W:		 Std Dv: 12.8809303758, Center: 4.6cm
+Longest: 3fingerpinch_side: end to end: cube_h_: W:		 Std Dv: 13.1624465811, Center: 30.4cm
+Shortest: hook_side: around the sides: ellipse_h_: H:		 Std Dv: 15.1620872207, Center: 3.4cm
+Longest: 3fingerpinch_side: around the sides: ellipse_h_: H:		 Std Dv: 34.7211110933, Center: 9.0cm
+Longest: equidistant_top: 2 around the sides, 1 on the base: cube_h_: H:		 Std Dv: 33.508290848, Center: 33.05cm
+Longest: hook_side: over the top: ellipse_h_: E:		 Std Dv: 35.1220095603, Center: 9.4cm
+Shortest: equidistant_top: 3 down the sides: ellipse_h_: W:		 Std Dv: 36.3520593945, Center: 7.8cm
+Shortest: equidistant_side: 3 around the sides, palm on round: ellipse_h_: W:		 Std Dv: 5.0, Center: 3.4cm
+Shortest: 3fingerpinch_side: end to end: cone_e_: W:		 Std Dv: 10.0, Center: 1.0cm
+Longest: 3fingerpinch_top: opposite sides: cylinder_w_: E:		 Std Dv: 30.0, Center: 25.0cm
+Shortest: 3fingerpinch_top: opposite sides: ellipse_h_: W:		 Std Dv: 45.0, Center: 15.0cm
+Shortest: equidistant_side: 3 around the sides, palm on round: cylinder_h_: E:		 Std Dv: 0.0, Center: 34.0cm
+Longest: 3fingerpinch_top: opposite sides: ellipse_h_: W:		 Std Dv: 0.0, Center: 34.0cm
+Shortest: hook_side: around the sides: cylinder_e_: H:		 Std Dv: 0.0, Center: 1.8cm
+-----------------------------------------------------------

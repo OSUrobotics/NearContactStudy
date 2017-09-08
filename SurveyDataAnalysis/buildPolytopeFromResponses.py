@@ -138,7 +138,7 @@ class BuildPolytope(object):
 		else:
 			return False
 
-	def paramsForNewQuestions(self, hull): # from the normal equations, list parameters for new questions
+	def paramsForNewQuestions(self, points, hull): # from the normal equations, list parameters for new questions
 		question_counter = 0
 		q_range = 10
 		half_range = 6

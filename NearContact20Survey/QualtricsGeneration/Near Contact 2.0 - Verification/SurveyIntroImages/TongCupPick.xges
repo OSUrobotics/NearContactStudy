@@ -1,0 +1,35 @@
+<ges version='0.1'>
+  <project properties='properties;' metadatas='metadatas, name=(string)&quot;New\ Project&quot;, author=(string)Ammar, render-scale=(double)100, year=(string)2017;'>
+    <encoding-profiles>
+      <encoding-profile name='pitivi-profile' description='Pitivi encoding profile' type='container' preset-name='oggmux' format='application/ogg' >
+        <stream-profile parent='pitivi-profile' id='0' type='video' presence='1' format='video/x-vp8, profile=(string){ 0, 1, 2, 3 }' preset-name='vp8enc' restriction='video/x-raw, width=(int)720, height=(int)576, framerate=(fraction)25/1, pixel-aspect-ratio=(fraction)1/1, format=(string)I420' pass='0' variableframerate='0' />
+        <stream-profile parent='pitivi-profile' id='1' type='audio' presence='1' format='audio/x-vorbis, rate=(int)[ 1, 200000 ], channels=(int)[ 1, 255 ]' preset-name='vorbisenc' restriction='audio/x-raw, channels=(int)2, rate=(int)44100' />
+      </encoding-profile>
+    </encoding-profiles>
+    <ressources>
+      <asset id='file:///home/ammar/Downloads/IMG_1067.MOV' extractable-type-name='GESUriClip' properties='properties, supported-formats=(int)6, duration=(guint64)10205000000;' metadatas='metadatas, datetime=(datetime)2017-08-28T16:32:08Z, container-format=(string)Quicktime, audio-codec=(string)&quot;MPEG-4\ AAC\ audio&quot;, maximum-bitrate=(uint)96000, video-codec=(string)&quot;H.264\ /\ AVC&quot;, bitrate=(uint)4688913;' />
+      <asset id='GESTitleClip' extractable-type-name='GESTitleClip' properties='properties;' metadatas='metadatas;' />
+      <asset id='file:///home/ammar/Downloads/IMG_1068.MOV' extractable-type-name='GESUriClip' properties='properties, supported-formats=(int)6, duration=(guint64)9771666666;' metadatas='metadatas, datetime=(datetime)2017-08-28T16:31:57Z, container-format=(string)Quicktime, audio-codec=(string)&quot;MPEG-4\ AAC\ audio&quot;, maximum-bitrate=(uint)96000, video-codec=(string)&quot;H.264\ /\ AVC&quot;, bitrate=(uint)4629128;' />
+      <asset id='crossfade' extractable-type-name='GESTransitionClip' properties='properties;' metadatas='metadatas, description=(string)&quot;Crossfade\ between\ two\ clips&quot;;' />
+    </ressources>
+    <timeline properties='properties, auto-transition=(boolean)true, snapping-distance=(guint64)115970853;' metadatas='metadatas, duration=(guint64)9771666666;'>
+      <track caps='video/x-raw' track-type='4' track-id='0' properties='properties, async-handling=(boolean)false, message-forward=(boolean)false, caps=(string)video/x-raw, restriction-caps=(string)&quot;video/x-raw\,\ width\=\(int\)720\,\ height\=\(int\)576\,\ framerate\=\(fraction\)25/1&quot;;' metadatas='metadatas;'/>
+      <track caps='audio/x-raw' track-type='2' track-id='1' properties='properties, async-handling=(boolean)false, message-forward=(boolean)false, caps=(string)audio/x-raw, restriction-caps=(string)&quot;NULL&quot;;' metadatas='metadatas;'/>
+      <layer priority='0' properties='properties, auto-transition=(boolean)true;' metadatas='metadatas, volume=(float)1;'>
+        <clip id='0' asset-id='file:///home/ammar/Downloads/IMG_1068.MOV' type-name='GESUriClip' layer-priority='0' track-types='6' start='0' duration='9771666666' inpoint='0' rate='0' properties='properties, mute=(boolean)false, is-image=(boolean)false;' >
+          <effect asset-id='videoflip' clip-id='0' type-name='GESEffect' track-type='4' track-id='0' properties='properties, priority=(uint)2, active=(boolean)true, track-type=(int)4;' metadatas='metadatas;' children-properties='properties, method=(int)1, qos=(boolean)true;'>
+          </effect>
+          <effect asset-id='videocrop' clip-id='0' type-name='GESEffect' track-type='4' track-id='0' properties='properties, priority=(uint)3, active=(boolean)true, track-type=(int)4;' metadatas='metadatas;' children-properties='properties, left=(int)0, bottom=(int)100, top=(int)100, qos=(boolean)true, right=(int)100;'>
+          </effect>
+          <effect asset-id='aspectratiocrop' clip-id='0' type-name='GESEffect' track-type='4' track-id='0' properties='properties, priority=(uint)4, active=(boolean)true, track-type=(int)4;' metadatas='metadatas;' children-properties='properties, left=(int)0, async-handling=(boolean)false, message-forward=(boolean)false, top=(int)0, right=(int)0, qos=(boolean)true, bottom=(int)0, aspect-ratio=(fraction)0/1;'>
+            <binding type='direct' source_type='interpolation' property='bottom' mode='1' track_id='-1' values =' 0:0  9771666666:0 '/>
+          </effect>
+            <binding type='direct' source_type='interpolation' property='volume' mode='1' track_id='1' values =' 0:0.10000000000000001  9771666666:0.10000000000000001 '/>
+            <binding type='direct' source_type='interpolation' property='alpha' mode='1' track_id='0' values =' 0:1  9771666666:1 '/>
+        </clip>
+      </layer>
+      <layer priority='1' properties='properties, auto-transition=(boolean)true;' metadatas='metadatas, volume=(float)1;'>
+      </layer>
+    </timeline>
+</project>
+</ges>
