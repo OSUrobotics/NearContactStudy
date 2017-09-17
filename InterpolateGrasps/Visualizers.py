@@ -13,7 +13,8 @@ elif platform.node() == 'Sonny': #lab computer
 	import retract_finger
 elif platform.node() == 'Desktop': #personal desktop Linux
 	base_path = os.path.dirname(os.path.realpath(__file__))
-	retract_fingers_path = os.path.expanduser('~/NearContactStudy/Interpolate Grasps/')
+	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
+	sys.path.append(retract_fingers_path)
 	import retract_finger
 else:
 	base_path = os.path.dirname(os.path.realpath(__file__))
@@ -46,6 +47,7 @@ class Vis(object): #General Class for visualization
 			self.viewer = self.env.GetViewer()
 			self.viewer.SetCamera(self.cameraTransform)
 			self.cameraFocusPoint = [0,0,0]
+			self.viewer.SetSize(1215,960)
 		# pdb.set_trace()
 		# sensor = RaveCreateSensor(self.env, 'offscreen_render_camera')
 		# sensor.SendCommand('setintrinsic 529 525 328 267 0.01 10')
@@ -86,8 +88,11 @@ class Vis(object): #General Class for visualization
 		self.axes = misc.DrawAxes(self.env, [1,0,0,0,0,0,0])
 
 	def takeImage(self, fname, delay = True): # Take an image of the OpenRave window
-		if not os.path.isdir(os.path.split(fname)[0]): #make a directory if it doesn't exist
-			os.makedirs(os.path.split(fname)[0])
+		try:
+			if not os.path.isdir(os.path.split(fname)[0]): #make a directory if it doesn't exist
+				os.makedirs(os.path.split(fname)[0])
+		except:
+			pass
 		self.env.UpdatePublishedBodies()
 		try: #there is a bug in my version of Linux.  This should work with the proper drivers setup
 			Im = self.viewer.GetCameraImage(640,480,  self.viewer.GetCameraTransform(),[640,640,320,240])
@@ -223,7 +228,7 @@ class GenVis(object): # General class for objects in visualization
 		#TODO: add a check to cycle through and verify colors are correct.  sometimes color change doesn't seem to work
 		for link in self.obj.GetLinks():
 			for geos in link.GetGeometries():
-				geos.SetAmbientColor(color)
+				geos.SetAmbientColor([0.9, 0.9, 0.9]) # Ambient color set to the same as the robot hand in bhand.dae file
 				geos.SetDiffuseColor(color)
 				geos.SetTransparency(alpha)
 

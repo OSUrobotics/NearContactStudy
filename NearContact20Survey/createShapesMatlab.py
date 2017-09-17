@@ -16,6 +16,8 @@ class ShapeSTLGeneratorPython(object):
 
 	def ShapeSTLGenerator(self, shape, resolution, filename, h, w, e, alpha):
 		#generates shape with matlab script
+		if isinstance(resolution, float):
+			resolution = float(resolution)
 		self.eng.ShapeSTLGenerator(shape, resolution, filename, h, w, e, alpha, nargout=0)
 
 	def quit(self): #stop matlab

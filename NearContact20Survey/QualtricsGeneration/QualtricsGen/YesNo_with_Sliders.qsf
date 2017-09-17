@@ -1,0 +1,528 @@
+{
+  "SurveyEntry": {
+    "SurveyID": "SV_0eTST1fwpeLwJyR",
+    "SurveyName": "YesNo with Sliders",
+    "SurveyDescription": null,
+    "SurveyOwnerID": "UR_dnAFgKKkrDH919r",
+    "SurveyBrandID": "oregonstate",
+    "DivisionID": null,
+    "SurveyLanguage": "EN",
+    "SurveyActiveResponseSet": "RS_eqzBj1bm6nGX44B",
+    "SurveyStatus": "Inactive",
+    "SurveyStartDate": "0000-00-00 00:00:00",
+    "SurveyExpirationDate": "0000-00-00 00:00:00",
+    "SurveyCreationDate": "2017-09-13 15:38:28",
+    "CreatorID": "UR_dnAFgKKkrDH919r",
+    "LastModified": "2017-09-13 17:37:38",
+    "LastAccessed": "0000-00-00 00:00:00",
+    "LastActivated": "0000-00-00 00:00:00",
+    "Deleted": null
+  },
+  "SurveyElements": [
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "BL",
+      "PrimaryAttribute": "Survey Blocks",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": [
+        {
+          "Type": "Default",
+          "Description": "Default Question Block",
+          "ID": "BL_6sWJKDNdI0GUkZv",
+          "BlockElements": [
+            {
+              "Type": "Question",
+              "QuestionID": "QID1"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID5"
+            }
+          ],
+          "Options": {
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false",
+            "Looping": "Static",
+            "LoopingOptions": {
+              "Static": {
+                "1": {
+                  "1": "",
+                  "2": "",
+                  "3": "",
+                  "4": ""
+                },
+                "2": {
+                  "1": "",
+                  "2": "",
+                  "3": "",
+                  "4": ""
+                }
+              },
+              "Randomization": "None"
+            }
+          }
+        },
+        {
+          "Type": "Trash",
+          "Description": "Trash / Unused Questions",
+          "ID": "BL_2lvOhbve3r05poF",
+          "BlockElements": []
+        },
+        {
+          "Type": "Standard",
+          "SubType": "",
+          "Description": "Block 1",
+          "ID": "BL_bkB2q529wslfOsJ",
+          "BlockElements": [
+            {
+              "Type": "Question",
+              "QuestionID": "QID4"
+            }
+          ],
+          "Options": {
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false",
+            "Looping": "Static",
+            "LoopingOptions": {
+              "Static": {
+                "1": {
+                  "1": "",
+                  "2": ""
+                },
+                "2": {
+                  "1": "",
+                  "2": ""
+                },
+                "3": {
+                  "1": "",
+                  "2": ""
+                },
+                "4": {
+                  "1": "",
+                  "2": ""
+                },
+                "5": {
+                  "1": "",
+                  "2": ""
+                }
+              },
+              "Randomization": "None"
+            }
+          }
+        },
+        {
+          "Type": "Standard",
+          "SubType": "",
+          "Description": "Block 2",
+          "ID": "BL_a5cPrGHbYMj7j7v",
+          "BlockElements": [
+            {
+              "Type": "Question",
+              "QuestionID": "QID6"
+            },
+            {
+              "Type": "Question",
+              "QuestionID": "QID7"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "FL",
+      "PrimaryAttribute": "Survey Flow",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "Flow": [
+          {
+            "ID": "BL_6sWJKDNdI0GUkZv",
+            "Type": "Block",
+            "FlowID": "FL_2"
+          },
+          {
+            "ID": "BL_a5cPrGHbYMj7j7v",
+            "Type": "Standard",
+            "FlowID": "FL_4"
+          },
+          {
+            "ID": "BL_bkB2q529wslfOsJ",
+            "Type": "Standard",
+            "FlowID": "FL_3"
+          }
+        ],
+        "Properties": {
+          "Count": 4
+        },
+        "FlowID": "FL_1",
+        "Type": "Root"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SO",
+      "PrimaryAttribute": "Survey Options",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "BackButton": "false",
+        "SaveAndContinue": "true",
+        "SurveyProtection": "PublicSurvey",
+        "BallotBoxStuffingPrevention": "false",
+        "NoIndex": "Yes",
+        "SecureResponseFiles": "true",
+        "SurveyExpiration": "None",
+        "SurveyTermination": "DefaultMessage",
+        "Header": "",
+        "Footer": "",
+        "ProgressBarDisplay": "None",
+        "PartialData": "+1 week",
+        "ValidationMessage": "",
+        "PreviousButton": "  <<  ",
+        "NextButton": "  >>  ",
+        "SkinLibrary": "oregonstate",
+        "SkinType": "MQ",
+        "Skin": "oregonstate",
+        "NewScoring": 1
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SCO",
+      "PrimaryAttribute": "Scoring",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "ScoringCategories": [],
+        "ScoringCategoryGroups": [],
+        "ScoringSummaryCategory": null,
+        "ScoringSummaryAfterQuestions": 0,
+        "ScoringSummaryAfterSurvey": 0,
+        "DefaultScoringCategory": null,
+        "AutoScoringCategory": null
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "STAT",
+      "PrimaryAttribute": "Survey Statistics",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "MobileCompatible": false,
+        "ID": "Survey Statistics"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "QC",
+      "PrimaryAttribute": "Survey Question Count",
+      "SecondaryAttribute": "7",
+      "TertiaryAttribute": null,
+      "Payload": null
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID1",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionText": "Click to write the question text",
+        "DefaultChoices": false,
+        "DataExportTag": "Q1",
+        "QuestionType": "MC",
+        "Selector": "MACOL",
+        "SubSelector": "TX",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionDescription": "Click to write the question text",
+        "Choices": {
+          "1": {
+            "Display": "Click to write Choice 1"
+          },
+          "2": {
+            "Display": "Click to write Choice 2"
+          },
+          "3": {
+            "Display": "Click to write Choice 3"
+          },
+          "4": {
+            "Display": "Click to write Choice 4"
+          },
+          "5": {
+            "Display": "Click to write Choice 5"
+          },
+          "6": {
+            "Display": "Click to write Choice 6"
+          },
+          "7": {
+            "Display": "Click to write Choice 7"
+          },
+          "8": {
+            "Display": "Click to write Choice 8"
+          },
+          "9": {
+            "Display": "Click to write Choice 9"
+          },
+          "10": {
+            "Display": "Click to write Choice 10"
+          }
+        },
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "ON",
+            "ForceResponseType": "ON",
+            "Type": "None"
+          }
+        },
+        "GradingData": [],
+        "Language": [],
+        "QuestionID": "QID1"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID4",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionText": "Click to write the question text",
+        "DataExportTag": "Q5",
+        "QuestionType": "MC",
+        "Selector": "SAVR",
+        "SubSelector": "TX",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        },
+        "QuestionDescription": "Click to write the question text",
+        "Choices": {
+          "1": {
+            "Display": "Click to write Choice 1"
+          },
+          "2": {
+            "Display": "Click to write Choice 2"
+          },
+          "3": {
+            "Display": "Click to write Choice 3"
+          }
+        },
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "ForceResponseType": "ON",
+            "Type": "None"
+          }
+        },
+        "Language": [],
+        "QuestionID": "QID4"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID5",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionText": "Click to write the question text",
+        "DefaultChoices": false,
+        "DataExportTag": "Q6",
+        "QuestionType": "Slider",
+        "Selector": "HSLIDER",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMin": 0,
+          "CSSliderMax": 100,
+          "GridLines": 10,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "ShowValue": true,
+          "CustomStart": false,
+          "NotApplicable": false,
+          "MobileFirst": true
+        },
+        "QuestionDescription": "Click to write the question text",
+        "Choices": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID1/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        },
+        "DynamicChoicesData": [],
+        "ChoiceOrder": [],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "ForceResponseType": "ON",
+            "Type": "None"
+          }
+        },
+        "GradingData": [],
+        "Language": [],
+        "Labels": [],
+        "QuestionID": "QID5"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID6",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionText": "Click to write the question text",
+        "DefaultChoices": false,
+        "DataExportTag": "Q4",
+        "QuestionType": "MC",
+        "Selector": "MACOL",
+        "SubSelector": "TX",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionDescription": "Click to write the question text",
+        "Choices": {
+          "1": {
+            "Display": "Click to write Choice 1"
+          },
+          "2": {
+            "Display": "Click to write Choice 2"
+          },
+          "3": {
+            "Display": "Click to write Choice 3"
+          },
+          "4": {
+            "Display": "Click to write Choice 4"
+          },
+          "5": {
+            "Display": "Click to write Choice 5"
+          },
+          "6": {
+            "Display": "Click to write Choice 6"
+          },
+          "7": {
+            "Display": "Click to write Choice 7"
+          },
+          "8": {
+            "Display": "Click to write Choice 8"
+          },
+          "9": {
+            "Display": "Click to write Choice 9"
+          }
+        },
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "ForceResponseType": "ON",
+            "Type": "None"
+          }
+        },
+        "GradingData": [],
+        "Language": [],
+        "QuestionID": "QID6"
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID7",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionText": "Click to write the question text",
+        "DefaultChoices": false,
+        "DataExportTag": "Q5",
+        "QuestionID": "QID7",
+        "QuestionType": "Slider",
+        "Selector": "HSLIDER",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMin": 0,
+          "CSSliderMax": 100,
+          "GridLines": 10,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "ShowValue": true,
+          "CustomStart": false,
+          "NotApplicable": false,
+          "MobileFirst": true
+        },
+        "QuestionDescription": "Click to write the question text",
+        "Choices": {
+          "1": {
+            "Display": "Click to write Choice 1"
+          },
+          "2": {
+            "Display": "Click to write Choice 2"
+          },
+          "3": {
+            "Display": "Click to write Choice 3"
+          }
+        },
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID6/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        },
+        "DynamicChoicesData": [],
+        "ChoiceOrder": [
+          "1",
+          "2",
+          "3"
+        ],
+        "Validation": {
+          "Settings": {
+            "ForceResponse": "OFF",
+            "ForceResponseType": "ON",
+            "Type": "None"
+          }
+        },
+        "GradingData": [],
+        "Language": [],
+        "Labels": []
+      }
+    },
+    {
+      "SurveyID": "SV_0eTST1fwpeLwJyR",
+      "Element": "RS",
+      "PrimaryAttribute": "RS_eqzBj1bm6nGX44B",
+      "SecondaryAttribute": "Default Response Set",
+      "TertiaryAttribute": null,
+      "Payload": null
+    }
+  ]
+}

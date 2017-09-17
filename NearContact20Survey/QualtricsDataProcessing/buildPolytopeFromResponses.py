@@ -3,6 +3,8 @@ import pdb
 import numpy as np
 import copy
 import matplotlib.pyplot as plt
+import matplotlib
+matplotlib.rcParams.update({'font.size': 22})
 from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 from scipy.spatial import ConvexHull
@@ -11,8 +13,10 @@ import os
 import seaborn as sns
 sns.set()
 import csv
+# import mayavi.mlab as mlab
+from NearContactStudy import HAND_PARAM, PARAMETERIZE
 
-from KeyMapper import KeyMapper
+from NearContactStudy import KeyMapper
 
 # Author: Ammar Kothari
 # Last Editted: 8/20/17
@@ -21,7 +25,13 @@ class BuildPolytope(object):
 	# It can plot data, build a convex hull, extract normal equations for each unique face
 	# We used this object to see what subsequent questions needed to be asked after each survey
 	def __init__(self):
-		self.value_range = value_range = [1, 9, 17, 25, 33]
+		self.value_range = [1, 9, 17, 25, 33]
+		self.param_value_range = (np.array([1, 9, 17, 25, 33])/HAND_PARAM).round(2)
+
+	def createPlot(self): #creates a standard plot
+		fig = plt.figure(figsize = (15, 10))
+		ax = fig.add_subplot(111, projection='3d')
+		return fig, ax
 
 	def plotPoints(self, survey_data): # function that takes in survey data and plots points for each shape
 		cube_color = [25,25,112] # Midnight Blue
@@ -49,12 +59,23 @@ class BuildPolytope(object):
 		return points
 
 	def formatPlot(self, ax): #adds some standard formatting for plots
-		ax.set_xlim3d([0,33])
-		ax.set_ylim3d([0,33])
-		ax.set_zlim3d([0,33])
-		ax.set_xticks(self.value_range)
-		ax.set_yticks(self.value_range)
-		ax.set_zticks(self.value_range)
+		if PARAMETERIZE:
+			ax.set_xlim3d([0, max(self.param_value_range)])
+			ax.set_ylim3d([0, max(self.param_value_range)])
+			ax.set_zlim3d([0, max(self.param_value_range)])
+			ax.set_xticks(self.param_value_range)
+			ax.set_yticks(self.param_value_range)
+			ax.set_zticks(self.param_value_range)
+		else:
+			ax.set_xlim3d([0,33])
+			ax.set_ylim3d([0,33])
+			ax.set_zlim3d([0,33])
+			ax.set_xticks(self.value_range)
+			ax.set_yticks(self.value_range)
+			ax.set_zticks(self.value_range)
+		ax.set_xlabel('width')
+		ax.set_ylabel('height')
+		ax.set_zlabel('extent')
 
 	def plotPoints(self, points, ax, errors = None, show = True): # creates a 3d plot of points
 		# assume errors are already scaled (not applying 2 stdev here)
@@ -69,9 +90,6 @@ class BuildPolytope(object):
 				y = [lower[1], upper[1]]
 				z = [lower[2], upper[2]]
 				ax.plot(x, y, z, marker="_", ms=10)
-		ax.set_xlabel('w')
-		ax.set_ylabel('h')
-		ax.set_zlabel('e')
 		if show:
 			plt.show()
 		return ax
@@ -151,16 +169,24 @@ class BuildPolytope(object):
 		if show:
 			plt.show()
 
+	# def getNormalsFromHull(self, points, hull):
+
 	def drawAvgPointOnHull(self, points, hull, ax, show = False, hull_original = None): #draws points at the center of each plane
+		### FIX THIS TO USE THE FUNCTION BELOW! ###
+		avg_pts = self.getAvgPointsOnHull(points, hull)
+		ax.scatter(avg_pts[:,0], avg_pts[:,1], avg_pts[:,2], c = 'r', marker = 'o', s = 50)
+		if show:
+			plt.show()
+		return avg_pts
+
+	def getAvgPointsOnHull(self, points, hull): #returns the avg points on surfaces of the hull
+		avg_pts = []
 		for eqs, simplex in zip(hull.equations, hull.simplices):
 			nm = self.normalVectors(eqs)
 			bound_pts = points[simplex]
 			avg_pt = np.mean(bound_pts, axis = 0).reshape(-1,3)
-			# print("Average Point: %s" %avg_pt)
-			ax.scatter(avg_pt[0,0], avg_pt[0,1], avg_pt[0,2], c = 'r', marker = 'o', s = 50)
-			# ax.plot(avg_pt[:], 'ro', markersize = 10)
-		if show:
-			plt.show()
+			avg_pts.append(avg_pt)
+		return np.array(avg_pts).flatten().reshape(-1,3)
 
 	def inHull(self, hull_orig, point): #checks if a point is in the hull
 		hull_test = self.fitConvexHull(np.vstack((hull_orig.points,  point)))
@@ -396,9 +422,12 @@ class PolytopeParametric(object):
 		return grid_points_all
 
 	def writePointsToCSV(self, csvfn, key, points): #writes points for a question to csv
+		KM = KeyMapper()
 		with open(csvfn, 'ab') as csvfile:
 			writer = csv.writer(csvfile)
-			writer.writerow([key])
+			key_list = KM.map(key[:key.rfind('_')]) #have to remove the probability at the end
+			new_key = ''.join(['_%s' %k for k in key_list])[1:]
+			writer.writerow([new_key])
 			for i,point_set in enumerate(points):
 				row = ['Question %s' %i]
 				for p in point_set:
@@ -427,7 +456,10 @@ class PolytopeNonparametric(PolytopeParametric):
 		try:
 			for i,d in enumerate((self.small_shapedata_stats[key], self.large_shapedata_stats[key])):
 				for k1, v1 in d.iteritems():
-					moderate_array = [17, 17, 17]
+					if PARAMETERIZE:
+						moderate_array = np.array([17, 17, 17])/HAND_PARAM
+					else:
+						moderate_array = [17, 17, 17]
 					#median value -- correct value changes depding on if its the large side or the small side
 					if CI_amount >= 0.5:
 						if i == 0: moderate_array[dim_mapper[k1]] = v1[2] # upper value in interval
@@ -449,7 +481,7 @@ class PolytopeNonparametric(PolytopeParametric):
 		else:
 			return True
 
-	def createPolytopeStats(self, CI_amount, key, Save = False, ax = None, multi = False, loc = 0, color = None): #plots values from survey for a single scenario using averaged values
+	def createPolytopeStats(self, CI_amount, key, Save = False, ax = None, multi = False, loc = 0, color = None, image = True): #plots values from survey for a single scenario using averaged values
 		P = BuildPolytope()
 		image_fn = self.FNFromKey(key) #key should already be converted
 		responses = self.responsesAsPoints(key = key, CI_amount = CI_amount)
@@ -472,34 +504,61 @@ class PolytopeNonparametric(PolytopeParametric):
 		# P.paramsForNewQuestionsGrid(responses, errors, hull_simp, ax, Plot = False)
 		color = P.drawPlanesFromHull(responses, hull_simp, ax, show = False, color = color)
 		P.drawAvgPointOnHull(responses, hull_simp, ax, show = False, hull_original = hull)
-		P.addGraspImage(image_fn, ax = ax, show = False, loc = loc, color = color)
+		BuildPolytope().formatPlot(ax)
+		# if image: P.addGraspImage(image_fn, ax = ax, show = False, loc = loc, color = color)
 		if not multi:
 			if Save:
 				ax.figure.savefig('SinglePolytope/NonparametricContinuous/' + key + '%s' %(round(CI_amount,2)) + '.png')
 				plt.close(ax.figure)
-		return ax
+		try:
+			bound_points = np.unique(np.array([responses[s] for s in hull_simp.simplices]).flatten().reshape(-1,3), axis = 0)
+		except:
+			bound_points = np.unique(np.concatenate([responses[s] for s in hull_simp.simplices]).flatten().reshape(-1,3), axis =0)
+		return ax, bound_points
 
-	def createPolytopeStatsAll(self, CI_amount): #plots for all scenarios in survey
+	# def createPolytopeStatsMayavi(self, CI_amount, key, Save = False, ax = None, multi = False, loc = 0, color = None, image = True): #plots values from survey for a single scenario using averaged values
+	# 	P = BuildPolytope()
+	# 	image_fn = self.FNFromKey(key) #key should already be converted
+	# 	responses = self.responsesAsPoints(key = key, CI_amount = CI_amount)
+	# 	check = self.pointsCreatePolytopeCheck(responses)
+	# 	if not check:
+	# 		print('Polytope does not exist: %s' %key)
+	# 		return False
+
+	# 	# plot it on an array
+	# 	x,y = np.meshgrid(responses[:,0], responses[:,1])
+	# 	z,z = np.meshgrid(responses[:,2], responses[:,2])
+	# 	s = mlab.mesh(x, y, z)
+
+
+	# 	pdb.set_trace()
+
+	def createPolytopeStatsAll(self, CI_amount):
+		#plots for all scenarios in survey
+		#CI is confidence interval value.  used to label plots and name files
 		for key in self.small_shapedata_stats.keys():
 			self.createPolytopeStats(CI_amount, key = key, Save = True)
 
-	def createMultiplePolytopeStats(self, CI_amount, key_list = None, Save = False):
+	def createMultiplePolytopeStats(self, CI_amount, key_list = None, Save = False, color_list = None):
 		#plots multiple polytopes on the same plot
 		if not key_list: key_list = [self.small_shapedata_stats.keys()[i] for i in [18, 30]]
 		if len(key_list) < 2:
 			print('Insufficient Entries')
 			return
 		ax = None
-		color_list = (np.random.rand(len(key_list * 3))).reshape(-1,3)
+		if color_list is None: color_list = (np.random.rand(len(key_list * 3))).reshape(-1,3)
 		for ik,key in enumerate(key_list):
-			ax = self.createPolytopeStats(CI_amount, key = key, Save = False, ax = ax, multi = True, loc = ik, color = color_list[ik])
-
+			ax, ___ = self.createPolytopeStats(CI_amount, key = key, Save = False, ax = ax, multi = True, loc = ik, color = color_list[ik])
+			if ax is False:
+				return False
 		ax.set_title('CI: %s' %(round(CI_amount*100,0)))
-		if Save:
-			ax.figure.savefig('TwoPolytopes/NonparametricContinuous/' + '_'.join(key_list) + '%s' %(round(CI_amount*100,0)) + '.png')
-			plt.close(ax.figure)
-		else:
-			plt.show()
+		BuildPolytope().formatPlot(ax)
+		# if Save:
+		# 	ax.figure.savefig('TwoPolytopes/NonparametricContinuous/' + '_'.join(key_list) + '%s' %(round(CI_amount*100,0)) + '.png')
+		# 	plt.close(ax.figure)
+		# else:
+		# 	plt.show()
+		return ax
 
 	def createMultiplePolytopeStatsAll(self, CI_amount, Save = True): #plots all combinations
 		for key1 in self.small_shapedata_stats.keys():
@@ -538,7 +597,7 @@ class PolytopeNonparametric(PolytopeParametric):
 					print('\t Image %s -- w:%0.2f, h:%0.2f, e:%0.2f' %(span, range_pt[span][0], range_pt[span][1], range_pt[span][2]))
 		return normal_pts
 
-	def paramsForNewQuestionsGrid(self, CI_amount, key): # from the normal equation, list parameters for next survey questions
+	def paramsForNewQuestionsGrid(self, CI_amount, key, exploration_range = 3): # from the normal equation, list parameters for next survey questions
 		points = self.responsesAsPoints(key, CI_amount)
 		P = BuildPolytope()
 		hull_orig = P.fitConvexHull(points)
@@ -546,9 +605,7 @@ class PolytopeNonparametric(PolytopeParametric):
 		hull = copy.deepcopy(hull_orig)
 		hull.equations = eqs
 		hull.simplices = simps
-
 		question_counter = 0
-		exploration_range = 1
 		grid_points_all = []
 		# print('Key: %s' %key)
 		for eqs, simplex in zip(hull.equations, hull.simplices):

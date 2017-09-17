@@ -4,16 +4,11 @@ import numpy as np
 import pdb
 import re
 import copy
-from buildPolytopeFromResponses import BuildPolytope, PolytopeParametric, PolytopeNonparametric
-from DiscreteAnalysis import DiscreteAnalysis
-from ContinuousAnalysis import ContinuousAnalysis
-from Parametric import Parametric
-from Nonparametric import Nonparametric
-
-# import matplotlib.pyplot as plt
+from NearContactStudy import BuildPolytope, PolytopeParametric, PolytopeNonparametric, DiscreteAnalysis, ContinuousAnalysis, Parametric, Nonparametric
 import os
 import sys
 import matplotlib.pyplot as plt
+from NearContactStudy import HAND_PARAM
 
 class csvReader(object):
 	#This class reads the exported csv file with the survey results
@@ -168,8 +163,6 @@ class dataResults(object):
 		#EITHER CATEGORY OR COLUMNNUM MUST BE PROVIDED
 		#If both are provided, breaks if they are not associated with each other
 		#removes the category from both self.data and self.columns
-		print columnNum
-		print category
 		if category and columnNum:
 			if self.columns[columnNum] != category:
 				raise ValueError("Column and Category did not match")
@@ -350,6 +343,13 @@ class dataResults(object):
 			for k2,v2 in v1.iteritems():
 				d[k1][k2] = Analysis_Object.array(v2)
 		return d
+
+	def parametrizeData(self, d):
+		# changes values to dimensionless paramatrization
+		param_value = 32.0
+		for k1, v1 in d.iteritems():
+			for k2,v2 in v1.iteritems():
+				d[k1][k2] = [i/HAND_PARAM for i in d[k1][k2]]
 
 	def createPolytopeAllPoints(self, key = None): #plots values from survey for a single scenario
 		if not key: key = self.small_shapedata.keys()[10]
@@ -567,21 +567,23 @@ class overnightRun(object):
 			NpStats.AnalyzeResults((data.small_shapedata, data.large_shapedata), P=CI)
 			NpSurf.setDicts(NpStats.small_shapedata_stats, NpStats.large_shapedata_stats)
 			NpSurf.writeAllQuestions('%s_NonparametricNextQuestions.csv' %CI, CI)
+			data.parametrizeData(NpStats.small_shapedata_stats)
+			data.parametrizeData(NpStats.large_shapedata_stats)
 			NpSurf.createPolytopeStatsAll(CI_amount = 0.5 + CI/2.0)
 
 
-		for CI in CIs:
-			NpStats.AnalyzeResults((data.small_shapedata, data.large_shapedata), P=CI)
-			NpSurf.setDicts(NpStats.small_shapedata_stats, NpStats.large_shapedata_stats)
-			NpSurf.createMultiplePolytopeStatsAll(CI_amount = 0.5 + CI/2.0)
+		# for CI in CIs:
+		# 	NpStats.AnalyzeResults((data.small_shapedata, data.large_shapedata), P=CI)
+		# 	NpSurf.setDicts(NpStats.small_shapedata_stats, NpStats.large_shapedata_stats)
+		# 	NpSurf.createMultiplePolytopeStatsAll(CI_amount = 0.5 + CI/2.0)
 
 
-		PStats = Parametric()
-		PSurf = PolytopeParametric()
-		PStats.AnalyzeResults((data.small_shapedata, data.large_shapedata))
-		PSurf.setDicts(PStats.small_shapedata_stats, PStats.large_shapedata_stats)
-		PSurf.createPolytopeStatsAll()
-		PSurf.createMultiplePolytopeStatsAll()
+		# PStats = Parametric()
+		# PSurf = PolytopeParametric()
+		# PStats.AnalyzeResults((data.small_shapedata, data.large_shapedata))
+		# PSurf.setDicts(PStats.small_shapedata_stats, PStats.large_shapedata_stats)
+		# PSurf.createPolytopeStatsAll()
+		# PSurf.createMultiplePolytopeStatsAll()
 
 
 		print('Overnight Run Has Ended!')
@@ -621,17 +623,22 @@ if __name__ == "__main__":
 	Stats = Nonparametric()
 	Surf = PolytopeNonparametric()
 	CIs = [.5, 0.0001, -0.5]
-	key = data.small_shapedata.keys()[05]
+	key = data.small_shapedata.keys()[10]
+	ax = None
 	for CI in CIs:
 		Stats.AnalyzeResults((data.small_shapedata, data.large_shapedata), P = CI)
 		# Stats.AnalyzeResultsToCSV(file_out = '%sNonParamContinuousAnalyzedResponses.csv' %abs(CI))
 		Surf.setDicts(Stats.small_shapedata_stats, Stats.large_shapedata_stats)
+		data.parametrizeData(Stats.small_shapedata_stats)
+		data.parametrizeData(Stats.large_shapedata_stats)
 		ax = Surf.createPolytopeStats(CI, key)
-		if not ax: continue # polytope does not exist!
+		plt.show()
+		if not ax: pass # polytope does not exist!
 		# Surf.createPolytopeStats()
 		qps = Surf.paramsForNewQuestionsGrid(CI, key)
-		Surf.plotQuestionPoints(qps, ax = ax)
-		Surf.writePointsToCSV('NonparametricNextQuestions.csv', key, qps, CI)
+		# Surf.plotQuestionPoints(qps, ax = ax)
+		# Surf.writePointsToCSV('%s_NonparametricNextQuestions.csv' %CI, qps, CI, key)
+		Surf.writeAllQuestions('%s_NonparametricNextQuestions.csv' %CI, CI)
 		# plt.show(block = True)
 		# pdb.set_trace()
 		# data.createPolytopeStatsAllNonparametric(CI_amount = 0.5 + CI/2.0)

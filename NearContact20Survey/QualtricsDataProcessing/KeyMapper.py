@@ -1,15 +1,15 @@
 import csv
 import re
+from NearContactStudy import BASE_PATH
 
-
+QUESTIONMAPPER_PATH = BASE_PATH + '/NearContact20Survey/QualtricsDataProcessing/QuestionMapper.csv'
 
 class KeyMapper(object):
 
 	def map(self, key): #changes key from one naming convention to the other?
 		key_split = re.split('[:_]', key)
 		key_split = filter(None, key_split) # removes blank
-		key_file = 'QuestionMapper.csv'
-		with open(key_file, 'rb') as csvfile:
+		with open(QUESTIONMAPPER_PATH, 'rb') as csvfile:
 			reader = csv.reader(csvfile)
 			for row in reader:
 				if row[0] != key_split[0].strip(): #grasp

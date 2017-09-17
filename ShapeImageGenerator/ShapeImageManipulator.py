@@ -1,4 +1,4 @@
-import subprocess, os, pdb, re, copy, sys
+import subprocess, os, pdb, re, copy, sys, progressbar, time
 import paramiko
 from  PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
@@ -12,6 +12,7 @@ from ShapeImageGeneratorTest import ShapeImageGenerator
 class ShapeImageManipulator: #manipulate images that have been produced (most likely with ShapeImageGenerator)
 	def __init__(self):
 		self.i = 1
+		self.SIG = None
 
 	def imageTypeCheck(self, image1): # deals with input that is either path to file or object
 		if type(image1) is str:
@@ -26,8 +27,11 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 			print("New Directory Made")
 
 	def combineImagesTopRight(self, image1, image2, percent_image2 = 35): #combine images so that the second one is smaller and in top right corner
-		im1 = self.imageTypeCheck(image1)
-		im2 = self.imageTypeCheck(image2)
+		try:
+			im1 = self.imageTypeCheck(image1)
+			im2 = self.imageTypeCheck(image2)
+		except:
+			return False
 
 		im_out = im1.copy()
 		w,h = im_out.size
@@ -36,21 +40,62 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 		im2_reduced = self.reduceSize(im2, size = (w_out, h_out))
 		# add border to left and bottom
-		border_size = 5
-		im2_reduced_border = Image.new("RGB", (w_out + border_size, h_out + border_size), color = 'white')
-		im2_reduced_border.paste(im2_reduced, (border_size,0))
-
-		im_out.paste(im2_reduced_border, box = (w-w_out-border_size, 0))
+		border_size = 3
+		reduced_border = Image.new("RGB", (w_out + border_size, h_out + border_size), color = 'black')
+		reduced_border.paste(im2_reduced, (border_size, 0))
+	
+		im_out.paste(reduced_border, box = (w-w_out-border_size, 0))
 		return im_out
+
+	def addBorder(self, image1, bSize):
+		im1 = self.imageTypeCheck(image1)
+		border_size = bSize
+		
+		im_out = im1.copy()
+		w,h = im_out.size
+
+		im_border = Image.new("RGB", (w + border_size * 2, h + border_size * 2), color = 'black')
+		im_border.paste(im_out, box = (border_size, border_size))
+		
+		return im_border
+	
+	def addBorderToMultipleImages(self, dir_name_in, dir_name_out, bSize): # combine multiple images from a directory
+		border_size = bSize
+		print 'Adding Border To Images From: %s To: %s' %(dir_name_in, dir_name_out)
+		for files in os.walk(dir_name_in):
+			try:
+				bar_status = 0
+				bar = progressbar.ProgressBar(maxval = len(files[2]), widgets = [progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+				bar.start()
+			except:
+				continue
+			while len(files[2]) > 0: # keep going until list is empty
+				im_path = files[2][0]
+				if os.path.splitext(im_path)[1] == '.png':
+					im_fin = self.addBorder(os.path.join(files[0], im_path), border_size)
+					files[2].remove(im_path)
+					save_name = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), re.sub('_cam\d', '', im_path))
+					self.saveImage(im_fin, save_name)
+				else:
+					files[2].remove(im_path)
+				bar_status += 1
+				bar.update(bar_status)
+			bar.finish()
 
 	def combineMultipleImages(self, dir_name_in, dir_name_out): # combine multiple images from a directory
 		#look through all the files in the directory
 		#find matching second camera angle
 		# combine images
 		# save image
-
+		print 'Combining Images From: %s To: %s' %(dir_name_in, dir_name_out)
 		for files in os.walk(dir_name_in):
 			files[2].sort()
+			try:
+				bar_status = 0
+				bar = progressbar.ProgressBar(maxval = len(files[2]), widgets = [progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+				bar.start()
+			except:
+				continue
 			while len(files[2]) > 0: # keep going until list is empty
 				im_path = files[2][0]
 				# print("Current Image: %s" %im_path)
@@ -58,28 +103,28 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 					if 'cam0' in im_path or 'camera' in im_path: #check that camera angles are being considered
 						next_camera_angle_name = re.sub('cam0','cam1',im_path) #replace 1 with 2 for camera angle
 						im_out = self.combineImagesTopRight(os.path.join(files[0], im_path), os.path.join(files[0], next_camera_angle_name))
+						if im_out is False: # deals with missing files, but shouldn't be missing files
+							files[2].remove(im_path)
+							continue
 						#remove those two files from the list
 						# print('Combined: %s, %s' %(im_path, next_camera_angle_name))
 						files[2].remove(im_path)
 						files[2].remove(next_camera_angle_name)
 						save_name = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), re.sub('_cam\d', '', im_path)) #remove camera angle identifier for save name
 						self.saveImage(im_out, save_name)
+						bar_status += 2
+						bar.update(bar_status)
 					elif 'cam1' in im_path: #just keep going look for cam1
+						files[2].remove(im_path)
 						continue
 					else:
 						files[2].remove(im_path)
+			bar.finish()
 
-
-	def cropOpenRAVEBoarder(self,image1): # crops image.  image1 is a PIL.Image object
+	def cropImage(self,image1,cBox): # crops image to a desired box.  image1 is a PIL.Image object
 		im1 = self.imageTypeCheck(image1)
 		try:
-			cur_box = im1.getbbox()
-			if cur_box != (0,0,640,480): #should crop images down to desired size if they are larger
-				print("Image has been cropped already: %s" %im1.filename)
-				return im1
-			# crop_box = (30,20,600,420)
-			crop_box = (130, 0, 510, 350)
-			im1_cropped = im1.crop(crop_box)
+			im1_cropped = im1.crop(cBox)
 		except:
 			print("File may be damaged.  Unable to crop file: %s" %(im1.filename))
 			return False
@@ -204,26 +249,59 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		im.show()
 
 	def saveImage(self, image1, fn): #save an image
+		while not os.path.isdir(os.path.split(fn)[0]):
+			if not os.path.isdir(os.path.split(fn)[0]): #make a directory if it doesn't exist
+				os.makedirs(os.path.split(fn)[0])
 		im1 = self.imageTypeCheck(image1)
-		if not os.path.isdir(os.path.split(fn)[0]): #make a directory if it doesn't exist
-			os.makedirs(os.path.split(fn)[0])
 		im1.save(fn)
 
 	def closeImage(self,image1):
 		image1.close()
 
 	def uploadMultipleImages(self, dir_name): # upload all the files in the folder
-		subprocess.Popen(["scp", "-r", dir_name, "%s@%s:%s" %('kotharia', 'shell.onid.oregonstate.edu', 'public_html/')]).wait()
+		subprocess.Popen(["scp", "-r", dir_name, "%s@%s:%s" %('kotharia', 'shell.onid.oregonstate.edu', 'public_html/RefinementSurvey/')]).wait()
 		# requires password
 		# images can be found at website: http://people.oregonstate.edu/~kotharia/GeneratedImagesCropped
 
 	def cropAllImages(self, dir_name_in, dir_name_out): # crop all the images in a folder and sub folders
+		print 'Cropping Images From: %s To: %s' %(dir_name_in, dir_name_out)
 		for files in os.walk(dir_name_in):
+			try: # creates a progress bar in the terminal, might be a way to simplify this.
+				bar_status = 0
+				bar = progressbar.ProgressBar(maxval = len(files[2]), widgets = [progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+				bar.start()
+			except: 
+				continue
 			for im_path in files[2]:
 				if os.path.splitext(im_path)[1] == '.png':
 					image_fn = os.path.join(files[0], im_path)
 					image_orig = Image.open(image_fn)
-					image_cropped = self.cropOpenRAVEBoarder(image_orig)
+					# crop_box_top_cam0 = (160, 50, 560, 380)
+					# crop_box_top_cam1 = (150, 50, 540, 420)
+					# crop_box_side_cam0 = (220, 20, 580, 280)
+					# crop_box_side_cam1 = (220, 90, 520, 380)
+					crop_box_top_cam0 = (320, 220, 1030, 716)
+					crop_box_top_cam1 = (300, 150, 950, 790)
+					crop_box_side_cam0 = (490, 150, 1150, 630)
+					crop_box_side_cam1 = (440, 300, 950, 730)
+
+					if 'top' in image_fn:
+						if 'cam0' in image_fn:
+							image_cropped = self.cropImage(image_orig, crop_box_top_cam0)
+						elif 'cam1' in image_fn:
+							image_cropped = self.cropImage(image_orig, crop_box_top_cam1)
+						else:
+							image_cropped = image_orig
+							print 'Image not copped: %s' %(image_fn)
+					if 'side' in image_fn:
+						if 'cam0' in image_fn:
+							image_cropped = self.cropImage(image_orig, crop_box_side_cam0)
+						elif 'cam1' in image_fn:
+							image_cropped = self.cropImage(image_orig, crop_box_side_cam1)
+						else:
+							image_cropped = image_orig
+							print 'Image not copped: %s' %(image_fn)
+
 					if image_cropped is not False:
 						#putting images in the same folder based on source folder structure
 						image_cropped_fn = '%s/%s' %(files[0].replace(dir_name_in, dir_name_out, 1), im_path)
@@ -234,6 +312,10 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 							self.closeImage(image_cropped)
 						except:
 							pass
+				
+				bar_status += 1
+				bar.update(bar_status)
+			bar.finish()
 
 	def reduceSize(self, image1, size = (128, 128)): # reduce the size of an image
 		im = self.imageTypeCheck(image1)
@@ -241,7 +323,14 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 		return im_reduced
 
 	def reduceSizeAllImages(self, dir_name_in, dir_name_out, size = (128, 128)): # reduce the size of all images in a folder and subfolders:
+		print 'Reducing Size Of Images From: %s To: %s' %(dir_name_in, dir_name_out)
 		for files in os.walk(dir_name_in):
+			try: # creates a progress bar in the terminal, might be a way to simplify this.
+				bar_status = 0
+				bar = progressbar.ProgressBar(maxval = len(files[2]), widgets = [progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+				bar.start()
+			except: 
+				continue
 			for im_path in files[2]:
 				if os.path.splitext(im_path)[1] == '.png':
 					image_fn = os.path.join(files[0], im_path)
@@ -259,6 +348,10 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 							pass
 					except:
 						print("File may be damaged.  Unable to reduce size of file: %s" %(image_orig.filename))
+				
+				bar_status += 1
+				bar.update(bar_status)
+			bar.finish()
 
 	# def uploadSingleImage(self): #upload images, specific to Ammar's folder
 	# 	ssh = paramiko.SSHClient() 
@@ -268,6 +361,10 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 	# 	sftp.put(localpath, remotepath)
 	# 	sftp.close()
 	# 	ssh.close()
+
+	# def cropAndCombine(self, dir_name_in, dir_name_out):
+		# for files in os.walk(dir_name_in):
+
 
 	def checkOverCropAll(self, dir_name_in): #checks for colors at the border of each image to see if the image was cropped too much
 		for files in os.walk(dir_name_in):
@@ -337,7 +434,8 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 
 	def checkForDuplicateImages(self, dir_name_in, retake = False): #check all files against each other for similarity
 		# pool = Pool(processes = 3)
-		self.SIG = ShapeImageGenerator()
+		if self.SIG == None:
+			self.SIG = ShapeImageGenerator()
 		self.SIG.readParameterFile('HandCenteredImageGeneratorParameters.csv')
 		for files in os.walk(dir_name_in):
 			# pick the first image
@@ -380,16 +478,17 @@ class ShapeImageManipulator: #manipulate images that have been produced (most li
 if __name__ == '__main__':
 	SIM = ShapeImageManipulator()
 
+	# SIM.ImageGeneration(curdir + '/HandCenteredImageGeneratorParameters.csv')
+
 	# crop images down to size
 	# SIM.cropAllImages('GeneratedImages', 'GeneratedImagesCropped')
 	# combine images
-
 	# SIM.combineMultipleImages('GeneratedImagesCropped', 'GeneratedImagesCombined')
-	# # reduce image size
-	# SIM.reduceSizeAllImages('GeneratedImagesCropped/ObjectsOnly', 'GeneratedImagesReduced/ObjectsOnly', size = (285, 200))
-	# SIM.reduceSizeAllImages('GeneratedImagesCombined/Grasps', 'GeneratedImagesReduced/Grasps', size = (285, 200))
-	# #upload Images
-	SIM.uploadMultipleImages('GeneratedImagesReduced/')
+	# SIM.addBorderToMultipleImages('GeneratedImagesCombined', 'GeneratedImagesWithBorder', 3)
+	# reduce image size
+	# SIM.reduceSizeAllImages('GeneratedImagesWithBorder', 'GeneratedImagesReduced', size = (285, 200))
+	# upload images
+	SIM.uploadMultipleImages('GeneratedImagesReduced')
 
 	# SIM.checkOverCrop('test_cone_h25_w9_e9_cam1')
 	# SIM.checkOverCrop('test_cone_h9_w9_e25_cam2')
@@ -398,7 +497,7 @@ if __name__ == '__main__':
 	# SIM.bboxToHand('test_cone_h9_w9_e25_cam2')
 
 	# SIM.checkForDuplicateImages('GeneratedImages', retake = True)
-	# SIM.meanSquaredError('test_cone_h9_w9_e25_cam2','test_cone_h33_w9_e9_cam1' )
+	# SIM.meanSquaredError('GeneratedImages/Grasps/cone_h1_w1_e1_a10_e_2fingerpinch_side_up_cam0.png', 'GeneratedImages/Grasps/cone_h1_w1_e1_a10_e_2fingerpinch_side_up_cam0.png')
 
 
 

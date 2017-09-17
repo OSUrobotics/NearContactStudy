@@ -4,10 +4,7 @@ import sys
 import csv
 import copy
 import numpy as np
-curdir = os.path.dirname(os.path.realpath(__file__))
-classdir = curdir +'/..'
-sys.path.insert(0, classdir) # path to helper classes
-from DataProcessing import csvReader, dataResults, removeUnfinishedRows, removeUnnecessaryColumns
+from NearContactStudy import csvReader, dataResults, removeUnfinishedRows, removeUnnecessaryColumns
 
 
 class DataProcessing(object):
@@ -71,10 +68,7 @@ class DataProcessing(object):
 			elif 'Cube' in feat[1]:
 				o_type = 'Cube h'
 			else:
-				# print("Failed to Identify: %s" %feat)
-				# pdb.set_trace()
 				return
-			# print('Response: %s' %(resp[i]))
 			self.response_list[i][o_type][feat[0]][feat[2]] = resp[i]
 
 	def writeResponseToCSV(self): #writes values from response_list to csv files with workerIDs
@@ -117,7 +111,6 @@ class DataProcessing(object):
 				q,o,r = self.parseQuestion(question)
 				self.storeResponse(self.dR.data[question], [q, o ,r])
 			except IndexError:
-				# print("Error, Question: %s" %question)
 				continue
 
 	def replaceLMVarWithGrasp(self, filename):
@@ -130,7 +123,6 @@ class DataProcessing(object):
 			reader = csv.reader(csvfile)
 			for row in reader:
 				LMV_dict['%s %s' %(row[1], row[0])] = row[2]
-		# print(LMV_dict)
 		self.LMV_dict = LMV_dict
 		# walk through dictionary and replace LM values for each response
 		for resp in self.response_list:
@@ -138,7 +130,6 @@ class DataProcessing(object):
 
 	def searchDict(self, search_dict, shape = None):
 		# searches for LM values and replaces it from the loaded mapping
-		# pdb.set_trace()
 		for k, v in search_dict.iteritems():
 			if '$' in k:
 				pre_size = len(search_dict.keys())
@@ -167,10 +158,6 @@ class DataProcessing(object):
 
 	def aggregateReponses(self): #aggregate responses from multiple users
 		agg_dict = self.copyRecursiveDict(self.response_list[0])
-		# for k1,v1 in agg_dict.iteritems():
-		# 	if isinstance(v1, dict): #checks for worker ID
-		# 		for k2,v2 in v1.iteritems():
-		# 			for k3,v2 in v2.iteritems():
 		keygen = self.keyGenerator(agg_dict)
 		for keys in keygen:
 			k1, k2, k3 = keys
@@ -224,8 +211,6 @@ class DataProcessing(object):
 			else:
 				d[k] = []
 		return d
-
-	#def removeIntroQuestions(self, )
 
 if __name__ == '__main__':
 	DP = DataProcessing('Near_Contact_20__Verification_filled_results.csv', '../../QualtricsGeneration/Near Contact 2.0 - Verification/mapping.csv')

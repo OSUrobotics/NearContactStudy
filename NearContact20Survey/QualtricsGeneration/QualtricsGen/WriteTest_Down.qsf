@@ -1,0 +1,1773 @@
+{
+  "SurveyEntry": {
+    "SurveyID": "SV_6QLVtts5ZrMoScR",
+    "SurveyName": "WriteTest",
+    "SurveyDescription": null,
+    "SurveyOwnerID": "UR_dnAFgKKkrDH919r",
+    "SurveyBrandID": "oregonstate",
+    "DivisionID": null,
+    "SurveyLanguage": "EN",
+    "SurveyActiveResponseSet": "RS_1C7VM7j8GEj3n6J",
+    "SurveyStatus": "Inactive",
+    "SurveyStartDate": "0000-00-00 00:00:00",
+    "SurveyExpirationDate": "0000-00-00 00:00:00",
+    "SurveyCreationDate": "2017-09-13 21:16:04",
+    "CreatorID": "UR_dnAFgKKkrDH919r",
+    "LastModified": "2017-09-13 21:16:05",
+    "LastAccessed": "0000-00-00 00:00:00",
+    "LastActivated": "0000-00-00 00:00:00",
+    "Deleted": null
+  },
+  "SurveyElements": [
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "BL",
+      "PrimaryAttribute": "Survey Blocks",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "11": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID24",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID25",
+              "Type": "Question"
+            }
+          ],
+          "Description": "BlockName-Auto",
+          "Type": "Default",
+          "ID": "BL_2nRA5o76bHS4NM0",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "option1",
+                  "3": "option3",
+                  "2": "option2",
+                  "5": "option5",
+                  "4": "option4"
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "10": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID22",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID23",
+              "Type": "Question"
+            }
+          ],
+          "Description": "BlockName-Auto",
+          "Type": "Default",
+          "ID": "BL_1Jn7V93YcrnfdYm",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "option1",
+                  "3": "option3",
+                  "2": "option2",
+                  "5": "option5",
+                  "4": "option4"
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "13": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID28",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID29",
+              "Type": "Question"
+            }
+          ],
+          "Description": "BlockName-Auto",
+          "Type": "Default",
+          "ID": "BL_ou4CieWvBDHfUWM",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "option1",
+                  "3": "option3",
+                  "2": "option2",
+                  "5": "option5",
+                  "4": "option4"
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "12": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID26",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID27",
+              "Type": "Question"
+            }
+          ],
+          "Description": "BlockName-Auto",
+          "Type": "Default",
+          "ID": "BL_cjCKZGt0ZVMdjLL",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "option1",
+                  "3": "option3",
+                  "2": "option2",
+                  "5": "option5",
+                  "4": "option4"
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "14": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID30",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID31",
+              "Type": "Question"
+            }
+          ],
+          "Description": "BlockName-Auto",
+          "Type": "Default",
+          "ID": "BL_kMGOmAqOahqOB3G",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "option1",
+                  "3": "option3",
+                  "2": "option2",
+                  "5": "option5",
+                  "4": "option4"
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "1": {
+          "BlockElements": [],
+          "Type": "Trash",
+          "Description": "Trash / Unused Questions",
+          "ID": "BL_9ySDOkfNnToHM1f"
+        },
+        "0": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID2",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID3",
+              "Type": "Question"
+            }
+          ],
+          "Type": "Default",
+          "Description": "Default Question Block",
+          "ID": "BL_9Xr4kchNnphPWS1"
+        },
+        "3": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID11",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID12",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 2",
+          "ID": "BL_1NX5PhotGkmWVaR"
+        },
+        "5": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID4",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID5",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID6",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID14",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 4",
+          "ID": "BL_8eryZsYoxGKpcdD"
+        },
+        "4": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID7",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID8",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID9",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID10",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 3",
+          "ID": "BL_eqAikmKhm5elBXv"
+        },
+        "7": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID15",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 6",
+          "ID": "BL_9uxyPF9PEYmdUYR"
+        },
+        "6": {
+          "Description": "Block 5",
+          "BlockElements": [
+            {
+              "QuestionID": "QID16",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID17",
+              "Type": "Question"
+            }
+          ],
+          "ID": "BL_7V6OfSCpTgt1Zn7",
+          "SubType": "",
+          "Type": "Standard",
+          "Options": {
+            "LoopingOptions": {
+              "Randomization": "None",
+              "Static": {
+                "1": {
+                  "1": "",
+                  "3": "",
+                  "2": "",
+                  "5": "",
+                  "4": ""
+                },
+                "2": {
+                  "1": "",
+                  "3": "",
+                  "2": "",
+                  "5": "",
+                  "4": ""
+                }
+              }
+            },
+            "Looping": "Static",
+            "BlockLocking": "false",
+            "RandomizeQuestions": "false"
+          }
+        },
+        "9": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID20",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID21",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 7",
+          "ID": "BL_eQLjbUPsWHt3iPr"
+        },
+        "8": {
+          "BlockElements": [
+            {
+              "QuestionID": "QID18",
+              "Type": "Question"
+            },
+            {
+              "QuestionID": "QID19",
+              "Type": "Question"
+            }
+          ],
+          "SubType": "",
+          "Type": "Standard",
+          "Description": "Block 6",
+          "ID": "BL_b7rcK0Jk8btoHSB"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "FL",
+      "PrimaryAttribute": "Survey Flow",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "Flow": [
+          {
+            "FlowID": "FL_2",
+            "Type": "Block",
+            "ID": "BL_9Xr4kchNnphPWS1"
+          },
+          {
+            "FlowID": "FL_6",
+            "Type": "Standard",
+            "ID": "BL_8eryZsYoxGKpcdD"
+          },
+          {
+            "FlowID": "FL_5",
+            "Type": "Standard",
+            "ID": "BL_eqAikmKhm5elBXv"
+          },
+          {
+            "FlowID": "FL_4",
+            "Type": "Standard",
+            "ID": "BL_1NX5PhotGkmWVaR"
+          },
+          {
+            "SubSet": 3,
+            "FlowID": "FL_9",
+            "Flow": [
+              {
+                "FlowID": "FL_7",
+                "Type": "Standard",
+                "ID": "BL_7V6OfSCpTgt1Zn7"
+              },
+              {
+                "FlowID": "FL_10",
+                "Type": "Standard",
+                "ID": "BL_b7rcK0Jk8btoHSB"
+              },
+              {
+                "FlowID": "FL_11",
+                "Type": "Standard",
+                "ID": "BL_eQLjbUPsWHt3iPr"
+              },
+              {
+                "FlowID": "FL_12",
+                "Type": "Standard",
+                "ID": "BL_1Jn7V93YcrnfdYm"
+              },
+              {
+                "FlowID": "FL_13",
+                "Type": "Standard",
+                "ID": "BL_2nRA5o76bHS4NM0"
+              },
+              {
+                "FlowID": "FL_14",
+                "Type": "Standard",
+                "ID": "BL_cjCKZGt0ZVMdjLL"
+              },
+              {
+                "FlowID": "FL_15",
+                "Type": "Standard",
+                "ID": "BL_ou4CieWvBDHfUWM"
+              },
+              {
+                "FlowID": "FL_16",
+                "Type": "Standard",
+                "ID": "BL_kMGOmAqOahqOB3G"
+              }
+            ],
+            "EvenPresentation": true,
+            "Type": "BlockRandomizer"
+          },
+          {
+            "FlowID": "FL_8",
+            "Type": "Standard",
+            "ID": "BL_9uxyPF9PEYmdUYR"
+          }
+        ],
+        "FlowID": "FL_1",
+        "Type": "Root",
+        "Properties": {
+          "Count": 11
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SO",
+      "PrimaryAttribute": "Survey Options",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "SurveyMetaDescription": "Qualtrics sophisticated online survey software solutions make creating online surveys easy. Learn more about Research Suite and get a free account today.",
+        "InactiveMessage": "",
+        "PasswordProtection": "No",
+        "EmailThankYou": "false",
+        "InactiveSurvey": "DefaultMessage",
+        "SurveyExpiration": null,
+        "ActiveResponseSet": null,
+        "ProgressBarDisplay": "None",
+        "ValidationMessageLibrary": null,
+        "EOSMessageLibrary": "",
+        "BackButton": "false",
+        "NextButton": "  >>  ",
+        "PartialDataCloseAfter": "LastActivity",
+        "SurveyTitle": "Online Survey Software | Qualtrics Survey Solutions",
+        "RefererURL": "http://",
+        "AvailableLanguages": {
+          "EN": []
+        },
+        "NewScoring": 1,
+        "ValidateMessage": "false",
+        "SaveAndContinue": "true",
+        "SurveyProtection": "PublicSurvey",
+        "ShowExportTags": "false",
+        "Password": "",
+        "NoIndex": "Yes",
+        "Footer": "",
+        "AnonymizeResponse": "No",
+        "SkinType": "MQ",
+        "EOSRedirectURL": "https://www.mturk.com/mturk/externalSubmit?assignmentId=${e://Field/assignmentId}&foo=bar",
+        "RefererCheck": "No",
+        "SkinLibrary": "oregonstate",
+        "ValidationMessage": null,
+        "SurveyTermination": "Redirect",
+        "PreviousButton": "  <<  ",
+        "InactiveMessageLibrary": "",
+        "EOSMessage": "",
+        "BallotBoxStuffingPrevention": "false",
+        "CollectGeoLocation": "false",
+        "Header": "",
+        "ThankYouEmailMessageLibrary": null,
+        "SecureResponseFiles": "true",
+        "Skin": "oregonstate",
+        "PartialData": "+1 week",
+        "ThankYouEmailMessage": null
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID8",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID8",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<video class=\"qmedia\" controls=\"true\" height=\"480\" preload=\"auto\" width=\"640\"><source src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_cBnLlUuGpHmQ7bL\" type=\"video/mp4\" /><embed align=\"middle\" autoplay=\"false\" bgcolor=\"white\" class=\"qmedia\" controller=\"true\" height=\"480\" pluginspage=\"http://www.apple.com/quicktime/download/\" src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_cBnLlUuGpHmQ7bL\" type=\"video/quicktime\" width=\"640\" /></video>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q15",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID10",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID10",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<video class=\"qmedia\" controls=\"true\" height=\"480\" preload=\"auto\" width=\"640\"><source src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_9MM2fxgmIz4KFuZ\" type=\"video/mp4\" /><embed align=\"middle\" autoplay=\"false\" bgcolor=\"white\" class=\"qmedia\" controller=\"true\" height=\"480\" pluginspage=\"http://www.apple.com/quicktime/download/\" src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_9MM2fxgmIz4KFuZ\" type=\"video/quicktime\" width=\"640\" /></video>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q19",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID12",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID12",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<video class=\"qmedia\" controls=\"true\" height=\"260\" preload=\"auto\" width=\"320\"><source src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_0jPwNqZA9PIWJkV\" type=\"video/ogg\" /><embed align=\"middle\" bgcolor=\"black\" class=\"qmedia\" controls=\"true\" height=\"260\" preload=\"metadata\" src=\"https://oregonstate.qualtrics.com/CP/File.php?F=F_0jPwNqZA9PIWJkV\" width=\"320\" /></video>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q23",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SCO",
+      "PrimaryAttribute": "Scoring",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "ScoringSummaryAfterQuestions": 0,
+        "ScoringSummaryCategory": null,
+        "ScoringCategoryGroups": [],
+        "ScoringSummaryAfterSurvey": 0,
+        "DefaultScoringCategory": null,
+        "ScoringCategories": [],
+        "AutoScoringCategory": null
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "STAT",
+      "PrimaryAttribute": "Survey Statistics",
+      "SecondaryAttribute": null,
+      "TertiaryAttribute": null,
+      "Payload": {
+        "MobileCompatible": false,
+        "ID": "Survey Statistics"
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "QC",
+      "PrimaryAttribute": "Survey Question Count",
+      "SecondaryAttribute": "21",
+      "TertiaryAttribute": null,
+      "Payload": null
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID9",
+      "SecondaryAttribute": "As shown in the video above, assume you can move the robot hand in, move it up and down (or side...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID9",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"background-color: transparent; color: rgb(0, 0, 0); white-space: pre-wrap;\">As shown in the video above, assume you can move the robot hand in, move it up and down (or side to side) a little if needed, and then close the fingers. The fingers may be closed together or separately.</span></span></span></p>\n\n<div>\n<p>&nbsp;</p>\n\n<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"color: rgb(0, 0, 0); background-color: transparent; vertical-align: baseline; white-space: pre-wrap;\">You may <b>not</b> rotate the hand or change the finger spread.</span></span></span></p>\n\n<p>&nbsp;</p>\n\n<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"color: rgb(0, 0, 0); background-color: transparent; vertical-align: baseline; white-space: pre-wrap;\">Also assume the object is resting on a table. It&rsquo;s fine if the robot hand touches the table when picking up the object, or bumps the object. </span></span></span></p>\n\n<p>&nbsp;</p>\n\n<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"color: rgb(0, 0, 0); background-color: transparent; vertical-align: baseline; white-space: pre-wrap;\">This is a video of what this looks like with a simulated hand:</span></span></span></p>\n</div>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "As shown in the video above, assume you can move the robot hand in, move it up and down (or side...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q17",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID23",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID23",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Click to write the question text",
+        "Language": [],
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "GridLines": 10,
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "Labels": [],
+        "DefaultChoices": false,
+        "Selector": "HSLIDER",
+        "Choices": [],
+        "QuestionDescription": "Click to write the question text",
+        "GradingData": [],
+        "ChoiceOrder": [],
+        "DataExportTag": "Q23",
+        "DynamicChoicesData": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID22/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID25",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID25",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Click to write the question text",
+        "Language": [],
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "GridLines": 10,
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "Labels": [],
+        "DefaultChoices": false,
+        "Selector": "HSLIDER",
+        "Choices": [],
+        "QuestionDescription": "Click to write the question text",
+        "GradingData": [],
+        "ChoiceOrder": [],
+        "DataExportTag": "Q25",
+        "DynamicChoicesData": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID24/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID27",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID27",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Click to write the question text",
+        "Language": [],
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "GridLines": 10,
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "Labels": [],
+        "DefaultChoices": false,
+        "Selector": "HSLIDER",
+        "Choices": [],
+        "QuestionDescription": "Click to write the question text",
+        "GradingData": [],
+        "ChoiceOrder": [],
+        "DataExportTag": "Q27",
+        "DynamicChoicesData": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID26/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID29",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID29",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Click to write the question text",
+        "Language": [],
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "GridLines": 10,
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "Labels": [],
+        "DefaultChoices": false,
+        "Selector": "HSLIDER",
+        "Choices": [],
+        "QuestionDescription": "Click to write the question text",
+        "GradingData": [],
+        "ChoiceOrder": [],
+        "DataExportTag": "Q29",
+        "DynamicChoicesData": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID28/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID31",
+      "SecondaryAttribute": "Click to write the question text",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID31",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Click to write the question text",
+        "Language": [],
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "GridLines": 10,
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "Labels": [],
+        "DefaultChoices": false,
+        "Selector": "HSLIDER",
+        "Choices": [],
+        "QuestionDescription": "Click to write the question text",
+        "GradingData": [],
+        "ChoiceOrder": [],
+        "DataExportTag": "Q31",
+        "DynamicChoicesData": [],
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID30/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "RS",
+      "PrimaryAttribute": "RS_1C7VM7j8GEj3n6J",
+      "SecondaryAttribute": "Default Response Set",
+      "TertiaryAttribute": null,
+      "Payload": null
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID11",
+      "SecondaryAttribute": "Due to the capabilities of the robot and what is made of, the robot's ability to pick up objects...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID11",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"font-size:16px;\">Due to the capabilities of the robot and what is made of, the robot's ability to pick up objects similar to how you might pick up an object with tongs. &nbsp;The fingertips of the robot are lined with hard rubber (like a spatula handle). &nbsp;Additionally, the maximum strength of the robotic hand is similar to the strength you can apply with your fingertips. &nbsp;Essentially, the robot hand can grasp objects strongly, but not as strongly as you might be able to.</span></span><div><span style=\"font-family:arial,helvetica,sans-serif;\"><span style=\"font-size:16px;\"><br></span></span></div><div><span style=\"font-size: 16px;\">All of the objects shown weigh approximately as much as a coffee cup like the one in the video below. &nbsp;All of the objects also have a surface finish similar to a coffee cup.</span></div>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "Due to the capabilities of the robot and what is made of, the robot's ability to pick up objects...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q21",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID14",
+      "SecondaryAttribute": "Examplepreferencesliders",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID14",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "Examplepreferencesliders",
+        "Language": [],
+        "Graphics": "IM_cFUNvIfFxmLsOEd",
+        "GradingData": [],
+        "Selector": "GRB",
+        "QuestionDescription": "Examplepreferencesliders",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "SubSelector": "WOTXB",
+        "DataExportTag": "Q27",
+        "GraphicsDescription": "Examplepreferencesliders",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID6",
+      "SecondaryAttribute": "Gridquestion example",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID6",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "Gridquestion example",
+        "Language": [],
+        "Graphics": "IM_dmxPp3BYmNYlJml",
+        "GradingData": [],
+        "Selector": "GRB",
+        "QuestionDescription": "Gridquestion example",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "SubSelector": "WOTXB",
+        "DataExportTag": "Q11",
+        "GraphicsDescription": "Gridquestion example",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID17",
+      "SecondaryAttribute": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID17",
+        "DynamicChoicesData": [],
+        "QuestionText": "How confident are you that the grasp will be able to pick up the object, move it a small distance, and place the object down on the surface?\n<div>(0 means you expect the grasp to fail, 100 means you expect the grasp to succeed every time)</div>",
+        "Language": [],
+        "Labels": {
+          "1": {
+            "Display": "Very Unlikely"
+          },
+          "2": {
+            "Display": "Very Likely"
+          }
+        },
+        "GradingData": [],
+        "Selector": "HSLIDER",
+        "QuestionDescription": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q17",
+        "Choices": [],
+        "Configuration": {
+          "GridLines": 10,
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "QuestionDescriptionOption": "UseText",
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID16/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID19",
+      "SecondaryAttribute": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID19",
+        "DynamicChoicesData": [],
+        "QuestionText": "How confident are you that the grasp will be able to pick up the object, move it a small distance, and place the object down on the surface?<div>(0 means you expect the grasp to fail, 100 means you expect the grasp to succeed every time)</div>",
+        "Language": [],
+        "Labels": {
+          "1": {
+            "Display": "Very Unlikely"
+          },
+          "2": {
+            "Display": "Very Likely"
+          }
+        },
+        "GradingData": [],
+        "Selector": "HSLIDER",
+        "QuestionDescription": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q19",
+        "Choices": [],
+        "Configuration": {
+          "GridLines": 10,
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "QuestionDescriptionOption": "UseText",
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID18/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID21",
+      "SecondaryAttribute": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "Slider",
+        "QuestionID": "QID21",
+        "DynamicChoicesData": [],
+        "QuestionText": "How confident are you that the grasp will be able to pick up the object, move it a small distance, and place the object down on the surface?<div>(0 means you expect the grasp to fail, 100 means you expect the grasp to succeed every time)</div>",
+        "Language": [],
+        "Labels": {
+          "1": {
+            "Display": "Very Unlikely"
+          },
+          "2": {
+            "Display": "Very Likely"
+          }
+        },
+        "GradingData": [],
+        "Selector": "HSLIDER",
+        "QuestionDescription": "How confident are you that the grasp will be able to pick up the object, move it a small distance...",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q21",
+        "Choices": [],
+        "Configuration": {
+          "GridLines": 10,
+          "CSSliderMax": 100,
+          "MobileFirst": true,
+          "CustomStart": false,
+          "SnapToGrid": false,
+          "NumDecimals": "0",
+          "QuestionDescriptionOption": "UseText",
+          "NotApplicable": false,
+          "ShowValue": true,
+          "CSSliderMin": 0
+        },
+        "DynamicChoices": {
+          "DynamicType": "ChoiceGroup",
+          "Locator": "q://QID20/ChoiceGroup/SelectedChoices",
+          "Type": "Dynamic"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID3",
+      "SecondaryAttribute": "Instructions: We are conducting a research study on grasping.  This survey is anonymous.  The sur.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID3",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<em>\n<p><em>Instructions:</em></p><p><em></em></p><p>We are conducting a research study on grasping. &nbsp;This survey is anonymous. &nbsp;The survey should take approximately 5 minutes. &nbsp;</p><p><br></p><p>The survey asks questions about how the sizes of an object affect what a robot hand can grasp. This survey does contain images, which will require a reasonably fast internet connection and a decent-sized (laptop) monitor. There are no known risks, and possibly some benefit to the general public on adding to the understanding of grasping.</p><p><em>&nbsp;</em></p><p><em>Study title: Grasping Dependence on Object Size</em></p><p><em>Oregon State University</em></p><p><em>Contact:&nbsp;</em>cindy.grimm@oregonstate.edu</p><p><em>&nbsp;</em></p><p></p><p><em>If you have questions about your rights or welfare as a participant, please contact the Oregon State University Institutional Review Board (IRB) Office, at (541) 737-8008 or by mail&nbsp;IRB@oregonstate.edu.</em></p></em>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "Instructions: We are conducting a research study on grasping.  This survey is anonymous.  The sur...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q5",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID5",
+      "SecondaryAttribute": "It is your job to select which grasps the robot can use to pick up the object, move it a short di...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID5",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<div>\n<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\">It is your job to select which grasps the robot can use to pick up the object, move it a short distance, and place the object down. Select the checkbox by all images that show grasps that will be able to pick up, move, and place the object.</span></span></p><p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\"><br></span></span></p><p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\">A follow up question will ask you to provide how certain you are that the object can be picked up by the grasp.&nbsp; You will move the scale from 0 (never will be able to pick up the object) to 100 (always able to pick up the object).&nbsp; You will be required to move the slider in order to advance to the next question.&nbsp; If you want to select 0 on the slide scale, move the slider away and back to zero.</span></span></p>\n</div>\n\n<div>\n<div>&nbsp;</div>\n\n<div><font face=\"arial, helvetica, sans-serif\"><span style=\"font-size: 16px;\">Below is an example question.</span></font></div>\n</div>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "It is your job to select which grasps the robot can use to pick up the object, move it a short di...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q9",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID2",
+      "SecondaryAttribute": "OSU Logo",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID2",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "OSU Logo",
+        "Language": [],
+        "Graphics": "IM_8pkPPzyn1AbsC7X",
+        "GradingData": [],
+        "Selector": "GRB",
+        "QuestionDescription": "OSU Logo",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "SubSelector": "WOTXB",
+        "DataExportTag": "Q3",
+        "GraphicsDescription": "OSU Logo",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID18",
+      "SecondaryAttribute": "Please choose the grasps that you think will be able to pick the object up, move it a short dista...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID18",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.&nbsp;",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "MACOL",
+        "QuestionDescription": "Please choose the grasps that you think will be able to pick the object up, move it a short dista...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q18",
+        "Choices": {
+          "1": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D466_w0D398_e0D395_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "3": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D466_w0D401_e0D395_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "2": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D466_w0D399_e0D395_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "5": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D448_w0D509_e0D411_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "4": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D448_w0D508_e0D411_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "7": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D443_w0D535_e0D414_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "6": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D448_w0D511_e0D411_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "9": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D439_w0D563_e0D418_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "8": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D441_w0D549_e0D416_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          }
+        },
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID20",
+      "SecondaryAttribute": "Please choose the grasps that you think will be able to pick the object up, move it a short dista...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID20",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.&nbsp;",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "MACOL",
+        "QuestionDescription": "Please choose the grasps that you think will be able to pick the object up, move it a short dista...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q20",
+        "Choices": {
+          "1": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D486_w0D364_e0D401_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "3": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D489_w0D359_e0D403_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "2": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D488_w0D361_e0D402_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "5": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D539_w0D299_e0D427_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "4": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D538_w0D301_e0D426_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "7": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D572_w0D259_e0D442_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "6": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D541_w0D297_e0D427_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "9": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D607_w0D218_e0D458_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "8": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D589_w0D238_e0D450_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          }
+        },
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID22",
+      "SecondaryAttribute": "Please choose the grasps that you think will work.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID22",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.",
+        "Language": [],
+        "Selector": "MACOL",
+        "Choices": {
+          "1": {
+            "Display": "${lm://Field/1}"
+          },
+          "3": {
+            "Display": "${lm://Field/3}"
+          },
+          "2": {
+            "Display": "${lm://Field/2}"
+          },
+          "5": {
+            "Display": "${lm://Field/5}"
+          },
+          "4": {
+            "Display": "${lm://Field/4}"
+          }
+        },
+        "QuestionDescription": "Grid Question",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q22",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "GradingData": []
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID24",
+      "SecondaryAttribute": "Please choose the grasps that you think will work.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID24",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.",
+        "Language": [],
+        "Selector": "MACOL",
+        "Choices": {
+          "1": {
+            "Display": "${lm://Field/1}"
+          },
+          "3": {
+            "Display": "${lm://Field/3}"
+          },
+          "2": {
+            "Display": "${lm://Field/2}"
+          },
+          "5": {
+            "Display": "${lm://Field/5}"
+          },
+          "4": {
+            "Display": "${lm://Field/4}"
+          }
+        },
+        "QuestionDescription": "Grid Question",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q24",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "GradingData": []
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID26",
+      "SecondaryAttribute": "Please choose the grasps that you think will work.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID26",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.",
+        "Language": [],
+        "Selector": "MACOL",
+        "Choices": {
+          "1": {
+            "Display": "${lm://Field/1}"
+          },
+          "3": {
+            "Display": "${lm://Field/3}"
+          },
+          "2": {
+            "Display": "${lm://Field/2}"
+          },
+          "5": {
+            "Display": "${lm://Field/5}"
+          },
+          "4": {
+            "Display": "${lm://Field/4}"
+          }
+        },
+        "QuestionDescription": "Grid Question",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q26",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "GradingData": []
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID28",
+      "SecondaryAttribute": "Please choose the grasps that you think will work.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID28",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.",
+        "Language": [],
+        "Selector": "MACOL",
+        "Choices": {
+          "1": {
+            "Display": "${lm://Field/1}"
+          },
+          "3": {
+            "Display": "${lm://Field/3}"
+          },
+          "2": {
+            "Display": "${lm://Field/2}"
+          },
+          "5": {
+            "Display": "${lm://Field/5}"
+          },
+          "4": {
+            "Display": "${lm://Field/4}"
+          }
+        },
+        "QuestionDescription": "Grid Question",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q28",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "GradingData": []
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID30",
+      "SecondaryAttribute": "Please choose the grasps that you think will work.",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID30",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        },
+        "QuestionText": "Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.",
+        "Language": [],
+        "Selector": "MACOL",
+        "Choices": {
+          "1": {
+            "Display": "${lm://Field/1}"
+          },
+          "3": {
+            "Display": "${lm://Field/3}"
+          },
+          "2": {
+            "Display": "${lm://Field/2}"
+          },
+          "5": {
+            "Display": "${lm://Field/5}"
+          },
+          "4": {
+            "Display": "${lm://Field/4}"
+          }
+        },
+        "QuestionDescription": "Grid Question",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q30",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "ON"
+          }
+        },
+        "GradingData": []
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID15",
+      "SecondaryAttribute": "Thank you for your input! When you finish the survey your MTurk response will be automatically re...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "TE",
+        "QuestionID": "QID15",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "<div>Thank you for your input! When you finish the survey your MTurk response will be automatically recorded; no need to enter a code.</div><div><br></div><div>If you have any comments or concerns about the survey, please enter them here:</div>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "SL",
+        "QuestionDescription": "Thank you for your input! When you finish the survey your MTurk response will be automatically re...",
+        "DefaultChoices": false,
+        "DataExportTag": "Q29",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID4",
+      "SecondaryAttribute": "We are developing simple rules that show a robot how to pick up an object. We are asking you (the...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID4",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<p><span style=\"font-size:16px;\"><span style=\"font-family:arial,helvetica,sans-serif;\">We are developing simple rules that show a robot how to pick up an object. We are asking you (the human) to help by providing guidelines about which grasps can be used to pick the object up.</span></span></p>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "We are developing simple rules that show a robot how to pick up an object. We are asking you (the...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q7",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID7",
+      "SecondaryAttribute": "We have a set of rules you must follow when imagining if an object can be picked up.  Please watc..",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "DB",
+        "QuestionID": "QID7",
+        "Validation": {
+          "Settings": {
+            "Type": "None"
+          }
+        },
+        "QuestionText": "<p>We have a set of rules you must follow when imagining if an object can be picked up. &nbsp;Please watch the videos to understand these rules.</p><p>&nbsp;</p><p>This is a demonstration of the rules using the real robot hand:</p>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "TB",
+        "QuestionDescription": "We have a set of rules you must follow when imagining if an object can be picked up.  Please watc...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [],
+        "DataExportTag": "Q13",
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText"
+        }
+      }
+    },
+    {
+      "SurveyID": "SV_6QLVtts5ZrMoScR",
+      "Element": "SQ",
+      "PrimaryAttribute": "QID16",
+      "SecondaryAttribute": "You will now see 3 questions that ask you to pick which grasps will work based on different range...",
+      "TertiaryAttribute": null,
+      "Payload": {
+        "QuestionType": "MC",
+        "QuestionID": "QID16",
+        "Validation": {
+          "Settings": {
+            "ForceResponseType": "ON",
+            "Type": "None",
+            "ForceResponse": "OFF"
+          }
+        },
+        "QuestionText": "You will now see 3 questions that ask you to pick which grasps will work based on different ranges of object sizes. Some of the questions will have ranges that look similar to each other; this helps us to analyze the data. Try to be consistent in how you pick which objects are pick-upable, but don't over-think it.&nbsp;<div><br></div><div>Please choose the grasps that you think will be able to pick the object up, move it a short distance, and place the object down.&nbsp;</div>",
+        "Language": [],
+        "GradingData": [],
+        "Selector": "MACOL",
+        "QuestionDescription": "You will now see 3 questions that ask you to pick which grasps will work based on different range...",
+        "DefaultChoices": false,
+        "ChoiceOrder": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "SubSelector": "TX",
+        "DataExportTag": "Q16",
+        "Choices": {
+          "1": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D445_w0D387_e0D371_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "3": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D441_w0D388_e0D367_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "2": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D443_w0D388_e0D369_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "5": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D397_w0D394_e0D325_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "4": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D399_w0D394_e0D327_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "7": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D353_w0D400_e0D283_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "6": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D394_w0D394_e0D322_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "9": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D306_w0D406_e0D239_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          },
+          "8": {
+            "Display": "<img src=\"http://people.oregonstate.edu/~kotharia/RefinementSurvey/Reduced/cube_h0D330_w0D403_e0D261_h_equidistant_side_up.png\" style=\"width: 285px; height: 200px;\" />"
+          }
+        },
+        "Configuration": {
+          "QuestionDescriptionOption": "UseText",
+          "NumColumns": 3
+        }
+      }
+    }
+  ]
+}
