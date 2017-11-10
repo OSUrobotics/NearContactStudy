@@ -1,3 +1,7 @@
+# from NearContactStudy import Vis, ArmVis
+
+
+# from NearContactStudy import JOINT_ANGLES_NAMES
 import cv2
 import os, pdb, copy, time, sys, csv, shutil, subprocess
 import numpy as np
@@ -9,7 +13,16 @@ sys.path.insert(0, classdir) # path to helper classes
 from Visualizers import Vis, ArmVis
 from cv_bridge import CvBridge, CvBridgeError
 import struct, ctypes
+import csv
 # import pcl.registration, pcl
+
+
+JOINT_ANGLE_FILENAME = 'JointAngles.csv'
+JOINT_ANGLES_NAMES = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'Unknown', 'Unknown',
+					'FINGER1-ROTATION','FINGER1-BASE','FINGER1-TIP',
+					'FINGER2-ROTATION','FINGER2-BASE','FINGER2-TIP', 
+					'FINGER3-ROTATION','FINGER3-BASE','FINGER3-TIP']
+
 
 class BagReader(object):
 	# Do general bag operations
@@ -107,7 +120,8 @@ class BagReader(object):
 		JA = self.robotStateToArray(self.all_data[-1]['/wam/joint_states'], handArray)
 		self.setJA(JA)
 		print('Pose at time: %s' %self.all_data[-1]['time'])
-		time.sleep(0.01)
+		time.sleep(0.0001)
+		return JA
 
 	def showPointCloud(self): #shows point cloud in openRave
 		topics_to_check = ['/camera1/depth/points', '/camera1/rgb/image_raw/compressed', '/camera2/depth/points', '/camera2/rgb/image_raw/compressed']
@@ -119,7 +133,6 @@ class BagReader(object):
 
 	def AllPoses(self, save_poses = False, dir_name = None, align_pc = False): #read a message, display pose, and write to file
 		print('Showing All Poses from Robot in openRAVE')
-		pdb.set_trace()
 		save_time_interval = 0.1 # amount of time between saved stls
 		# some directory checking for file creation
 		if save_poses:
@@ -133,6 +146,11 @@ class BagReader(object):
 			else:
 				print("no directory name")
 				return
+
+		# create (overwrite) file and write headers
+		with open('%s/%s' %(dir_name,JOINT_ANGLE_FILENAME), 'wb') as f_jointangles:
+			writer = csv.writer(f_jointangles)
+			writer.writerow(['Frame'] + JOINT_ANGLES_NAMES)
 		#read all messages
 		#if there is a timestamp with enough information, show the pose
 		# if there is a timestamp with enough information, save the pointcloud data from that timestep
@@ -146,7 +164,7 @@ class BagReader(object):
 			hand_check = '/bhand/joint_states' in self.all_data[-1].keys() or not self.hand_attached_flag #checks if hand message is there when necessary
 			if '/wam/joint_states' in self.all_data[-1].keys() and hand_check:
 				# if the necessary data is in the last entry of list to show a pose
-				self.showPoses()
+				JA = self.showPoses()
 				if save_poses:
 					if '/camera1/depth/points' in self.all_data[-1].keys() \
 					and '/camera1/rgb/image_raw/compressed' in self.all_data[-1].keys() \
@@ -164,7 +182,6 @@ class BagReader(object):
 							cv_image2 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera2/rgb/image_raw/compressed'], "bgr8")
 						except CvBridgeError, e:
 							print e
-						
 						# save point clouds
 						camera_pts = [camera1_pts, camera2_pts]
 						camera_filename = ['%s/frame%s_pc%s.csv' %(dir_name,self.frame_count,ci) for ci in range(len(camera_pts))]
@@ -181,6 +198,13 @@ class BagReader(object):
 						# save image
 						cv2.imwrite('%s/frame%s_camera%s.png' %(dir_name, self.frame_count, 1), cv_image1)
 						cv2.imwrite('%s/frame%s_camera%s.png' %(dir_name, self.frame_count, 2), cv_image2)
+
+						# save joint angles
+						with open('%s/%s' %(dir_name,JOINT_ANGLE_FILENAME), 'ab') as csv_jointangles:
+							JA_writer = csv.writer(csv_jointangles)
+							JA_write = np.insert(JA,0,self.frame_count)
+							JA_write = np.insert(JA_write,-2,0)
+							JA_writer.writerow(JA_write)
 
 						self.writeToLog(log_fn, 'Time Step %s Saved as Frame %s' %(self.all_data[-1]['time'], self.frame_count))
 						self.frame_count += 1
@@ -308,10 +332,10 @@ class BagReader(object):
 		xyzrgb = list()
 		for point in sensor_msgs.point_cloud2.read_points(msg, skip_nans = True, field_names=("x", "y", "z", "rgb")):
 			# pdb.set_trace()
-			if np.linalg.norm(point[:3]) < 1e-10: # if the point is close to zero, don't bother processing
-				continue
-			if np.linalg.norm(point[:3]) > 10: # if the point is too far away don't worry about it
-				continue
+			# if np.linalg.norm(point[:3]) < 1e-10: # if the point is close to zero, don't bother processing
+			# 	continue
+			# if np.linalg.norm(point[:3]) > 10: # if the point is too far away don't worry about it
+			# 	continue
 			# converts rgb color from 24bit integer to seperate values
 			RGBint = point[3]
 			# found conversion at:
@@ -450,13 +474,14 @@ class BagReader(object):
 
 if __name__ == '__main__':
 	B = BagReader()
-	# B.createEnv()
+	B.createEnv()
 	# B.saveSetofBagFiles('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7')
 	# B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43.bag')
 	# B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_2_2017-08-18-14-40-43')
 	
-	B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43.bag')
-	B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43')
+	# B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43.bag')
+	# B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43')
 
+	B.saveSetofBagFiles('/media/kotharia/RGWdata/BagFiles/NRI Data Collection 2')
 
 	B.closeBag()

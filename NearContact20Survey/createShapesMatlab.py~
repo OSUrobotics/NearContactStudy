@@ -17,7 +17,7 @@ class ShapeSTLGeneratorPython(object):
 
 	def ShapeSTLGenerator(self, shape, resolution, filename, h, w, e, alpha):
 		#generates shape with matlab script
-		resolution, h, w, e, alpha = map(self.float_check, (resolution, h, w, e, alpha))
+		resolution, h, w, e, alpha = map(float_check, (resolution, h, w, e, alpha))
 		self.eng.ShapeSTLGenerator(shape, resolution, filename, h, w, e, alpha, nargout=0)
 	
 	def float_check(self, val): #converts values to floats

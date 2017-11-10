@@ -403,9 +403,9 @@ class HandVis(GenVis):
 
 	def setJointAngles(self, JA): # set hand joint angles
 		#adjust fingertip values so we get behavior more similar to the actual hand
-		JA[4] += -0.7853981
-		JA[7] += -0.7853981
-		JA[9] += -0.7853981
+		# JA[4] += -0.7853981
+		# JA[7] += -0.7853981
+		# JA[9] += -0.7853981
 		self.obj.SetDOFValues(JA)
 		''' Index in Joint Angle array: joint that it affects  |   value limit
 		0: unknown
