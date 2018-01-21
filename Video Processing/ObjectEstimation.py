@@ -15,7 +15,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import struct, ctypes
 import csv
 # import pcl.registration, pcl
-
+CAMERA_COUNT = 1
 
 JOINT_ANGLE_FILENAME = 'JointAngles.csv'
 JOINT_ANGLES_NAMES = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'Unknown', 'Unknown',
@@ -124,7 +124,10 @@ class BagReader(object):
 		return JA
 
 	def showPointCloud(self): #shows point cloud in openRave
-		topics_to_check = ['/camera1/depth/points', '/camera1/rgb/image_raw/compressed', '/camera2/depth/points', '/camera2/rgb/image_raw/compressed']
+		topics_to_check = ['/camera1/depth/points', '/camera1/rgb/image_raw/compressed']
+		if CAMERA_COUNT >= 2:
+			topics_to_check.append('/camera2/depth/points')
+			topics_to_check.append('/camera2/rgb/image_raw/compressed')
 
 
 	def writeToLog(self, fn, text): #writes text line to log file
@@ -168,18 +171,25 @@ class BagReader(object):
 				if save_poses:
 					if '/camera1/depth/points' in self.all_data[-1].keys() \
 					and '/camera1/rgb/image_raw/compressed' in self.all_data[-1].keys() \
-					and '/camera2/depth/points' in self.all_data[-1].keys() \
-					and '/camera2/rgb/image_raw/compressed' in self.all_data[-1].keys() \
 					and abs(self.all_data[-1]['time'] - last_save_time) > save_time_interval:
+						# if CAMERA_COUNT >= 2:
+						# 	if '/camera2/depth/points' in self.all_data[-1].keys() \
+						# 	and '/camera2/rgb/image_raw/compressed' in self.all_data[-1].keys():
 						
 						camera1_pts = self.pc2ToXYZRGB(self.all_data[-1]['/camera1/depth/points'])
-						camera2_pts = self.pc2ToXYZRGB(self.all_data[-1]['/camera2/depth/points'])
+						if CAMERA_COUNT >= 2:
+							camera2_pts = self.pc2ToXYZRGB(self.all_data[-1]['/camera2/depth/points'])
+						else:
+							camera2_pts = camera1_pts
 						# self.showPointCloud(camera1_pts)
 						# self.showPointCloud(camera2_pts)
 						
 						try:
 							cv_image1 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera1/rgb/image_raw/compressed'], "bgr8")
-							cv_image2 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera2/rgb/image_raw/compressed'], "bgr8")
+							if CAMERA_COUNT >= 2:
+								cv_image2 = bridge.compressed_imgmsg_to_cv2(self.all_data[-1]['/camera2/rgb/image_raw/compressed'], "bgr8")
+							else:
+								cv_image2 = cv_image1
 						except CvBridgeError, e:
 							print e
 						# save point clouds
@@ -472,6 +482,13 @@ class BagReader(object):
 				if os.path.splitext(fname)[1] == '.bag': #only want bag files -- check for .orig.bag?
 					self.splitBag(os.path.join(root,fname))
 
+	def uploadFiles(self, upload_URL, data_folder):
+		#uploads using curl to the box website! -- super unsecure cuz i have to put my password here but meh
+		# can add a step so it takes it from a local file or something
+		proc = subprocess.call('', stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+		output, err = proc.communicate()
+		
+
 if __name__ == '__main__':
 	B = BagReader()
 	B.createEnv()
@@ -481,7 +498,9 @@ if __name__ == '__main__':
 	
 	# B.loadBagFile('/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43.bag')
 	# B.writeAllPosesToFile(dir_name = '/media/ammar/c23ffa28-e7a3-41e9-a56a-648972275a10/Collected Data/Trial 7/part1_3_2017-08-18-14-40-43')
-
-	B.saveSetofBagFiles('/media/kotharia/RGWdata/BagFiles/NRI Data Collection 2')
+# 
+	# B.saveSetofBagFiles('/media/kotharia/90fb6017-d43d-4bd7-812d-f2d1317f0a0a/BagFiles/CameraPosition2')
+	B.saveSetofBagFiles('/media/kotharia/90fb6017-d43d-4bd7-812d-f2d1317f0a0a/BagFiles/Collected data/CalibrationTest_1_11')
+	# B.saveSetofBagFiles('/home/kotharia/Documents/CameraPosition2')
 
 	B.closeBag()

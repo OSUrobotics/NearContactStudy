@@ -1,11 +1,13 @@
-from openravepy import *
+
 from Colors import ColorsDict, bcolors
 import numpy as np
 import sys, os, pdb, copy, subprocess, time
+pdb.set_trace()
+from openravepy import *
 from Colors import ColorsDict, bcolors
 from stlwriter import Binary_STL_Writer
 import platform
-print "\n\n" + platform.node() + "\n\n"
+print("\n\n" + platform.node() + "\n\n")
 if platform.node()[0:3] == 'reu': #lab computer
 	base_path = os.path.dirname(os.path.realpath(__file__))
 elif platform.node() == 'Sonny': #lab computer
@@ -43,7 +45,9 @@ class Vis(object): #General Class for visualization
        									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
        									[ 0.        ,  0.        ,  0.        ,  1.        ]])
 		if viewer:
+			pdb.set_trace()
 			self.env.SetViewer('qtcoin')
+			# self.env.SetViewer('qtosg')
 			self.viewer = self.env.GetViewer()
 			self.viewer.SetCamera(self.cameraTransform)
 			self.cameraFocusPoint = [0,0,0]
@@ -147,7 +151,6 @@ class Vis(object): #General Class for visualization
 		el, az, __ = camAA
 		dist = np.linalg.norm(cam_pos) * 100 # convert to cm
 		new_T2 = self.setCamera(dist, az, el)
-
 
 
 class GenVis(object): # General class for objects in visualization
@@ -657,6 +660,12 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 			writer.add_faces(faces_points)
 			writer.close()
 
+	def writeVerticestoFile(self, filename):
+		self.getSTLFeatures()
+		np.savetxt(filename, np.array(self.all_vertices))
+		print('List of Vertices saved to %s' %filename)
+
+
 	def generateSTL(self, save_filename):
 		self.getSTLFeatures()
 		self.writeSTL(save_filename)
@@ -698,10 +707,18 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		
 if __name__ == '__main__': #For testing classes (put code below and run in terminal)
 	V = Vis()
-	H = HandVis(V)
-	O = ObjectGenericVis(V)
-	H.loadHand()
-	O.loadObject('cube', 3, 3, 3)
+	# H = HandVis(V)
+	# H.loadHand()
+	# O = ObjectGenericVis(V)
+	# O.loadObject('cube', 3, 3, 3)
+	A = ArmVis(V)
+	A.loadArm()
+	# O = ObjectVis(V)
+	# O.loadObjectList()
+	# O.loadObject(2)
+
+	# A.writeVerticestoFile('test_vertices')
+
 	# G = AddGroundPlane(V)
 	# G.createGroundPlane(0)
 	# Gr = AddGroundPlane(V)
@@ -716,4 +733,11 @@ if __name__ == '__main__': #For testing classes (put code below and run in termi
 	# 	A.setJointAngles(JA)
 	# 	raw_input('Continue?')
 	pdb.set_trace()
+	from openravepy import interfaces
+	basemanip = interfaces.BaseManipulation(A.obj)
+
+	T = np.array([[np.cos(0.1), np.sin(0.1), 0, 0.1], [np.sin(0.1), np.cos(0.1), 0, 0.1], [0, 0, 0, 0], [0, 0, 0, 1]])
+	basemanip.MoveToHandPosition(matrices = [T], execute = False, outputtrajobj = True)
+
+
 
