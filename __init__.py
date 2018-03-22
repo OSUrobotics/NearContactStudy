@@ -16,17 +16,19 @@ from NearContactStudy.NearContact20Survey.createShapesMatlab import ShapeSTLGene
 HAND_PARAM = 32.0 #maximum finger span
 PARAMETERIZE = True #general keyword to know if calculations and stuff should be done with paramaterized version or with absolute size
 
+
+# Visualization Stuff
 from NearContactStudy.InterpolateGrasps.Visualizers import Vis, GenVis, ObjectVis, ObjectGenericVis, HandVis, AddGroundPlane, ArmVis
 from NearContactStudy.InterpolateGrasps.Colors import ColorsDict, bcolors
-# from InterpolateGrasps.stl_generator import stl_generator
-# from InterpolateGrasps.stlwriter import ASCII_STL_Writer, Binary_STL_Writer
+from NearContactStudy.InterpolateGrasps.stlwriter import ASCII_STL_Writer, Binary_STL_Writer
 from NearContactStudy.InterpolateGrasps.obj_dict import grasp_obj_dict, obj_centroid_dict
+
+##### Extracting Data from Saurabh's Study #####
+from NearContactStudy.InterpolateGrasps.ParseGraspData import ParseGraspData
 
 
 ##### Qualtrics Data Processing #####
 from NearContactStudy.NearContact20Survey.QualtricsDataProcessing.KeyMapper import KeyMapper
-
-
 
 #### Qualtrics Data Processing ####
 from NearContactStudy.NearContact20Survey.QualtricsDataProcessing.buildPolytopeFromResponses import BuildPolytope, PolytopeParametric, PolytopeNonparametric
@@ -47,9 +49,14 @@ from NearContactStudy.ShapeImageGenerator.HandCenteredCSV import HandCenteredCSV
 from NearContactStudy.ShapeImageGenerator.ShapeImageGeneratorTest import ShapeImageGenerator
 from NearContactStudy.ShapeImageGenerator.ShapeImageManipulator import ShapeImageManipulator
 
+#### Generating Noisy Grasps ####
+from NearContactStudy.NoiseyMovements.noisy_finger_stl_gen import noiseJoints
+
+
+
 
 ##### General Helpful Constants #####
 JOINT_ANGLES_NAMES = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'Unknown', 'Unknown',
 					'FINGER1-ROTATION','FINGER1-BASE','FINGER1-TIP',
 					'FINGER2-ROTATION','FINGER2-BASE','FINGER2-TIP', 
-					'FINGER3-ROTATION','FINGER3-BASE','FINGER3-TIP']
+										'FINGER3-BASE','FINGER3-TIP']

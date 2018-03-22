@@ -2,24 +2,10 @@
 from Colors import ColorsDict, bcolors
 import numpy as np
 import sys, os, pdb, copy, subprocess, time
-pdb.set_trace()
 from openravepy import *
 from Colors import ColorsDict, bcolors
 from stlwriter import Binary_STL_Writer
-import platform
-print("\n\n" + platform.node() + "\n\n")
-if platform.node()[0:3] == 'reu': #lab computer
-	base_path = os.path.dirname(os.path.realpath(__file__))
-elif platform.node() == 'Sonny': #lab computer
-	base_path = rospkg.RosPack().get_path('valid_grasp_generator')
-	import retract_finger
-elif platform.node() == 'Desktop': #personal desktop Linux
-	base_path = os.path.dirname(os.path.realpath(__file__))
-	retract_fingers_path = os.path.expanduser('~/catkin_ws/src/valid_grasp_generator/src')
-	sys.path.append(retract_fingers_path)
-	import retract_finger
-else:
-	base_path = os.path.dirname(os.path.realpath(__file__))
+base_path = os.path.dirname(os.path.realpath(__file__))
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -45,7 +31,6 @@ class Vis(object): #General Class for visualization
        									[ 0.8789257 , -0.36163905,  0.3109772 , -0.17278717],
        									[ 0.        ,  0.        ,  0.        ,  1.        ]])
 		if viewer:
-			pdb.set_trace()
 			self.env.SetViewer('qtcoin')
 			# self.env.SetViewer('qtosg')
 			self.viewer = self.env.GetViewer()
@@ -192,6 +177,9 @@ class GenVis(object): # General class for objects in visualization
 		else:
 			print("Did not recognize Transform Type")
 
+	def getGlobalTransformation(self):
+		return self.obj.GetTransform()
+
 	def globalMove(self,T): # apply global Translation to object
 		T_new = self.TClass.TL2T(T)
 		self.obj.SetTransform(T_new)
@@ -278,6 +266,69 @@ class GenVis(object): # General class for objects in visualization
 
 	def remove(self):
 		self.vis.env.Remove(self.obj) # remove object from scene
+
+	#can all STL functions go into GenVis?
+	def getSTLFeatures(self):
+		links = self.obj.GetLinks()
+		all_vertices = []
+		all_faces = []
+		ind = 0
+		# I don't know what is happening here
+		for link in links:
+			vertices = link.GetCollisionData().vertices
+			faces = link.GetCollisionData().indices
+			if ind == 0:
+				faces = np.add(faces,ind)
+			else:
+				faces = np.add(faces,ind+1)
+			try:
+				ind = faces[-1][-1]
+			except:
+				pass
+		
+			#print "link: ", link, "\nStarting index for this link: ", len(all_vertices)
+			link_pose = poseFromMatrix(link.GetTransform())
+			transform_vertices = poseTransformPoints(link_pose, vertices)
+			all_vertices.extend(transform_vertices.tolist())
+			all_faces.extend(faces.tolist())
+		return all_faces, all_vertices
+
+	def writeSTL(self, save_filename, faces, vertices):
+		faces_points = []
+		for vec in faces:
+			faces_points.append([vertices[vec[0]],vertices[vec[1]],vertices[vec[2]]])
+
+		with open(save_filename,'wb') as fp:
+			writer = Binary_STL_Writer(fp)
+			writer.add_faces(faces_points)
+			writer.close()
+
+	def writeVerticestoFile(self, filename):
+		self.getSTLFeatures()
+		np.savetxt(filename, np.array(self.all_vertices))
+		print('List of Vertices saved to %s' %filename)
+
+	def generateSTL(self, save_filename):
+		f, v = self.getSTLFeatures()
+		self.writeSTL(save_filename, f, v)
+
+	def multiGenerateSTL(self, save_filename, add_objs):
+		# takes multiple objects and generates a single STL
+		# one of the objects is the object that it is being called from
+		add_objs.extend([self])
+		faces = []
+		vertices = []
+		for o in add_objs:
+			f, v = o.getSTLFeatures()
+			if len(faces) > 1:
+				# if there is nothing in it, just add
+				# else need to continue vertice counter from last value
+				max_ind = np.max(faces) + 1
+				f = f + max_ind
+			faces.extend(f)
+			vertices.extend(v)
+		self.writeSTL(save_filename, faces, vertices)
+
 
 class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
@@ -423,6 +474,10 @@ class HandVis(GenVis):
 		9: Finger3-Tip			|	0 < l < 0.837
 		'''
 
+	def getJointAngles(self):
+		# get the current joint angles
+		return self.obj.GetDOFValues()
+
 	def getPalmPoint(self, draw = False): # get the point that is in the center of the palm
 		palm_pose = poseFromMatrix(self.obj.GetTransform())
 		base_pt = numpy.array(palm_pose[4:])
@@ -486,36 +541,108 @@ class HandVis(GenVis):
 		contact_points, contact_links = retract_finger.retract_fingers(self.env, self.obj, Obj.obj)
 		return contact_points, contact_links
 
-	def addNoiseToGrasp(self, Obj, T_zero = None, Contact_JA = None, TL_n = 0.01, R_n = 0.1, JA_n = 0.1): # adds white noise to position, rotation, and location of grasp
-		# searches for grasp that has all three fingers in contact with object, otherwise grasp can be odd
-		in_contact = [False, False]
-		if Contact_JA is None:
-			Contact_JA = self.obj.GetDOFValues()
-		if T_zero is None:
-			T_zero = self.obj.GetTransform()
-		while not all(in_contact):
-			self.setJointAngles(Contact_JA)
-			# some type of noise operation.  probably more noise in orientation, ane less in position
-			noise_T = np.eye(4)
-			noise_T[:3,:3] = np.random.normal(loc = 0, scale = R_n, size = (3,3))
-			noise_T[:3,3] = np.random.normal(loc = 0, scale = TL_n, size = (3))
-			T_noise = T_zero + noise_T
-			noise_JA = np.random.normal(loc = 0, scale = JA_n, size = Contact_JA.shape)
-			JA_noise = Contact_JA + noise_JA
-			# move fingers into noise position and adjust fingers for valid grasp
-			self.setJointAngles(JA_noise)
-			self.obj.SetTransform(T_noise)
-			contact_points2, contact_links2 = self.retractFingers(Obj)
-			# check to make sure all fingers are in contact. not perfect, but makes certain a good grasp
-			in_contact = [any([True if link in x else False for x in contact_links2]) for link in ['finger_1', 'finger_2', 'finger_3']]
-			# in_contact = [any([True if link in x else False for x in contact_links2]) for link in contact_links1]
-		return T_noise, JA_noise
+	# def addNoiseToGrasp(self, Obj, T_zero = None, Contact_JA = None, TL_n = 0.01, R_n = 0.1, JA_n = 0.1): # adds white noise to position, rotation, and location of grasp
+	# 	# searches for grasp that has all three fingers in contact with object, otherwise grasp can be odd
+	# 	in_contact = [False, False]
+	# 	if Contact_JA is None:
+	# 		Contact_JA = self.obj.GetDOFValues()
+	# 	if T_zero is None:
+	# 		T_zero = self.obj.GetTransform()
+	# 	while not all(in_contact):
+	# 		self.setJointAngles(Contact_JA)
+	# 		# some type of noise operation.  probably more noise in orientation, ane less in position
+	# 		noise_T = np.eye(4)
+	# 		noise_T[:3,:3] = np.random.normal(loc = 0, scale = R_n, size = (3,3))
+	# 		noise_T[:3,3] = np.random.normal(loc = 0, scale = TL_n, size = (3))
+	# 		T_noise = T_zero + noise_T
+	# 		noise_JA = np.random.normal(loc = 0, scale = JA_n, size = Contact_JA.shape)
+	# 		JA_noise = Contact_JA + noise_JA
+	# 		# move fingers into noise position and adjust fingers for valid grasp
+	# 		self.setJointAngles(JA_noise)
+	# 		self.obj.SetTransform(T_noise)
+	# 		contact_points2, contact_links2 = self.retractFingers(Obj)
+	# 		# check to make sure all fingers are in contact. not perfect, but makes certain a good grasp
+	# 		in_contact = [any([True if link in x else False for x in contact_links2]) for link in ['finger_1', 'finger_2', 'finger_3']]
+	# 		# in_contact = [any([True if link in x else False for x in contact_links2]) for link in contact_links1]
+	# 	return T_noise, JA_noise
+
+	def addNoiseToGrasp(self, noise):
+		# add noise to the joint angles of the grasp
+		# get random length array
+		# ensure it is within bounds -- clamp if it is not
+		noisy_grasp = self.getJointAngles() + noise*np.random.randn(len(self.getJointAngles()))
+		(lower, upper) = self.obj.GetDOFLimits()
+		noisy_grasp = np.clip(noisy_grasp, lower, upper)
+		return noisy_grasp
 
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
+
+	def closeFingersToContact(self):
+		# keep closing the fingers until contact occurs with the object
+		# NO dynamic simulation of object (caused by contact or gravity)
+		# i have not tried it with a small object that is only touched by proximal objects
+		JA_d = 1e-3
+		start_JA = self.getJointAngles()
+		current_JA = copy.deepcopy(start_JA)
+		contact_flag = False
+		finger_count = 3
+		prox_JA_indx = [3, 6, 8]
+		dist_JA_indx = [4, 7, 9]
+		while not contact_flag:
+			JA_add = np.zeros(10)
+			contacts = self.getContact(verbose=False)
+			contact_proximal_flag = [False] * finger_count
+			contact_distal_flag = [False] * finger_count
+			if len(contacts) > 0:
+				# something in contact
+				# check for proximal and distal for each finger
+				# set parts that are in contact to True
+				# pdb.set_trace()
+				for k,v in contacts.iteritems():
+					for l,d in (('dist',contact_distal_flag), ('prox',contact_proximal_flag)):
+						if l in k:
+							for i in range(finger_count):
+								if str(i+1) in k:
+									d[i] = True
+
+			for fing in range(finger_count):
+				# if the distal link is in contact
+				# then stop moving the proximal
+				if contact_distal_flag[fing]:
+					contact_proximal_flag[fing] = contact_distal_flag[fing]
+
+				# if proximal link is not in contact and distal link is not in contact
+				# then move proximal only
+				elif not contact_proximal_flag[fing] and not contact_distal_flag[fing]:
+					contact_proximal_flag[fing] = False
+					contact_distal_flag[fing] = True
+
+				# if poximal link is in contact and distal link is not in contact
+				# then move distal only
+				# -- this should already be taken care of by contact
+				elif contact_proximal_flag[fing] and not contact_distal_flag[fing]:
+					contact_distal_flag[fing] = False
+
+			# add to proximal joints based on which ones are not in contact
+			for cf, idx in zip(contact_proximal_flag, prox_JA_indx):
+				if not cf:
+					JA_add[idx] = 1
+			for cf, idx in zip(contact_distal_flag, dist_JA_indx):
+				if not cf:
+					JA_add[idx] = 1
+			JA_add *= JA_d
+
+			if all(JA_add == 0):
+				# stop closing fingers if nothing is moving
+				contact_flag = True
+				continue
+			current_JA = current_JA + JA_add
+			self.setJointAngles(current_JA)
+		return self.getJointAngles()
 	
-	def getContact(self, body=None):
+	def getContact(self, body=None, verbose=True):
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)
 		report = CollisionReport()
 		contact = {}
@@ -525,7 +652,7 @@ class HandVis(GenVis):
 			else:
 				collision = self.env.CheckCollision(link, body, report=report)
 			if len(report.contacts) > 0:
-				print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
+				if verbose: print 'link %s %d contacts'%(link.GetName(),len(report.contacts))
 				contact[link.GetName()] = report.contacts
 		return contact
 
@@ -670,8 +797,6 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		self.getSTLFeatures()
 		self.writeSTL(save_filename)
 
-
-
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):
 		self.i = 1
@@ -702,8 +827,6 @@ class Transforms(object): #class for holding all transform operations -- this ma
 		T = self.R2T(R)
 		T = self.AddTranslation(Tl, T)
 		return T
-
-		
 		
 if __name__ == '__main__': #For testing classes (put code below and run in terminal)
 	V = Vis()

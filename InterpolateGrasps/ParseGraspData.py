@@ -3,47 +3,51 @@ import pdb
 import numpy as np
 import platform
 import os
+import pyquaternion
+base_path = os.path.dirname(os.path.realpath(__file__))
+
 
 class ParseGraspData(object):
-
+	# Parse all the data from Saurabh's study
+	# I am not really sure what it is
 
 	def __init__(self):
 		self.val_grasp_file = list()
 		self.val_grasp_data = list()
 		self.all_transforms = list()
 		self.output_data = list()
-		if platform.node() == 'Sonny':
-			self.fn_root = '/home/sonny/Desktop/'
-		if platform.node() == 'Desktop':
-			self.fn_root = os.path.dirname(os.path.realpath(__file__)) + '/'
-		else:
-			self.fn_root = 'C:\Users\KothariAmmar\Documents\Grasping Lab\Interpolate Grasps\\'
-		self.fn_grasp_file = self.fn_root + 'all_grasp_file.csv'
-		self.fn_grasp_data = self.fn_root + 'all_grasp_data.csv'
+		self.fn_root = base_path
+		self.fn_grasp_file = os.path.join(self.fn_root, 'PreviousStudyData', 'all_grasp_file.csv')
+		self.fn_grasp_data = os.path.join(self.fn_root, 'PreviousStudyData', 'all_grasp_data.csv')
 		# self.parseAllTransforms()
 
-
 	def parseGraspFile(self):
+		# i have no idea what this is loading
 		with open(self.fn_grasp_file, 'rb') as csv_file:
 			reader = csv.reader(csv_file, delimiter = ',')
 			for row in reader:
 				self.val_grasp_file.append(np.array(row).astype('float'))
-
 			self.val_grasp_file = np.array(self.val_grasp_file)
 
 	def parseGraspData(self):
+		# goes through all the files and extracts the pertinent information
+		# currently, it is saved in a series of csv files which is fine i guess
+		# i am not sure what is different about this collected file and the individual files in the folder
+		self.val_grasp_data = []
 		with open(self.fn_grasp_data, 'rb') as csv_file:
 			reader = csv.reader(csv_file, delimiter = ',')
 			for row in reader:
 				val_grasp_data = dict()
-				val_grasp_data['obj'] = row[0] #TODO: fix this so that it is an int
-				val_grasp_data['sub'] = row[1] #TODO: fix this so that it is an int
-				val_grasp_data['grasp'] = row[2] #TODO: fix this so that it is an int
+				val_grasp_data['obj'] = int(row[0].strip('obj'))
+				val_grasp_data['sub'] = int(row[1].strip('sub'))
+				val_grasp_data['grasp'] = int(row[2].strip('grasp'))
 				val_grasp_data['type'] = row[3]
-				val_grasp_data['HandRotation'] = self.text2Array(row[4]) #TODO: make these into single transform
+				val_grasp_data['HandRotation'] = self.text2Array(row[4])
 				val_grasp_data['HandPosition'] = self.text2Array(row[5])
-				val_grasp_data['ObjPosition'] = self.text2Array(row[7]) #TODO: make these into single transform
+				val_grasp_data['HandTransformation'] = self.combineTransRot(val_grasp_data['HandRotation'], val_grasp_data['HandPosition'])
+				val_grasp_data['ObjPosition'] = self.text2Array(row[7])
 				val_grasp_data['ObjRotation'] = self.text2Array(row[8])
+				val_grasp_data['ObjTransformation'] = self.combineTransRot(val_grasp_data['ObjRotation'], val_grasp_data['ObjPosition'])
 
 				try:
 					val_grasp_data['array3'] = self.text2BigArray(row[6])
@@ -53,6 +57,15 @@ class ParseGraspData(object):
 					print(val_grasp_data)
 
 				self.val_grasp_data.append(val_grasp_data)
+
+	def combineTransRot(self, Q, Trans):
+		#combines quaternion and translation vectors into a transformation matrix
+		T = np.eye(4)
+		q = pyquaternion.Quaternion(Q)
+
+		T[:3,:3] = q.rotation_matrix
+		T[:3, 3] = Trans
+		return T
 
 	def text2Array(self, s):
 		out = s.strip('[]') # remove brackets
@@ -115,6 +128,10 @@ class ParseGraspData(object):
 		return out_dict
 
 	def parseAllTransforms(self):
+		# searches through folder for files
+		# extracts data from files and puts them into an array
+
+
 		#load from file if it exists
 		# save_file = self.fn_root + 'all_transforms_dict.csv'
 		# if os.path.isfile(save_file):
@@ -130,57 +147,64 @@ class ParseGraspData(object):
 		# 	return
 
 		# get file names
-		all_transforms_path = self.fn_root + 'all_obj_transformation/'
+		all_transforms_path = os.path.join(self.fn_root, 'PreviousStudyData', 'all_obj_transformation')
 		FolderList = os.listdir(all_transforms_path)
 		FilesList = list()
 		for Folder in FolderList:
 			subfiles = os.listdir(all_transforms_path + '/' + Folder)
 			if len(subfiles) > 1:
 				for subf in subfiles:
-					FilesList.append(all_transforms_path + Folder + '/' + subf)
-
+					FilesList.append(os.path.join(all_transforms_path,Folder,subf))
+		
 		#load files into dictionary
 		all_transforms_list = list()
 		for f in FilesList:
 			T_dict = dict()
-			parts = f.split('/')[-1].split('_')
-			obj = int(parts[0].strip('obj'))
-			sub = int(parts[1].strip('sub'))
-			graspnum = int(parts[2].strip('grasp'))
-			grasptype = parts[3]
+			obj, sub, graspnum, grasptype = self.getInfoFromFN(f)
 			# check if grasp is already in list
 			T_dict['obj'] = obj
 			T_dict['sub'] = sub
 			T_dict['grasp'] = graspnum
 			T_dict['type'] = grasptype
 
-			count_list = self.findDictInList(T_dict, all_transforms_list)
-			if count_list == -1:
+			idx_pre = self.findDictInList(T_dict, all_transforms_list)
+			if idx_pre == -1:
 				all_transforms_list.append(T_dict)
 
-			count = self.findDictInList(T_dict, all_transforms_list)
+			idx = self.findDictInList(T_dict, all_transforms_list)
 			try:
-				key_name = parts[4].strip('.txt')
-				if key_name in all_transforms_list[count].keys():
+				key_name = os.path.split(f)[-1].split('_')[-1].strip('.txt')
+				if key_name in all_transforms_list[idx].keys():
 					print("Overwriting Data")
 				if key_name == 'ContactLinkNames':
 					with open(f, 'rb') as fc:
 						lines = fc.readlines()
-						all_transforms_list[count][key_name] = [t.strip('\n') for t in lines]
+						all_transforms_list[idx][key_name] = [t.strip('\n') for t in lines]
 				else:
-					all_transforms_list[count][key_name] = np.genfromtxt(f, delimiter = ',')
+					all_transforms_list[idx][key_name] = np.genfromtxt(f, delimiter = ',')
 			except:
 				print("Skipping File")
 		self.all_transforms = all_transforms_list
 
+	def getInfoFromFN(self, fn):
+		# seperates out the parts of the file name that can be used for identification
+		parts = os.path.split(fn)[-1].split('_')
+		obj = int(parts[0].strip('obj'))
+		sub = int(parts[1].strip('sub'))
+		graspnum = int(parts[2].strip('grasp'))
+		grasptype = parts[3]
+		return obj, sub, graspnum, grasptype
+
 	def findDictInList(self, T_dict, T_list):
-		count = 0
-		for dict_list in T_list:
+		# searches dictionary for an entry
+		# returns -1 if nothing found
+		# returns index if something found
+		idx = -1
+		for i,dict_list in enumerate(T_list):
 			matchFunc = lambda e, x = dict_list, y = T_dict: x[e] == y[e]
 			match_array = map(matchFunc, T_dict.keys())
 			if all(match_array):
-				return count
-			count += 1
+				return i
 		return -1 #failed to match anything
 
 	def matricesFromGrasp(self, grasp): # Description: helper function to get individual arrays from dictionary
