@@ -3,6 +3,7 @@ from NearContactStudy import Vis,HandVis,ObjectVis
 from NearContactStudy import ParseGraspData
 # from NearContactStudy import noiseJoints
 import numpy as np
+import os
 
 
 #################
@@ -35,8 +36,8 @@ class noiseJoints:
 		self.grasp_data.parseAllTransforms()
 
 
-	def noisyGrasp_single(self, noise):
-		grasp_noisy = self.H.addNoiseToGrasp(noise)
+	def noisyGrasp_single(self, noise, percent=False):
+		grasp_noisy = self.H.addNoiseToGrasp(noise, percent)
 		self.H.setJointAngles(grasp_noisy)
 		return grasp_noisy
 
@@ -59,13 +60,21 @@ class noiseJoints:
 		self.H.globalTransformation(HandT_0)
 		self.O.globalTransformation(ObjT_0)
 
-	def N_noisyGrasp(self, noise, N):
-		start_T = self.H.getGlobalTransformation()
+	def N_noisyGrasp(self, noise, N, folder=None, percent=False):
+		start_JA = self.H.getJointAngles()
+		fn = 'noise_grasp%s.stl'
+		if folder is not None:
+			fn = os.path.join(folder, fn)
+			try:
+				os.makedirs(folder)
+			except:
+				print('Folder %s already exists' %folder)
+				pass
 		for i in range(N):
-			self.noisyGrasp_single(noise)
-			self.generateSTL('noise_grasp%s.stl' %i )
-			pdb.set_trace()
-			self.H.globalTransformation(start_T)
+			self.noisyGrasp_single(noise, percent=percent)
+			self.generateSTL(fn %i )
+			self.H.setJointAngles(start_JA)
+			print('File %s Created' %(fn %i))
 
 
 

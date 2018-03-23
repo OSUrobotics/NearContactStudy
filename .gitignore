@@ -7,3 +7,5 @@
 *.goutputstream*
 *.~
 *.bag
+/NoiseyMovements/*.stl
+/NoiseyMovements/*PercentNoise

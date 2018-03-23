@@ -565,11 +565,17 @@ class HandVis(GenVis):
 	# 		# in_contact = [any([True if link in x else False for x in contact_links2]) for link in contact_links1]
 	# 	return T_noise, JA_noise
 
-	def addNoiseToGrasp(self, noise):
+	def addNoiseToGrasp(self, noise, percent=False):
 		# add noise to the joint angles of the grasp
 		# get random length array
 		# ensure it is within bounds -- clamp if it is not
-		noisy_grasp = self.getJointAngles() + noise*np.random.randn(len(self.getJointAngles()))
+		# percent True means to add noise that is a percentage of the total travel range
+		if percent:
+			(lower, upper) = self.obj.GetDOFLimits()
+			noise_JA = noise/100.0*(upper-lower)*np.random.randn(len(self.getJointAngles()))
+		else:
+			noise_JA = noise*np.random.randn(len(self.getJointAngles()))
+		noisy_grasp = self.getJointAngles() + noise_JA
 		noisy_grasp = self.limitJAToLimits(noisy_grasp)
 		return noisy_grasp
 
