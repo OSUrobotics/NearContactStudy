@@ -503,7 +503,6 @@ class HandVis(GenVis):
 		palm_approach_rel = [0,0,1]
 		palm_approach_global = poseTransformPoints(poseFromMatrix(self.obj.GetTransform()), [palm_approach_rel])[0]
 
-
 	def orientHandtoObj(self, T_H, T_O, Obj): # based on hand transform and object transform, can orient hand to object -- for previous study
 		HandtoObject = np.dot(np.linalg.inv(T_O), T_H)
 		self.obj.SetTransform(HandtoObject)
@@ -571,37 +570,43 @@ class HandVis(GenVis):
 		# get random length array
 		# ensure it is within bounds -- clamp if it is not
 		noisy_grasp = self.getJointAngles() + noise*np.random.randn(len(self.getJointAngles()))
-		(lower, upper) = self.obj.GetDOFLimits()
-		noisy_grasp = np.clip(noisy_grasp, lower, upper)
+		noisy_grasp = self.limitJAToLimits(noisy_grasp)
 		return noisy_grasp
+
+	def limitJAToLimits(self, JA):
+		(lower, upper) = self.obj.GetDOFLimits()
+		JA_clamp = np.clip(JA, lower, upper)
+		return JA_clamp
 
 	def makeEqual(self, HandObj): # make this object have same shape and transform as another hand object
 		self.obj.SetTransform(HandObj.obj.GetTransform())
 		self.obj.SetDOFValues(HandObj.obj.GetDOFValues())
 
 	def closeFingersToContact(self):
+		# TODO: add a check for when the joint limits have been reached
 		# keep closing the fingers until contact occurs with the object
 		# NO dynamic simulation of object (caused by contact or gravity)
-		# i have not tried it with a small object that is only touched by proximal objects
+		# i have not tried it with a small object that is only touched by medial objects
 		JA_d = 1e-3
 		start_JA = self.getJointAngles()
 		current_JA = copy.deepcopy(start_JA)
 		contact_flag = False
 		finger_count = 3
-		prox_JA_indx = [3, 6, 8]
-		dist_JA_indx = [4, 7, 9]
+		med_JA_idx = [3, 6, 8]
+		dist_JA_idx = [4, 7, 9]
+		iter_count = 0
 		while not contact_flag:
 			JA_add = np.zeros(10)
 			contacts = self.getContact(verbose=False)
-			contact_proximal_flag = [False] * finger_count
+			contact_medial_flag = [False] * finger_count
 			contact_distal_flag = [False] * finger_count
 			if len(contacts) > 0:
 				# something in contact
-				# check for proximal and distal for each finger
+				# check for medial and distal for each finger
 				# set parts that are in contact to True
 				# pdb.set_trace()
 				for k,v in contacts.iteritems():
-					for l,d in (('dist',contact_distal_flag), ('prox',contact_proximal_flag)):
+					for l,d in (('dist',contact_distal_flag), ('med',contact_medial_flag)):
 						if l in k:
 							for i in range(finger_count):
 								if str(i+1) in k:
@@ -609,27 +614,27 @@ class HandVis(GenVis):
 
 			for fing in range(finger_count):
 				# if the distal link is in contact
-				# then stop moving the proximal
+				# then stop moving the medial
 				if contact_distal_flag[fing]:
-					contact_proximal_flag[fing] = contact_distal_flag[fing]
+					contact_medial_flag[fing] = contact_distal_flag[fing]
 
-				# if proximal link is not in contact and distal link is not in contact
-				# then move proximal only
-				elif not contact_proximal_flag[fing] and not contact_distal_flag[fing]:
-					contact_proximal_flag[fing] = False
+				# if medial link is not in contact and distal link is not in contact
+				# then move medial only
+				elif not contact_medial_flag[fing] and not contact_distal_flag[fing]:
+					contact_medial_flag[fing] = False
 					contact_distal_flag[fing] = True
 
 				# if poximal link is in contact and distal link is not in contact
 				# then move distal only
 				# -- this should already be taken care of by contact
-				elif contact_proximal_flag[fing] and not contact_distal_flag[fing]:
+				elif contact_medial_flag[fing] and not contact_distal_flag[fing]:
 					contact_distal_flag[fing] = False
 
-			# add to proximal joints based on which ones are not in contact
-			for cf, idx in zip(contact_proximal_flag, prox_JA_indx):
+			# add to medial joints based on which ones are not in contact
+			for cf, idx in zip(contact_medial_flag, med_JA_idx):
 				if not cf:
 					JA_add[idx] = 1
-			for cf, idx in zip(contact_distal_flag, dist_JA_indx):
+			for cf, idx in zip(contact_distal_flag, dist_JA_idx):
 				if not cf:
 					JA_add[idx] = 1
 			JA_add *= JA_d
@@ -639,8 +644,107 @@ class HandVis(GenVis):
 				contact_flag = True
 				continue
 			current_JA = current_JA + JA_add
-			self.setJointAngles(current_JA)
+			self.setJointAngles(self.limitJAToLimits(current_JA))
+			iter_count += 1
+			if iter_count > 2e3: # crude solution to understanding when JA limits exceeded
+				print('No Solution found')
+				break
 		return self.getJointAngles()
+
+	def moveInPalmNormalDirection(self, vec):
+		# given a movement vector, it will return a transformation matrix to move it in that direction
+		T = self.getGlobalTransformation()
+		T[:3, 3] += vec
+		return T
+
+	def moveToMakeValidGrasp(self):
+		# from the current configuration
+		# 1) move the palm out of contact with the object by moving along palm normal
+		# 2) move the fingers out of contact by opening medial and distal links
+		
+		step_d = -0.01 # I don't know how to determine if it is in the correct direction
+		finger_count = 3
+		med_JA_idx = [3, 6, 8]
+		dist_JA_idx = [4, 7, 9]
+		start_JA = self.getJointAngles()
+		current_JA = copy.deepcopy(start_JA)
+		palm_normal_dir = self.getPalmOffset()
+		# palm in contact
+		contacts = self.getContact(verbose=False)
+		palm_contact = any(['palm' in k for k in contacts.keys()])
+		while palm_contact: #may want to add distal links to this set? or create a seperate section for distal
+			# move in normal direction by step_d
+			handT_new = self.moveInPalmNormalDirection(palm_normal_dir * step_d)
+			self.globalTransformation(handT_new)
+			contacts = self.getContact(verbose=False)
+			palm_contact = any(['palm' in k for k in contacts.keys()])
+				
+		# open fingers until medial not in contact		
+		contacts = self.getContact(verbose=False)
+		medial_contact = any(['med' in k for k in contacts.keys()])
+		while medial_contact:
+			JA_add = np.zeros(10)
+			contact_medial_flag = [False] * finger_count # assume they are not in contact
+			# check if the medial sections are in contact
+			for i in range(finger_count):
+				for k,v in contacts.iteritems():
+					for l,d in [('med',contact_medial_flag)]:
+						if l in k:
+							for i in range(finger_count):
+								if str(i+1) in k:
+									d[i] = True
+			
+			# move medial sections based on contact -- could move distal sections are ratio here
+			for i in range(finger_count):
+				if contact_medial_flag[i]:
+					JA_add[med_JA_idx[i]] += step_d
+			current_JA = current_JA + JA_add
+			# check JA to make sure limit is not reached
+			if any(self.limitJAToLimits(current_JA)[med_JA_idx] != current_JA[med_JA_idx]):
+				print('Cannot move medial joints to non contact location')
+				break
+			self.setJointAngles(self.limitJAToLimits(current_JA))
+
+			# check contact status
+			contacts = self.getContact(verbose=False)
+			medial_contact = any(['med' in k for k in contacts.keys()])
+
+		# open fingers until distal not in contact		
+		contacts = self.getContact(verbose=False)
+		distal_contact = any(['dist' in k for k in contacts.keys()])
+		while distal_contact:
+			JA_add = np.zeros(10)
+			contact_distal_flag = [False] * finger_count
+			# check if the distal sections are in contact
+			for i in range(finger_count):
+				for k,v in contacts.iteritems():
+					for l,d in [('dist',contact_distal_flag)]:
+						if l in k:
+							for i in range(finger_count):
+								if str(i+1) in k:
+									d[i] = True
+			# move distal sections based on contact
+			for i in range(finger_count):
+				if contact_distal_flag[i]:
+					JA_add[dist_JA_idx[i]] += step_d
+			current_JA = current_JA + JA_add
+			# check JA to make sure limit is not reached
+			## the much more complicated version ##
+			# dist_move_idx = JA_add[dist_JA_idx] != 0
+			# if any((self.limitJAToLimits(current_JA)[dist_JA_idx] != current_JA[dist_JA_idx]) + dist_move_idx):
+			## 
+			if any(self.limitJAToLimits(current_JA)[dist_JA_idx] != current_JA[dist_JA_idx]):
+				print('Cannot move distal joints to non contact location')
+				break
+			self.setJointAngles(self.limitJAToLimits(current_JA))
+
+			# check contact status
+			contacts = self.getContact(verbose=False)
+			distal_contact = any(['dist' in k for k in contacts.keys()])
+
+
+		# last step is to close the fingers to contact
+		self.closeFingersToContact()
 	
 	def getContact(self, body=None, verbose=True):
 		self.env.GetCollisionChecker().SetCollisionOptions(CollisionOptions.Contacts)

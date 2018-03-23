@@ -1,6 +1,7 @@
 import pdb
 from NearContactStudy import Vis,HandVis,ObjectVis
 from NearContactStudy import ParseGraspData
+# from NearContactStudy import noiseJoints
 import numpy as np
 
 
@@ -37,6 +38,7 @@ class noiseJoints:
 	def noisyGrasp_single(self, noise):
 		grasp_noisy = self.H.addNoiseToGrasp(noise)
 		self.H.setJointAngles(grasp_noisy)
+		return grasp_noisy
 
 	def generateSTL(self, fn):
 		self.H.multiGenerateSTL(fn, [self.O])
@@ -45,12 +47,27 @@ class noiseJoints:
 		self.O.loadObject(objNum)
 		grasp_list = self.grasp_data.findGrasp(objnum=objNum, list2check=self.grasp_data.all_transforms)
 		for grasp in grasp_list:
-			HandT, ObjT, Arm_JA, Hand_JA = self.grasp_data.matricesFromGrasp(grasp)
-			self.H.setJointAngles(Hand_JA)
-			self.H.globalTransformation(HandT)
-			self.O.globalTransformation(ObjT)
+			self.showGrasp(grasp)
 			raw_input("Obj: %s, Sub: %s, Grasp: %s, Type: %s, Press Enter to continue..."
 						%(grasp['obj'], grasp['sub'], grasp['grasp'], grasp['type']))
+
+	def showGrasp(self, grasp):
+		HandT, ObjT, Arm_JA, Hand_JA = self.grasp_data.matricesFromGrasp(grasp)
+		ObjT_0 = np.matmul(np.linalg.inv(ObjT), ObjT) # move to 0
+		HandT_0 = np.matmul(np.linalg.inv(ObjT), HandT) # adjust hand position accordingly
+		self.H.setJointAngles(Hand_JA)
+		self.H.globalTransformation(HandT_0)
+		self.O.globalTransformation(ObjT_0)
+
+	def N_noisyGrasp(self, noise, N):
+		start_T = self.H.getGlobalTransformation()
+		for i in range(N):
+			self.noisyGrasp_single(noise)
+			self.generateSTL('noise_grasp%s.stl' %i )
+			pdb.set_trace()
+			self.H.globalTransformation(start_T)
+
+
 
 
 
@@ -68,10 +85,20 @@ if __name__ == '__main__':
 	H.loadHand()
 	O = ObjectVis(V)
 	O.loadObject(2) # SprayBottle
-	pdb.set_trace()
-	H.setJointAngles(H_spray_JA)
-	H.globalTransformation(H_spray_T)
-	H.closeFingersToContact()
+	# H.setJointAngles(H_spray_JA)
+	# H.globalTransformation(H_spray_T)
+	# H.closeFingersToContact()
 	NJ = noiseJoints(H, O)
+	# NJ.showAllGraspsForObject(2)
+	grasp = NJ.grasp_data.findGrasp(objnum=2, subnum=4, graspnum=6, grasptype='optimal0', list2check=NJ.grasp_data.all_transforms)[0]
+	NJ.showGrasp(grasp)
+	H.moveToMakeValidGrasp()
+	NJ.N_noisyGrasp(1e-4, 10)
 	NJ.noisyGrasp_single(1e-4)
 	NJ.generateSTL('noise_grasp.stl')
+
+
+	# grab bottle from squarish part with palm on narrower side
+	# Obj: 2, Sub: 4, Grasp: 6, Type: optimal0
+	# Obj: 2, Sub: 4, Grasp: 6, Type: extreme0
+	# Obj: 2, Sub: 6, Grasp: 3, Type: optimal0
