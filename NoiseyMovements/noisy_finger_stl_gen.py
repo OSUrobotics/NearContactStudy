@@ -70,14 +70,16 @@ class noiseJoints:
 			except:
 				print('Folder %s already exists' %folder)
 				pass
+		self.O.generateSTL(os.path.join(folder,'SprayBottle.stl'))
 		for i in range(N):
 			self.noisyGrasp_single(noise, percent=percent)
-			self.generateSTL(fn %i )
+			self.H.generateSTL(fn %i)
 			self.H.setJointAngles(start_JA)
 			print('File %s Created' %(fn %i))
 
-
-
+	def workshopPaper(self):
+		for i_p in np.arange(1,6):
+			self.N_noisyGrasp(i_p, 20, '%sPercentNoise' %i_p, True)
 
 
 

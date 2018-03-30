@@ -18,7 +18,7 @@ PARAMETERIZE = True #general keyword to know if calculations and stuff should be
 
 
 # Visualization Stuff
-from NearContactStudy.InterpolateGrasps.Visualizers import Vis, GenVis, ObjectVis, ObjectGenericVis, HandVis, AddGroundPlane, ArmVis
+from NearContactStudy.InterpolateGrasps.Visualizers import Vis, GenVis, ObjectVis, ObjectGenericVis, HandVis, AddGroundPlane, ArmVis, ArmVis_OR
 from NearContactStudy.InterpolateGrasps.Colors import ColorsDict, bcolors
 from NearContactStudy.InterpolateGrasps.stlwriter import ASCII_STL_Writer, Binary_STL_Writer
 from NearContactStudy.InterpolateGrasps.obj_dict import grasp_obj_dict, obj_centroid_dict
@@ -52,7 +52,8 @@ from NearContactStudy.ShapeImageGenerator.ShapeImageManipulator import ShapeImag
 #### Generating Noisy Grasps ####
 from NearContactStudy.NoiseyMovements.noisy_finger_stl_gen import noiseJoints
 
-
+#### Extracting Data from Bag Files
+from NearContactStudy.VideoProcessing.ObjectEstimation import BagReader
 
 
 ##### General Helpful Constants #####
@@ -60,3 +61,6 @@ JOINT_ANGLES_NAMES = ['J1', 'J2', 'J3', 'J4', 'J5', 'J6', 'J7', 'Unknown', 'Unkn
 					'FINGER1-ROTATION','FINGER1-BASE','FINGER1-TIP',
 					'FINGER2-ROTATION','FINGER2-BASE','FINGER2-TIP', 
 										'FINGER3-BASE','FINGER3-TIP']
+
+# indices of robot JA to build OpenRAVE JA
+ROBOT_TO_OR_MAPPING = [0, 1, 2, 3, 4, 5, 6, -1, -1, 10, 7, 11, 10, 8, 12, 9, 13]

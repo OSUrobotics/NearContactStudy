@@ -6,6 +6,7 @@ from openravepy import *
 from Colors import ColorsDict, bcolors
 from stlwriter import Binary_STL_Writer
 base_path = os.path.dirname(os.path.realpath(__file__))
+# from NearContactStudy import JOINT_ANGLES_NAMES
 
 '''
 Classes in this document are for working in OpenRave specific to the Barrett Hand and generated STL objects
@@ -798,12 +799,15 @@ class AddGroundPlane(object): #General class for adding a ground plane into the 
 				for geos in link.GetGeometries():
 					geos.SetDiffuseColor(color)
 
-		def createGroundPlane(self, y_height, x = 0.5, y = 0, z = 0.5): #Removes any existing ground plane (if any), then creates a ground plane.
+		def createGroundPlane(self, y_height, x = 0.5, y = 0, z = 0.5, x_pos = 0, z_pos = 0): #Removes any existing ground plane (if any), then creates a ground plane.
 			with self.vis.env:
 				self.removeGroundPlane()
 				self.groundPlane = RaveCreateKinBody(self.vis.env, '')
 				self.groundPlane.SetName('groundPlane')
-				self.groundPlane.InitFromBoxes(np.array([[0,y_height,0, x, y, z]]),True) # set geometry as one box
+				self.groundPlane.InitFromBoxes(np.array([[x_pos,y_height,z_pos, x, y, z]]),True) # set geometry as one box
+				T = np.eye(4)
+				T[:3,3] = [x_pos, y_height, z_pos]
+				self.groundPlane.SetTransform(T)
 				self.vis.env.AddKinBody(self.groundPlane)
 				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetDiffuseColor([0,0,0])
 				self.groundPlane.GetLinks()[0].GetGeometries()[0].SetAmbientColor([3,3,3])
@@ -821,15 +825,19 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 	def __init__(self, V):
 		super(ArmVis, self).__init__(V)
 		self.stl_path = base_path + "/models/robots/"
+		self.base_offset = np.array([[-0.06,  1.  ,  0.  ,  0.  ],
+									[-1.  , -0.06, -0.  , -0.  ],
+									[-0.  , -0.  ,  1.  , -1.  ],
+									[ 0.  ,  0.  ,  0.  ,  1.  ]])
 
 	def loadArm(self): # load arm from file
 		self.robotFN = self.stl_path + 'barrett_wam.dae'
 		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
-		# self.robotFN = '/home/ammar/Documents/SourceSoftware/openrave/src/robots/barrettwam.robot.xml'
 		self.obj = self.vis.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
 		self.TClass = Transforms(self.obj)
+		self.globalTransformation(self.base_offset)
 
 	def getJointAngles(self):
 		return self.obj.GetDOFValues()
@@ -858,7 +866,32 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		16: Finger3-Base			|	0 < l < 2.44
 		17: Finger3-Tip				|	0 < l < 0.837
 		'''
-		self.obj.SetDOFValues(jointAngles)
+		# self.obj.SetDOFValues(joinAngles)
+		self.obj.SetActiveDOFValues(jointAngles)
+
+	def testJointIndicies(self):
+		#cycles through joint indices to help identify which numbers correspond to which joint
+		pdb.set_trace()
+		JA_start = self.getJointAngles()
+		JA = np.zeros(self.obj.GetActiveDOF())
+		minval, maxval = self.obj.GetDOFLimits()
+		for i in range(self.obj.GetActiveDOF()):
+			print("Changing Joint %s -- %s" %(i, JOINT_ANGLES_NAMES[i]))
+			for theta in np.linspace(minval[i], maxval[i], 10):
+				JA[i] = theta
+				self.setJointAngles(JA)
+				time.sleep(0.2)
+			JA[i] = 0
+		self.setJointAngles(JA_start)
+
+
+	def convertRobot2OpenRAVE(self, JA_robot):
+		# converts the angles output by the robot to the right length for OpenRAVE
+		# rearrange and insert some zeros so that it aligns with openrave system
+		# idx 7,8 are unknown and 9,12 should be the same because they are rotation of the fingers around base
+		# for the hand, robot outputs all the proximal links, spread, all distal links
+		JA_openrave = np.concatenate((JA_robot[0:7], [0,0], JA_robot[[10, 7, 11, 10, 8, 12, 9, 13]]), 0)
+		return JA_openrave
 
 	#can all STL functions go into GenVis?
 	def getSTLFeatures(self):
@@ -902,10 +935,74 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		np.savetxt(filename, np.array(self.all_vertices))
 		print('List of Vertices saved to %s' %filename)
 
-
 	def generateSTL(self, save_filename):
 		self.getSTLFeatures()
 		self.writeSTL(save_filename)
+
+class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like the real robot
+	# it also is set up to work with things like IK
+	def __init__(self, V):
+		super(ArmVis, self).__init__(V)
+		self.stl_path = base_path + "/models/robots/"
+		self.other_robots = []
+
+
+	def loadArm(self): # load arm from file
+		self.robotFN = '/home/ammar/git/openrave/src/robots/barrettwam.robot.xml'
+		self.obj = self.env.ReadRobotXMLFile(self.robotFN)
+		self.obj = self.vis.env.ReadRobotXMLFile(self.robotFN)
+		self.env.Add(self.obj, True)
+		self.obj.SetVisible(1)
+		self.TClass = Transforms(self.obj)
+
+	def loadIK(self):
+		#loads the ik plugin
+		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(self.obj, iktype=IkParameterization.Type.Transform6D)
+		if not self.ikmodel.load():
+			self.ikmodel.autogenerate()
+
+	def randomCollisionFreeConfig(self):
+		lower,upper = [v[self.ikmodel.manip.GetArmIndices()] for v in self.ikmodel.robot.GetDOFLimits()]
+		self.obj.SetDOFValues(np.random.rand()*(upper-lower)+lower,self.ikmodel.manip.GetArmIndices()) # set random values
+		if self.obj.CheckSelfCollision():
+			print('Collision!')
+			time.sleep(1)
+			self.randomCollisionFreeConfig()
+
+	def IKSolutions(self):
+		#computes all the solutions for the current configuration
+		solutions = self.ikmodel.manip.FindIKSolutions(self.ikmodel.manip.GetTransform(),True)
+		return solutions
+
+	def dispIKSolutions(self, sols):
+		# displays them as transparent arms
+		transparency = 0.8
+		for sol in sols:
+			newrobot = RaveCreateRobot(self.vis.env,self.obj.GetXMLId())
+			newrobot.Clone(self.obj,0)
+			for link in newrobot.GetLinks():
+				for geom in link.GetGeometries():
+					geom.SetTransparency(transparency)
+			self.vis.env.Add(newrobot,True)
+			newrobot.SetTransform(self.obj.GetTransform())
+			newrobot.SetDOFValues(sol,self.ikmodel.manip.GetArmIndices())
+			self.other_robots.append(newrobot)
+
+	def removeAllIKSolutions(self):
+		# START HERE: DELETE ROBOTS!
+		for robot in self.other_robots:
+			pdb.set_trace()
+
+
+'''
+from NearContactStudy import Vis, ArmVis_OR
+V = Vis(); A = ArmVis_OR(V);
+A.loadArm()
+A.loadIK()
+A.randomCollisionFreeConfig()
+sols = A.IKSolutions()
+A.dispIKSolutions(sols[:10])
+'''
 
 class Transforms(object): #class for holding all transform operations -- this may be useless!
 	def __init__(self, link):

@@ -9,3 +9,4 @@
 *.bag
 /NoiseyMovements/*.stl
 /NoiseyMovements/*PercentNoise
+*.tar.gz
