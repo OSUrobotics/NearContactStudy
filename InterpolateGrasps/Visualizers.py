@@ -1,9 +1,9 @@
 
-from Colors import ColorsDict, bcolors
 import numpy as np
 import sys, os, pdb, copy, subprocess, time
 from openravepy import *
 from Colors import ColorsDict, bcolors
+from Utils import UtilTransforms
 from stlwriter import Binary_STL_Writer
 base_path = os.path.dirname(os.path.realpath(__file__))
 # from NearContactStudy import JOINT_ANGLES_NAMES
@@ -138,7 +138,6 @@ class Vis(object): #General Class for visualization
 		dist = np.linalg.norm(cam_pos) * 100 # convert to cm
 		new_T2 = self.setCamera(dist, az, el)
 
-
 class GenVis(object): # General class for objects in visualization
 	def __init__(self, V):
 		self.vis = V
@@ -182,7 +181,7 @@ class GenVis(object): # General class for objects in visualization
 		return self.obj.GetTransform()
 
 	def globalMove(self,T): # apply global Translation to object
-		T_new = self.TClass.TL2T(T)
+		T_new = UtilTransforms.TL2T(T)
 		self.obj.SetTransform(T_new)
 
 	def globalQuatMove(self, Q): # apply global Rotation from Quaternion
@@ -196,9 +195,9 @@ class GenVis(object): # General class for objects in visualization
 		self.QCheck(Q), Self.TLCheck(Translation)
 		RotationMatrix = matrixFromQuat(Q)
 		self.vis.drawPoints(Translation)
-		T = self.TClass.CombineRotationTranslation(RotationMatrix, Translation)
+		T = UtilTransforms.RTL2T(RotationMatrix, Translation)
 		pdb.set_trace()
-		T = self.TClass.AddTranslation(self.objCentroid, T) #what is this doing?
+		T = UtilTransforms.AddTranslation(self.objCentroid, T) #what is this doing?
 		self.globalTransformation(T)
 
 	def addObjectAxes(self): # Add local axes to object (will not move with object!)
@@ -330,7 +329,6 @@ class GenVis(object): # General class for objects in visualization
 			vertices.extend(v)
 		self.writeSTL(save_filename, faces, vertices)
 
-
 class ObjectVis(GenVis): # intended for use with more complex shapes and with additional feature information -- for previous study
 	def __init__(self, V):
 		super(ObjectVis, self).__init__(V)
@@ -353,7 +351,7 @@ class ObjectVis(GenVis): # intended for use with more complex shapes and with ad
 		self.objFN = self.stl_path + self.objectGraspDict[self.obj_num][1]
 		self.obj = self.env.ReadKinBodyXMLFile(self.objFN, {'scalegeometry':'0.001 0.001 0.001'})
 		self.env.Add(self.obj, True)
-		self.TClass = Transforms(self.obj)
+		self.TClass = UtilTransforms
 	
 	def moveCentroid_to_Origin(self): # gets centroid from list and moves object to that location
 		self.objCentroid = np.array(self.objectCentroidDict[self.obj_num]) / 1000  # some weird scaling factor
@@ -372,6 +370,10 @@ class ObjectVis(GenVis): # intended for use with more complex shapes and with ad
 		centroid_transform = poseTransformPoints(pose, -1*self.objCentroid.reshape(1,3)) #effectively a local translation by centroid!
 		pose_new = np.hstack((pose[:4], centroid_transform.reshape(3,)))
 		return pose_new
+
+	def GetCurrentCentroid(self):
+		pose = poseFromMatrix(self.obj.GetTransform())
+		return self.vis.drawPoints(poseTransformPoints(pose, self.objCentroid.reshape(1,3))[-3:])
 
 class ObjectGenericVis(ObjectVis):  # this object is for basic shapes -- near contact study
 	def __init__(self, V):
@@ -454,13 +456,12 @@ class HandVis(GenVis):
 		self.env.Add(self.obj, True)
 		self.changeColor(color = self.colors['grey'])
 		self.obj.SetVisible(1)
-		self.TClass = Transforms(self.obj)
 
 	def setJointAngles(self, JA): # set hand joint angles
 		#adjust fingertip values so we get behavior more similar to the actual hand
-		# JA[4] += -0.7853981
-		# JA[7] += -0.7853981
-		# JA[9] += -0.7853981
+		JA[4] += -0.7853981
+		JA[7] += -0.7853981
+		JA[9] += -0.7853981
 		self.obj.SetDOFValues(JA)
 		''' Index in Joint Angle array: joint that it affects  |   value limit
 		0: unknown
@@ -541,31 +542,6 @@ class HandVis(GenVis):
 		contact_points, contact_links = retract_finger.retract_fingers(self.env, self.obj, Obj.obj)
 		return contact_points, contact_links
 
-	# def addNoiseToGrasp(self, Obj, T_zero = None, Contact_JA = None, TL_n = 0.01, R_n = 0.1, JA_n = 0.1): # adds white noise to position, rotation, and location of grasp
-	# 	# searches for grasp that has all three fingers in contact with object, otherwise grasp can be odd
-	# 	in_contact = [False, False]
-	# 	if Contact_JA is None:
-	# 		Contact_JA = self.obj.GetDOFValues()
-	# 	if T_zero is None:
-	# 		T_zero = self.obj.GetTransform()
-	# 	while not all(in_contact):
-	# 		self.setJointAngles(Contact_JA)
-	# 		# some type of noise operation.  probably more noise in orientation, ane less in position
-	# 		noise_T = np.eye(4)
-	# 		noise_T[:3,:3] = np.random.normal(loc = 0, scale = R_n, size = (3,3))
-	# 		noise_T[:3,3] = np.random.normal(loc = 0, scale = TL_n, size = (3))
-	# 		T_noise = T_zero + noise_T
-	# 		noise_JA = np.random.normal(loc = 0, scale = JA_n, size = Contact_JA.shape)
-	# 		JA_noise = Contact_JA + noise_JA
-	# 		# move fingers into noise position and adjust fingers for valid grasp
-	# 		self.setJointAngles(JA_noise)
-	# 		self.obj.SetTransform(T_noise)
-	# 		contact_points2, contact_links2 = self.retractFingers(Obj)
-	# 		# check to make sure all fingers are in contact. not perfect, but makes certain a good grasp
-	# 		in_contact = [any([True if link in x else False for x in contact_links2]) for link in ['finger_1', 'finger_2', 'finger_3']]
-	# 		# in_contact = [any([True if link in x else False for x in contact_links2]) for link in contact_links1]
-	# 	return T_noise, JA_noise
-
 	def addNoiseToGrasp(self, noise, percent=False):
 		# add noise to the joint angles of the grasp
 		# get random length array
@@ -611,7 +587,6 @@ class HandVis(GenVis):
 				# something in contact
 				# check for medial and distal for each finger
 				# set parts that are in contact to True
-				# pdb.set_trace()
 				for k,v in contacts.iteritems():
 					for l,d in (('dist',contact_distal_flag), ('med',contact_medial_flag)):
 						if l in k:
@@ -664,7 +639,7 @@ class HandVis(GenVis):
 		T[:3, 3] += vec
 		return T
 
-	def moveToMakeValidGrasp(self):
+	def moveToMakeValidGrasp(self, body=None):
 		# from the current configuration
 		# 1) move the palm out of contact with the object by moving along palm normal
 		# 2) move the fingers out of contact by opening medial and distal links
@@ -677,17 +652,17 @@ class HandVis(GenVis):
 		current_JA = copy.deepcopy(start_JA)
 		palm_normal_dir = self.getPalmOffset()
 		# palm in contact
-		contacts = self.getContact(verbose=False)
+		contacts = self.getContact(verbose=False, body=body)
 		palm_contact = any(['palm' in k for k in contacts.keys()])
 		while palm_contact: #may want to add distal links to this set? or create a seperate section for distal
 			# move in normal direction by step_d
 			handT_new = self.moveInPalmNormalDirection(palm_normal_dir * step_d)
 			self.globalTransformation(handT_new)
-			contacts = self.getContact(verbose=False)
+			contacts = self.getContact(verbose=False, body=body)
 			palm_contact = any(['palm' in k for k in contacts.keys()])
 				
 		# open fingers until medial not in contact		
-		contacts = self.getContact(verbose=False)
+		contacts = self.getContact(verbose=False, body=body)
 		medial_contact = any(['med' in k for k in contacts.keys()])
 		while medial_contact:
 			JA_add = np.zeros(10)
@@ -713,11 +688,11 @@ class HandVis(GenVis):
 			self.setJointAngles(self.limitJAToLimits(current_JA))
 
 			# check contact status
-			contacts = self.getContact(verbose=False)
+			contacts = self.getContact(verbose=False, body=body)
 			medial_contact = any(['med' in k for k in contacts.keys()])
 
 		# open fingers until distal not in contact		
-		contacts = self.getContact(verbose=False)
+		contacts = self.getContact(verbose=False, body=body)
 		distal_contact = any(['dist' in k for k in contacts.keys()])
 		while distal_contact:
 			JA_add = np.zeros(10)
@@ -836,7 +811,6 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		self.obj = self.vis.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
-		self.TClass = Transforms(self.obj)
 		self.globalTransformation(self.base_offset)
 
 	def getJointAngles(self):
@@ -866,7 +840,10 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		16: Finger3-Base			|	0 < l < 2.44
 		17: Finger3-Tip				|	0 < l < 0.837
 		'''
-		# self.obj.SetDOFValues(joinAngles)
+		# adjusting the joint angles due to an issue with the model mapping
+		jointAngles[11] += -0.7853981
+		jointAngles[14] += -0.7853981
+		jointAngles[16] += -0.7853981
 		self.obj.SetActiveDOFValues(jointAngles)
 
 	def testJointIndicies(self):
@@ -884,6 +861,12 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 			JA[i] = 0
 		self.setJointAngles(JA_start)
 
+	def markZeroForAllLinks(self):
+		# plots a point at the "zero" for each link
+		all_transforms = self.obj.GetLinkTransformations()
+		for link in self.obj.GetLinks():
+			link_pt = link.GetTransform()[:3,3]
+			self.vis.drawPoints(link_pt)
 
 	def convertRobot2OpenRAVE(self, JA_robot):
 		# converts the angles output by the robot to the right length for OpenRAVE
@@ -892,6 +875,10 @@ class ArmVis(GenVis): # general class for importing arm into an openrave scene
 		# for the hand, robot outputs all the proximal links, spread, all distal links
 		JA_openrave = np.concatenate((JA_robot[0:7], [0,0], JA_robot[[10, 7, 11, 10, 8, 12, 9, 13]]), 0)
 		return JA_openrave
+
+	def getEETransform(self):
+		# get transformation of hand (so that I can align just a hand with it)
+		return self.obj.GetLinks()[9].GetTransform()
 
 	#can all STL functions go into GenVis?
 	def getSTLFeatures(self):
@@ -945,6 +932,10 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 		super(ArmVis, self).__init__(V)
 		self.stl_path = base_path + "/models/robots/"
 		self.other_robots = []
+		self.base_offset = np.array([[-0.066,  0.998,  0.   , -0.124],
+									[-0.998, -0.066, -0.   ,  0.233],
+									[-0.   , -0.   ,  1.   ,  0.009],
+									[ 0.   ,  0.   ,  0.   ,  1.   ]])
 
 
 	def loadArm(self): # load arm from file
@@ -953,7 +944,7 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 		self.obj = self.vis.env.ReadRobotXMLFile(self.robotFN)
 		self.env.Add(self.obj, True)
 		self.obj.SetVisible(1)
-		self.TClass = Transforms(self.obj)
+		self.obj.SetTransform(self.base_offset)
 
 	def loadIK(self):
 		#loads the ik plugin
@@ -972,6 +963,7 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 	def IKSolutions(self):
 		#computes all the solutions for the current configuration
 		solutions = self.ikmodel.manip.FindIKSolutions(self.ikmodel.manip.GetTransform(),True)
+		# openravepy.IkFilterOptions.IgnoreJointLimits +  openravepy.IkFilterOptions.CheckEnvCollisions
 		return solutions
 
 	def dispIKSolutions(self, sols):
@@ -993,6 +985,33 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 		for robot in self.other_robots:
 			pdb.set_trace()
 
+	def setJointAngles(self, jointAngles):
+		if len(jointAngles) == 7:
+			# only arm joints given
+			hand_JA = self.obj.GetDOFValues()[7:]
+			JA = np.append(jointAngles, hand_JA)
+		elif len(jointAngles) == 11:
+			# arm an hand joints given
+			JA = jointAngles
+		else:
+			print('Input array should be 1x7 or 1x11')
+			return
+		'''
+		Index in Joint Angle array: joint that it affects  |   value limit
+		0 : J1						|-2.60 < l < 2.6
+		1 : J2						|-1.98 < l < 1.97
+		2 : J3						|-2.70 < l < 2.74
+		3 : J4						|-0.85 < l < 3.14
+		4 : J5						|-4.75 < l < 1.30
+		5 : J6						|-1.57 < l < 1.57
+		6 : J7						|-3.00 < l < 3.00
+		7 : ?						| 0.00 < l < 2.44
+		8 : ?						| 0.00 < l < 2.44
+		9 : ?						| 0.00 < l < 2.44
+		10: ?						|-0.01 < l < 3.15
+		'''
+		self.obj.SetActiveDOFValues(JA)
+
 
 '''
 from NearContactStudy import Vis, ArmVis_OR
@@ -1004,36 +1023,7 @@ sols = A.IKSolutions()
 A.dispIKSolutions(sols[:10])
 '''
 
-class Transforms(object): #class for holding all transform operations -- this may be useless!
-	def __init__(self, link):
-		self.i = 1
-		self.link = link
 
-	# Description: Translation to Transformation
-	def TL2T(self, Tl):
-		Tl = np.array(Tl)
-		T_pose = np.hstack((np.array([1,0,0,0]), Tl)) # zero rotation quaternion
-		T_new = matrixFromPose(T_pose)
-		return T_new
-
-	def R2T(self, R):
-		T = np.eye(4)
-		T[:3,:3] = R
-		return T
-
-	def AddTranslation(self,Tl, T):
-		if len(Tl) == 3:
-			T[:3,3] += Tl[:]
-		else: # if it is a transformation matrix
-			T[:3,3] += Tl[:3,3]
-		return T
-
-
-	def CombineRotationTranslation(self, R, Tl):
-		T = np.eye(4)
-		T = self.R2T(R)
-		T = self.AddTranslation(Tl, T)
-		return T
 		
 if __name__ == '__main__': #For testing classes (put code below and run in terminal)
 	V = Vis()

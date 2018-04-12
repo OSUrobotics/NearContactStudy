@@ -22,6 +22,7 @@ from NearContactStudy.InterpolateGrasps.Visualizers import Vis, GenVis, ObjectVi
 from NearContactStudy.InterpolateGrasps.Colors import ColorsDict, bcolors
 from NearContactStudy.InterpolateGrasps.stlwriter import ASCII_STL_Writer, Binary_STL_Writer
 from NearContactStudy.InterpolateGrasps.obj_dict import grasp_obj_dict, obj_centroid_dict
+from NearContactStudy.InterpolateGrasps.Utils import UtilTransforms
 
 ##### Extracting Data from Saurabh's Study #####
 from NearContactStudy.InterpolateGrasps.ParseGraspData import ParseGraspData

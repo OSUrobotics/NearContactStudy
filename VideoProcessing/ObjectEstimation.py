@@ -79,7 +79,7 @@ class BagReader(object):
 			except:
 				print "Could not reindex and open "
 				raise IOError
-		print("Bag File Loaded")
+		print("Bag File Loaded: %s" %self.fn)
 		return b
 
 	def bagFileNameCheck(self, fn): # check file name
@@ -94,7 +94,6 @@ class BagReader(object):
 			return topic, msg, t
 		except:
 			print("There was an error")
-			pdb.set_trace()
 
 	def readBag(self, showPose = False): #cycles through all time steps, running other functions as necessary
 		for topic, msg, t in self.bag_gen:
