@@ -202,6 +202,20 @@ class WineGlassInterpData(object):
 		JA = np.array([self.data.joint_angles[i][FIELDNAMES[0]], self.data.joint_angles[i][FIELDNAMES[1]]]).flatten()
 		return JA
 
+class InterpData(object):
+	# something that reads in a .npz file that has two endpoints of an interpolation and the location of the center point
+	# meant to be a more concise recording of a grasp
+
+	def load(self, fn):
+		data = np.load(fn)
+		return data['grasp1_Arm_JA'], data['grasp1_Hand_JA'], data['grasp2_Arm_JA'], data['grasp2_Hand_JA'], data['center_pt']
+
+	def save(sefl, fn, grasp1_JA, grasp2_JA, center_pt):
+		# saves variables to file
+		np.savez(fn, grasp1_JA=grasp1_JA,
+					grasp2_JA=grasp2_JA,
+					center_pt=center_pt)
+
 class InterpHandPositions(object):
 	def __init__(self, W):
 		self.V = Vis()
@@ -213,6 +227,7 @@ class InterpHandPositions(object):
 		self.G = AddGroundPlane(self.V)
 		self.G.createGroundPlane(y_height=0.5, x=0.65, y=0.51, z=0, x_pos=0, z_pos=0.04)
 		self.H = None
+		self.A_OR = None
 
 	def showGrasp(self, i):
 		# loads a grasp from the file and displays in OpenRave
@@ -251,7 +266,6 @@ class InterpHandPositions(object):
 		self.O.globalTransformation(self.O.GetCentroidTransform())
 
 	def alignToManualTransform(self, T):
-		# name is the name of the grasp
 		# maybe think of a better way to store data?
 		# write object transform to bag file?
 		self.O.globalTransformation(T)
@@ -275,6 +289,15 @@ class InterpHandPositions(object):
 		# use the find valid grasp
 		# use IK to find solution for valid grasp
 		# record final joint angles
+
+	def saveInterpData(self, fn, grasp1, grasp2, center_pt):
+		I = InterpData()
+		I.save(fn, self.W.getArmArray(grasp1), self.W.getArmArray(grasp2), center_pt)
+
+	def loadInterpData(self, fn):
+		I = InterpData()
+		I.load(fn)
+
 
 	def recordObjectPosition(self):
 		# record object position
@@ -331,8 +354,8 @@ class InterpHandPositions(object):
 
 	def interpolateBetweenGrasps(self, H1_global, H2_global, center_pt_T, prcnt):
 		# # transform pose into center point reference frame
-		H1_local = np.matmul(np.linalg.inv(center_pt_T), H1_global)
-		H2_local = np.matmul(np.linalg.inv(center_pt_T), H2_global)
+		H1_local = self.inFrameA(center_pt_T, H1_global)
+		H2_local = self.inFrameA(center_pt_T, H2_global)
 		center_pt_local = np.eye(4)
 
 		# # build circle
@@ -360,25 +383,24 @@ class InterpHandPositions(object):
 		return T_world
 
 	def loadORArm(self):
-		self.A_OR = ArmVis_OR(self.V)
-		self.A_OR.loadArm()
-		self.A_OR.loadIK()
+		if self.A_OR is None:
+			self.A_OR = ArmVis_OR(self.V)
+			self.A_OR.loadArm()
+			self.A_OR.loadIK()
 
 	def showSolutions(self, goalT, bitmask=0):
 		# bitmask defines which settings to use
 		# each bit (1,2,4,8...) will turn a setting on and off
-		sols = self.A_OR.ikmodel.manip.FindIKSolutions(goalT, bitmask)
-		pdb.set_trace()
+		sols = self.A_OR.getIK(goalT,bitmask)
 		for sol in sols:
 			self.A_OR.setJointAngles(sol)
-			time.sleep(0.1)
-
+			time.sleep(0.01)
 
 	def showAllSolutions(self, goalT):
 		for i in range(32):
 			self.showSolutions(goalT, bitmask = i)
 
-	def interpolateHandPositions(self, grasp1, grasp2, prcnt = 0.5):
+	def interpolateHandPositions(self, grasp1, grasp2, prcnt = 0.5, show=False):
 		# interpolate current hand location
 		# grasp 1 is 0 interpolation
 		# grasp 2 is 1 interpolation
@@ -395,23 +417,52 @@ class InterpHandPositions(object):
 		self.H.obj.SetTransform(T_world)
 		self.H.changeColor([0,1,1])
 
-		# # extract palm position (or whatever IK needs)
+		JA_hand = self.H1.linearInterp(self.H1.getJointAngles(), self.H2.getJointAngles(), prcnt)
+		# this returns as though you can control all of the joint angles
+		# just take spread and proximal
+		# have to remap because of the two models having different degrees of freedom!
+		# 4th position is spread
+		JA_hand_robot = np.array([JA_hand[6],JA_hand[3],JA_hand[8], 0.5*(JA_hand[2]+JA_hand[5])])
+
+		# joint angles may not be doable by the robot
+		return T_world, JA_hand_robot
+
+	def generateTraj(self, T_goal, JA_Hand_goal):
 		self.loadORArm()
-		# array([[-1.   , -0.003,  0.003,  0.004],
-  #      [ 0.003, -1.   , -0.   , -0.009],
-  #      [ 0.003, -0.   ,  1.   , -0.156],
-  #      [ 0.   ,  0.   ,  0.   ,  1.   ]])
-		# need to fix some parameter here to find solutions
-		self.IK()
-		pdb.set_trace()
-		i = 1
+		# first get the arm to all zero joint angles
+		start_JA = np.zeros(11)
+		reset_traj = None
+		if np.linalg.norm(self.A_OR.getJointAngles()) > 0.1:
+			arm_reset_traj = self.A_OR.thetaTrajectory(start_JA[0:7], self.A_OR.getJointAngles()[0:7])
+			hand_reset_traj = self.A_OR.thetaTrajectory(start_JA[7:], self.A_OR.getJointAngles()[7:])
+			reset_traj = self.A_OR.sequentialCombineArmandHandTraj(arm_reset_traj, hand_reset_traj)
 
-	def IK(self):
-  		pdb.set_trace()
-  		RotX = UtilTransforms.RotX(np.pi/2)
-  		T_updated = np.matmul(self.H.getGlobalTransformation(), np.matmul(self.A_OR.obj.GetManipulators()[0].GetLocalToolTransform(), RotX))
 
-		self.showSolutions(T_updated)
+		JA_arm = self.A_OR.IK(self.H.getGlobalTransformation())
+
+		# do all the arm movements
+		arm_traj = self.A_OR.thetaTrajectory(JA_arm)
+
+		# do all hand movements
+		JA_hand_clamped = self.A_OR.limitHandJAToLimits(JA_Hand_goal)
+		hand_traj = self.A_OR.thetaTrajectory(JA_hand_clamped, step_size=0.1)
+
+		# combine them
+		forward_traj = self.A_OR.sequentialCombineArmandHandTraj(arm_traj, hand_traj)
+
+		if reset_traj is not None:
+			traj = np.vstack((reset_traj, forward_traj))
+		else:
+			traj = forward_traj
+
+		return traj
+
+	def showTraj(self, traj):
+		self.A_OR.viewThetaTrajectory(traj)
+
+	def saveTraj(self, fn, traj):
+		# saves trajectory as np array
+		np.savez(fn, traj=traj) 
 
 	# # solve for IK positions
 	def moveArmEEToPosition(self,pose):

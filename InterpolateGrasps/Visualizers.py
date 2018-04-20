@@ -1012,6 +1012,91 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 		'''
 		self.obj.SetActiveDOFValues(JA)
 
+	def limitArmJAToLimits(self, JA):
+		(lower, upper) = self.obj.GetDOFLimits()
+		JA_clamp = np.clip(JA, lower[0:7], upper[0:7])
+		return JA_clamp
+
+	def limitHandJAToLimits(self, JA):
+		(lower, upper) = self.obj.GetDOFLimits()
+		JA_clamp = np.clip(JA, lower[7:], upper[7:])
+		return JA_clamp
+
+	def IK(self, goalT):
+		# RotX = UtilTransforms.RotX(np.pi/2)
+		# RotY = UtilTransforms.RotY(np.pi/2)
+		RotZ = UtilTransforms.RotZ(-np.pi/2) # cosys misalignment
+		T_updated = np.matmul(goalT, np.matmul(self.obj.GetManipulators()[0].GetLocalToolTransform(), RotZ))
+		JA, _ = self.IKwithMinJA(T_updated)
+		return JA
+
+	def getIK(self, goalT, bitmask=0):
+		# returns all IK solutions
+		# need to figure out some parameter here to understand how to get certain solutions
+		return self.ikmodel.manip.FindIKSolutions(goalT, bitmask)
+
+	def IKwithMinJA(self, goalT):
+		# returns the IK solution that is closest to the 0 configuration
+		sols = self.getIK(goalT)
+		dist_from_zeros = np.linalg.norm(sols, axis = 1)
+		idx = np.argmin(dist_from_zeros)
+		return sols[idx], dist_from_zeros[idx]
+
+	def thetaTrajectory(self, goalJA, startJA=None, step_size=0.01):
+		# trajectory on the robot for using with ros (based on WamPy)
+		if startJA == None:
+			startJA = np.zeros(len(goalJA))
+		DOFs = len(startJA)
+		max_dist = np.max(np.abs(goalJA-startJA))
+		steps = np.ceil(max_dist/step_size)
+		traj = np.array([np.linspace(startJA[i], goalJA[i], steps) for i in range(DOFs)]).T
+		if len(traj) == 0:
+			traj = np.zeros((1,len(goalJA)))
+		else:
+			traj_vel = np.gradient(traj, axis=1)
+			traj_acc = np.gradient(traj_vel, axis=1)
+		return traj
+
+	def sequentialCombineArmandHandTraj(self, armTraj, handTraj):
+		# first all the arm movement
+		# then all the hand movement
+		comb_traj = []
+		for a_t in armTraj:
+			comb_traj.append(np.hstack((a_t, handTraj[0])))
+		for h_t in handTraj:
+			comb_traj.append(np.hstack((armTraj[-1], h_t)))
+		comb_traj = np.array(comb_traj)
+		return comb_traj
+
+	def viewThetaTrajectory(self, traj, dt=0.01):
+		for step in traj:
+			self.setJointAngles(step)
+			time.sleep(dt)
+
+	def generateOperationalSpaceStraightLineTrajectory(self, goalT, startT=poseFromMatrix(np.eye(4))):
+		pdb.set_trace()
+		self.traj = RaveCreateTrajectory(self.env,'')
+		spec = IkParameterization.GetConfigurationSpecificationFromType(IkParameterizationType.Transform6D,'linear')
+		self.traj.Init(spec)
+		self.traj.Insert(self.traj.GetNumWaypoints(), startT)
+		self.traj.Insert(self.traj.GetNumWaypoints(), goalT)
+
+		# set trajectory limits
+		planningutils.RetimeAffineTrajectory(self.traj,maxvelocities=np.ones(7),maxaccelerations=5*np.ones(7))
+
+		# creating planner
+		planner = RaveCreatePlanner(self.env,'workspacetrajectorytracker')
+		params = Planner.PlannerParameters()
+		params.SetRobotActiveJoints(self.obj)
+		params.SetExtraParameters('<workspacetrajectory>%s</workspacetrajectory>'%self.traj.serialize(0))
+		planner.InitPlan(self.obj,params)
+		
+		outputtraj = RaveCreateTrajectory(self.env,'')
+
+		# execute trajectory
+		self.obj.GetController().SetPath(outputtraj)
+		# wait for trajectory to finish
+		self.obj.WaitForController(0)
 
 '''
 from NearContactStudy import Vis, ArmVis_OR
