@@ -1,5 +1,6 @@
 from WineGlassInterpData import WineGlassInterpData, readRosBag, InterpHandPositions, readTextCapturedGrasps, object_transforms, readRosBags
 from openravepy import *
+from Utils import UtilTransforms
 import numpy as np
 import matplotlib.pyplot as plt
 import pdb
@@ -16,8 +17,16 @@ I.saveInterpData('Trial3/InterpData1', 0, 2, object_transforms['grasp2'])
 # I.interpolateHandPositions(0,1)
 goalT, goal_hand_JA = I.interpolateHandPositions(0,2)
 # pdb.set_trace()
-traj = I.generateTraj(goalT, goal_hand_JA)
-I.saveTraj('Trial3/interpTrajectory', traj)
+U = UtilTransforms()
+I.loadORArm()
+I.A_OR.setJointAngles(np.array([-0.73, -1.06,  1.51, -0.87,  0.  , -0.  ,  0.  , -0.  , -0.  ,0.  ,  0.  ]))
+traj = I.generateTraj(goalT, goal_hand_JA, I.A_OR.getJointAngles())
+traj_lift = I.generateTraj(np.matmul(U.TL2T([0,0,0.2]), goalT), goal_hand_JA, traj[-1], reset=False)
+traj_putdown = I.generateTraj(goalT, goal_hand_JA, traj_lift[-1], reset=False)
+return_traj = traj[::-1]
+traj_full = I.A_OR.sequentialCombineTrajectories((traj, traj_lift, traj_putdown, return_traj))
+I.showTraj(traj_full)
+I.saveTraj('Trial3/interpTrajectory', traj_full)
 # I.showTraj(traj)
 # I.A_OR.generateOperationalSpaceStraightLineTrajectory(I.H.obj.GetTransformPose())
 

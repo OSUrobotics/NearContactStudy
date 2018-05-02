@@ -427,26 +427,25 @@ class InterpHandPositions(object):
 		# joint angles may not be doable by the robot
 		return T_world, JA_hand_robot
 
-	def generateTraj(self, T_goal, JA_Hand_goal):
-		self.loadORArm()
-		# first get the arm to all zero joint angles
-		start_JA = np.zeros(11)
+	def generateTraj(self, T_goal, JA_Hand_goal, start_JA=np.zeros(11), reset=True):
+
+		# first get the arm to some start configuration
 		reset_traj = None
-		if np.linalg.norm(self.A_OR.getJointAngles()) > 0.1:
+		if (np.linalg.norm(self.A_OR.getJointAngles() - start_JA) > 0.1) & reset:
 			arm_reset_traj = self.A_OR.thetaTrajectory(start_JA[0:7], self.A_OR.getJointAngles()[0:7])
 			hand_reset_traj = self.A_OR.thetaTrajectory(start_JA[7:], self.A_OR.getJointAngles()[7:])
 			reset_traj = self.A_OR.sequentialCombineArmandHandTraj(arm_reset_traj, hand_reset_traj)
+			print('Creating trajectory to start point')
 
 
-		JA_arm = self.A_OR.IK(self.H.getGlobalTransformation())
+		JA_arm = self.A_OR.IK(T_goal)
 
 		# do all the arm movements
-		arm_traj = self.A_OR.thetaTrajectory(JA_arm)
+		arm_traj = self.A_OR.thetaTrajectory(JA_arm, startJA=start_JA[0:7])
 
 		# do all hand movements
 		JA_hand_clamped = self.A_OR.limitHandJAToLimits(JA_Hand_goal)
-		hand_traj = self.A_OR.thetaTrajectory(JA_hand_clamped, step_size=0.1)
-
+		hand_traj = self.A_OR.thetaTrajectory(JA_hand_clamped, startJA=start_JA[7:], step_size=0.1)
 		# combine them
 		forward_traj = self.A_OR.sequentialCombineArmandHandTraj(arm_traj, hand_traj)
 
@@ -462,7 +461,12 @@ class InterpHandPositions(object):
 
 	def saveTraj(self, fn, traj):
 		# saves trajectory as np array
-		np.savez(fn, traj=traj) 
+		np.savez(fn, traj=traj)
+
+	def loadTraj(self, fn):
+		# loads trajectory as np array
+		data = np.loadz(fn) 
+		return data['traj']
 
 	# # solve for IK positions
 	def moveArmEEToPosition(self,pose):

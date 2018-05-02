@@ -1051,7 +1051,8 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 		steps = np.ceil(max_dist/step_size)
 		traj = np.array([np.linspace(startJA[i], goalJA[i], steps) for i in range(DOFs)]).T
 		if len(traj) == 0:
-			traj = np.zeros((1,len(goalJA)))
+			# still want to produce a list
+			traj = goalJA.reshape(1,-1)
 		else:
 			traj_vel = np.gradient(traj, axis=1)
 			traj_acc = np.gradient(traj_vel, axis=1)
@@ -1067,6 +1068,9 @@ class ArmVis_OR(ArmVis): # uses the openrave model of the arm which is more like
 			comb_traj.append(np.hstack((armTraj[-1], h_t)))
 		comb_traj = np.array(comb_traj)
 		return comb_traj
+
+	def sequentialCombineTrajectories(self, trajs):
+		return np.vstack(trajs)
 
 	def viewThetaTrajectory(self, traj, dt=0.01):
 		for step in traj:
