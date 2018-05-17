@@ -208,12 +208,15 @@ class InterpData(object):
 
 	def load(self, fn):
 		data = np.load(fn)
+		pdb.set_trace()
 		return data['grasp1_Arm_JA'], data['grasp1_Hand_JA'], data['grasp2_Arm_JA'], data['grasp2_Hand_JA'], data['center_pt']
 
-	def save(sefl, fn, grasp1_JA, grasp2_JA, center_pt):
+	def save(sefl, fn, grasp1_JA, grasp1_T, grasp2_JA, grasp2_T, center_pt):
 		# saves variables to file
 		np.savez(fn, grasp1_JA=grasp1_JA,
+					grasp1_T = grasp1_T,
 					grasp2_JA=grasp2_JA,
+					grasp2_T = grasp2_T,
 					center_pt=center_pt)
 
 class InterpHandPositions(object):
@@ -227,6 +230,9 @@ class InterpHandPositions(object):
 		self.G = AddGroundPlane(self.V)
 		self.G.createGroundPlane(y_height=0.5, x=0.65, y=0.51, z=0, x_pos=0, z_pos=0.04)
 		self.H = None
+		self.H1 = None
+		self.H2 = None
+		self.center_pt = None
 		self.A_OR = None
 
 	def showGrasp(self, i):
@@ -335,6 +341,10 @@ class InterpHandPositions(object):
 		print(self.center_pt.GetTransform().round(4))
 
 	def markPoint(self, pt):
+		if self.center_pt is not None:
+			for i in self.V.env.GetBodies():
+				if i.GetName() == 'CenterPoint':
+					self.V.env.Remove(i)
 		self.center_pt = openravepy.RaveCreateKinBody(self.V.env,'')
 		self.center_pt.SetName('CenterPoint')
 		self.center_pt.InitFromSpheres(np.array([[0,0,0,0.01]]))
@@ -406,6 +416,8 @@ class InterpHandPositions(object):
 		# grasp 2 is 1 interpolation
 		# prcnt is between 0 and 1 and defines how much interpolation
 		# # initialize hands
+		if self.H1 is not None: self.H1.remove()
+		if self.H2 is not None: self.H2.remove()
 		self.H1 = self.loadHandWithGrasp(grasp1)
 		self.H2 = self.loadHandWithGrasp(grasp2)
 		
